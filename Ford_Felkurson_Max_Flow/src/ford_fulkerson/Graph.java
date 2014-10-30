@@ -2,6 +2,9 @@ package ford_fulkerson;
 
 import java.util.ArrayList;
 
+import residual_classes.ResidualEdge;
+import residual_classes.ResidualVertex;
+
 public class Graph {
 	
 	private static final int PROJECT_READER_CAPACITY = 1;
@@ -37,15 +40,15 @@ public class Graph {
 		this.edges = new ArrayList<Edge>();
 		
 		for (Vertex v : g.getVertices()){
-			this.vertices.add(new Vertex(v));
+			this.vertices.add(new ResidualVertex(v));
 		}
 		
 		for (Edge e : g.getEdges()){
 			if (e.getResidualCapacity() > 0){
-				this.addEdge(new ResidualEdge(this.getVertex(e.getParent()), this.getVertex(e.getDestination()), e.getResidualCapacity(), false, e));
+				this.addEdge(new ResidualEdge(this.getVertex(e.getParent()), this.getVertex(e.getDestination()), false, e));
 			}
 			if (e.getFlow() > 0 ){
-				ResidualEdge res = new ResidualEdge( this.getVertex(e.getDestination()), this.getVertex(e.getParent()), e.getFlow(), true, e);
+				ResidualEdge res = new ResidualEdge( this.getVertex(e.getDestination()), this.getVertex(e.getParent()), true, e);
 				this.addEdge(res);
 				
 			}

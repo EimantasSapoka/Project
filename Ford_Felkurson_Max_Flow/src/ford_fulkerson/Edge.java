@@ -69,6 +69,10 @@ public class Edge{
 		return this.weight;
 	}
 	
+	public void setWeight(int weight){
+		this.weight = weight;
+	}
+	
 	
 	public String toString(){
 		return "Edge capacity " + this.capacity + ", flow " + this.flow 

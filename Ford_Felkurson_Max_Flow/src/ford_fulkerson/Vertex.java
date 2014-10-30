@@ -3,6 +3,9 @@ package ford_fulkerson;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import residual_classes.ResidualEdge;
+import residual_classes.ResidualVertex;
+
 public class Vertex implements Comparable<Vertex>{
 	private final static Logger log = Logger.getLogger(Algorithm.class.getName()); 
 
@@ -120,10 +123,10 @@ public class Vertex implements Comparable<Vertex>{
 	 */
 	public void relaxation(int distance, Edge e) {
 		if (distance < this.distanceFromSource){
-			log.info("performing relaxation on vertex " + this.getID());
-			log.info("\t previous distance: " + this.distanceFromSource + ", previous path: " + path);
-			log.info("\t new distance: " + distance + ", new path " + e);
 			this.distanceFromSource = distance;
+			if (this instanceof ResidualVertex){
+				((ResidualVertex) this).getOriginalVertex().setDistanceFromSource(distance);						 
+			}
 			this.path = (ResidualEdge) e;
 		}
 	}

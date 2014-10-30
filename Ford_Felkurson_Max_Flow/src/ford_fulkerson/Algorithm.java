@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import residual_classes.ResidualEdge;
+
 public class Algorithm {
 	private final static Logger log = Logger.getLogger(Algorithm.class.getName()); 
 	
@@ -145,10 +147,12 @@ public class Algorithm {
 	 */
 	public static ArrayList<ResidualEdge> dijkstra(Graph realGraph){
 		Graph residualGraph = new Graph(realGraph);
+		updateWeights(residualGraph);
 		ArrayList<Vertex> unvisitedVertices = residualGraph.getVertices(); // list of all vertices
 		Vertex current;
 		
 		residualGraph.source().setDistanceFromSource(0); // set source distance from itself to be 0
+		realGraph.source().setDistanceFromSource(0); 
 		
 		while ( unvisitedVertices.size() > 0 ){
 			
@@ -170,15 +174,41 @@ public class Algorithm {
 			
 			// mark vertex as visited and remove it from unvisited list
 			current.visit();
+
 			unvisitedVertices.remove(current);		
 		}
 		
-		System.out.println("sink distance is : " + residualGraph.sink().getDistanceFromSource());		
-		System.out.println("sink path is: " + residualGraph.sink().getPath());
 		if ( residualGraph.sink().getPath() == null ){
 			return null;
 		} else {
 			return getPathArray(residualGraph);
+		}
+		
+	}
+
+	/**
+	 * method which updates the edge weights according to the vertices distances
+	 * w'(u,v) = w(u,v) + d(u) - d(v)
+	 * @param residualGraph
+	 */
+	private static void updateWeights(Graph residualGraph) {
+		for (Edge e: residualGraph.getEdges()){
+			ResidualEdge res = (ResidualEdge) e;
+			Edge original = res.getOriginalEdge();
+			
+			int currentWeight = e.getWeight();
+			int sourceDistance;
+			int destinationDistance;
+			
+			if (res.isBackwards()){
+				sourceDistance = original.getDestination().getDistanceFromSource();
+				destinationDistance = original.getParent().getDistanceFromSource();
+			} else {
+				sourceDistance = original.getParent().getDistanceFromSource();
+				destinationDistance = original.getDestination().getDistanceFromSource();
+			}
+			
+			e.setWeight(currentWeight + sourceDistance - destinationDistance );
 		}
 		
 	}
