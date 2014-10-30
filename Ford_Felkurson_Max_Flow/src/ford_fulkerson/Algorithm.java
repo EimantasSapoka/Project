@@ -1,6 +1,7 @@
 package ford_fulkerson;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -84,7 +85,8 @@ public class Algorithm {
 	 */
 	public static ArrayList<ResidualEdge> bfs(Graph graph){
 		log.info("RUNNING ALGORITHM!! ============");
-		Graph residualGraph = new Graph(graph);
+		Graph residualGraph = new Graph(graph); // creates a residual graph.
+		
 		LinkedList<Vertex> queue = new LinkedList<Vertex>();
 		Vertex current;
 		
@@ -115,6 +117,12 @@ public class Algorithm {
 		
 	}
 
+	/**
+	 * method to traverse the graph backwards from the sink and return the path as an 
+	 * arraylist of edges from source to sink
+	 * @param graph
+	 * @return
+	 */
 	private static ArrayList<ResidualEdge> getPathArray(Graph graph) {
 		Vertex vertex = graph.sink();
 		ArrayList<ResidualEdge> path = new ArrayList<ResidualEdge>();
@@ -127,6 +135,48 @@ public class Algorithm {
 		}
 		
 		return path;
+	}
+	
+	
+	/**
+	 * method to traverse the residual graph using Dijkstra's algorithm and
+	 * find the shortest path from source to sink. 
+	 * @param realGraph
+	 */
+	public void dijkstra(Graph realGraph){
+		Graph residualGraph = new Graph(realGraph);
+		ArrayList<Vertex> unvisitedVertices = residualGraph.getVertices(); // list of all vertices
+		Vertex current;
+		
+		residualGraph.source().setDistanceFromSource(0); // set source distance from itself to be 0
+		
+		while ( unvisitedVertices.size() > 0 ){
+			
+			Collections.sort(unvisitedVertices);
+			current = unvisitedVertices.remove(0);
+			
+			/* for each edge perform relaxation on the destination vertex (if it had not been visited yet)
+			 	with the curret vertex's distance from source added to edge's weight
+			 	and provide the edge as a path reference, if the path turns out to be shorter
+			 */
+			for (Edge edge : current.getOutEdges()){
+				Vertex destination = edge.getDestination();
+				
+				if (! destination.isVisited()){
+					destination.relaxation(edge.getWeight() + current.getDistanceFromSource(), edge);
+				}
+				
+			}
+			
+			// mark vertex as visited and remove it from unvisited list
+			current.visit();
+			unvisitedVertices.remove(current);
+			System.out.println("is vertex removed? " + unvisitedVertices.contains(current));
+		
+		}
+		
+		System.out.println("sink distance is : " + residualGraph.sink().getDistanceFromSource());		
+		
 	}
 
 }
