@@ -21,7 +21,7 @@ public class Algorithm {
 		log.setLevel(Level.SEVERE);
 		
 		ArrayList<ResidualEdge> path;
-		while( (path = bfs(graph)) != null) {
+		while( (path = dijkstra(graph)) != null) {
 			log.info(path.toString());
 			int maxFlow = findPathCapacity(path);
 			updateEdges(path, maxFlow);
@@ -143,7 +143,7 @@ public class Algorithm {
 	 * find the shortest path from source to sink. 
 	 * @param realGraph
 	 */
-	public void dijkstra(Graph realGraph){
+	public static ArrayList<ResidualEdge> dijkstra(Graph realGraph){
 		Graph residualGraph = new Graph(realGraph);
 		ArrayList<Vertex> unvisitedVertices = residualGraph.getVertices(); // list of all vertices
 		Vertex current;
@@ -170,12 +170,16 @@ public class Algorithm {
 			
 			// mark vertex as visited and remove it from unvisited list
 			current.visit();
-			unvisitedVertices.remove(current);
-			System.out.println("is vertex removed? " + unvisitedVertices.contains(current));
-		
+			unvisitedVertices.remove(current);		
 		}
 		
 		System.out.println("sink distance is : " + residualGraph.sink().getDistanceFromSource());		
+		System.out.println("sink path is: " + residualGraph.sink().getPath());
+		if ( residualGraph.sink().getPath() == null ){
+			return null;
+		} else {
+			return getPathArray(residualGraph);
+		}
 		
 	}
 
