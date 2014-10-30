@@ -260,8 +260,10 @@ public class Graph {
 		readers.add(reader);
 		addVertex(reader.getVertex());
 		
-		Edge sourceReaderEdge = new Edge(source,reader.getVertex(), reader.getCapacity());
-		addEdge(sourceReaderEdge);	
+		if (reader.getCapacity() > 0){
+			Edge sourceReaderEdge = new Edge(source,reader.getVertex(), reader.getCapacity());
+			addEdge(sourceReaderEdge);	
+		}
 		
 		for (Project project : reader.getPreferences()){
 			if (!hasProject(project.getId())){
