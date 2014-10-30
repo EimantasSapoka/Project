@@ -44,7 +44,7 @@ public class TextScanner {
 	 */
 	private static void parseProjectPreferences(String projects, Reader reader) {
 		String[] projectsSplit = projects.split(" ");
-		
+		int pref = 1;
 		for (String projectID: projectsSplit){
 			if (projectID.trim().isEmpty()){
 				continue;
@@ -53,9 +53,10 @@ public class TextScanner {
 			
 			Project project = null;
 			if( (project = graph.getProject(id)) == null){
-				project = new Project(id);
+				project = new Project(id, pref++);
 			}
 			reader.addPreference(project);
+			
 			
 		}
 	}

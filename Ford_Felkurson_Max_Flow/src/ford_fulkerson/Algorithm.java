@@ -145,7 +145,7 @@ public class Algorithm {
 	 * find the shortest path from source to sink. 
 	 * @param realGraph
 	 */
-	public static ArrayList<ResidualEdge> dijkstra(Graph realGraph){	
+	public static ArrayList<ResidualEdge> dijkstra(Graph realGraph){
 		Graph residualGraph = new Graph(realGraph);
 		updateWeights(residualGraph);
 		ArrayList<Vertex> unvisitedVertices = residualGraph.getVertices(); // list of all vertices

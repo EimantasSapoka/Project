@@ -270,7 +270,7 @@ public class Graph {
 				addProject(project);
 			}
 			
-			Edge readerProjectEdge = new Edge(reader.getVertex(), project.getVertex(), READERS_TO_PROJECTS_CONSTANT);
+			Edge readerProjectEdge = new Edge(reader.getVertex(), project.getVertex(), READERS_TO_PROJECTS_CONSTANT, project.getPreference());
 			addEdge(readerProjectEdge);
 			
 		}
