@@ -1,4 +1,4 @@
-package ford_fulkerson;
+package ford_fulkerson.graph;
 
 public class Edge{
 	

@@ -5,6 +5,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import ford_fulkerson.graph.Graph;
+import ford_fulkerson.graph.Project;
+import ford_fulkerson.graph.Reader;
+
 public class TextScanner {
 	private static Graph graph;
 
@@ -44,7 +48,7 @@ public class TextScanner {
 	 */
 	private static void parseProjectPreferences(String projects, Reader reader) {
 		String[] projectsSplit = projects.split(" ");
-		int pref = 1;
+		
 		for (String projectID: projectsSplit){
 			if (projectID.trim().isEmpty()){
 				continue;
@@ -53,7 +57,7 @@ public class TextScanner {
 			
 			Project project = null;
 			if( (project = graph.getProject(id)) == null){
-				project = new Project(id, pref++);
+				project = new Project(id);
 			}
 			reader.addPreference(project);
 			

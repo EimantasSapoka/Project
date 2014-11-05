@@ -1,17 +1,18 @@
-package ford_fulkerson;
+package ford_fulkerson.graph;
 
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
-import residual_classes.ResidualEdge;
-import residual_classes.ResidualVertex;
+import ford_fulkerson.Algorithm;
+import ford_fulkerson.residual_classes.ResidualEdge;
+import ford_fulkerson.residual_classes.ResidualVertex;
 
 public class Vertex implements Comparable<Vertex>{
 	private final static Logger log = Logger.getLogger(Algorithm.class.getName()); 
 
 	private static long vertexIdCounter = 1;
-	private long ID;
-	private int parentID;
+	private long vertexID;
+	private int objectID;
 	private ArrayList<Edge> outEdges;
 	private ArrayList<Edge> inEdges;
 	private int distanceFromSource;
@@ -27,29 +28,29 @@ public class Vertex implements Comparable<Vertex>{
 
 	public Vertex(Vertex v){
 		this();
-		this.ID = v.getID();
-		this.parentID = v.getParentID();
+		this.vertexID = v.getVertexID();
+		this.objectID = v.getObjectID();
 	}
 
 	
 	public Vertex( int id){
 		this();
-		this.ID = vertexIdCounter++;
-		this.parentID = id;
+		this.vertexID = vertexIdCounter++;
+		this.objectID = id;
 	}
 	
 	public Vertex(int parentID, long vertexID){
 		this();
-		this.parentID = parentID;
-		this.ID = vertexID;
+		this.objectID = parentID;
+		this.vertexID = vertexID;
 	}
 	
-	public long getID() {
-		return ID;
+	public long getVertexID() {
+		return vertexID;
 	}
 	
-	public int getParentID(){
-		return this.parentID;
+	public int getObjectID(){
+		return this.objectID;
 	}
 	
 	public void visit(Edge e){
@@ -83,7 +84,7 @@ public class Vertex implements Comparable<Vertex>{
 	}
 	
 	public boolean equals(Vertex v ){
-		return this.ID  == v.getID();
+		return this.vertexID  == v.getVertexID();
 	}
 	
 	
@@ -105,13 +106,21 @@ public class Vertex implements Comparable<Vertex>{
 
 
 	public String toString(){
-		return this.parentID + "";
+		return this.objectID + "";
 	}
 
 
 	@Override
 	public int compareTo(Vertex o) {
-		return this.getDistanceFromSource() - o.getDistanceFromSource();
+		if (this == o) {
+			return 0;
+		} else if (this.getDistanceFromSource() > o.getDistanceFromSource()){
+			return 1;
+		} else if (this.getDistanceFromSource() < o.getDistanceFromSource()){
+			return -1;
+		} else {
+			return 0;
+		}
 	}
 
 	/**

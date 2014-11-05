@@ -1,14 +1,12 @@
-package ford_fulkerson;
+package ford_fulkerson.graph;
 
 public class Project {
 	private final int id;
 	private final Vertex vertex;
-	private final int preferenceNo;
 	
-	public Project (int id, int preference){
+	public Project (int id){
 		this.id = id;
 		this.vertex = new Vertex(id);
-		this.preferenceNo = preference;
 	}
 
 	public Vertex getVertex() {
@@ -21,10 +19,6 @@ public class Project {
 	
 	public String toString(){
 		return this.id + "";
-	}
-	
-	public int getPreference(){
-		return preferenceNo;
 	}
 	
 }

@@ -1,6 +1,6 @@
-package residual_classes;
+package ford_fulkerson.residual_classes;
 
-import ford_fulkerson.Vertex;
+import ford_fulkerson.graph.Vertex;
 
 public class ResidualVertex extends Vertex{
 	private Vertex originalVertex;

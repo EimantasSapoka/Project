@@ -3,6 +3,8 @@ package ford_fulkerson;
 import java.io.File;
 import java.io.IOException;
 
+import ford_fulkerson.graph.Graph;
+
 public class UserInterface {
 
 	public static void main(String[] args){

@@ -6,7 +6,10 @@ import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import residual_classes.ResidualEdge;
+import ford_fulkerson.graph.Edge;
+import ford_fulkerson.graph.Graph;
+import ford_fulkerson.graph.Vertex;
+import ford_fulkerson.residual_classes.ResidualEdge;
 
 public class Algorithm {
 	private final static Logger log = Logger.getLogger(Algorithm.class.getName()); 

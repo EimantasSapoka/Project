@@ -1,7 +1,7 @@
-package residual_classes;
+package ford_fulkerson.residual_classes;
 
-import ford_fulkerson.Edge;
-import ford_fulkerson.Vertex;
+import ford_fulkerson.graph.Edge;
+import ford_fulkerson.graph.Vertex;
 
 public class ResidualEdge extends Edge {
 	private boolean isBackwards;

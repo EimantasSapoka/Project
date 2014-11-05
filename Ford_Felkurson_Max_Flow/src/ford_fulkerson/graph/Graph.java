@@ -1,9 +1,9 @@
-package ford_fulkerson;
+package ford_fulkerson.graph;
 
 import java.util.ArrayList;
 
-import residual_classes.ResidualEdge;
-import residual_classes.ResidualVertex;
+import ford_fulkerson.residual_classes.ResidualEdge;
+import ford_fulkerson.residual_classes.ResidualVertex;
 
 public class Graph {
 	
@@ -65,8 +65,8 @@ public class Graph {
 	 * @param edge
 	 */
 	public void addEdge(Edge edge){
-		this.getVertex(edge.getParent().getID()).addOutEdge(edge);
-		this.getVertex(edge.getDestination().getID()).addInEdge(edge);
+		this.getVertex(edge.getParent().getVertexID()).addOutEdge(edge);
+		this.getVertex(edge.getDestination().getVertexID()).addInEdge(edge);
 		edges.add(edge);
 	}
 	
@@ -97,7 +97,7 @@ public class Graph {
 	 */
 	public Vertex getVertex(long l){
 		for (Vertex v : vertices){
-			if ( v.getID() == l ){
+			if ( v.getVertexID() == l ){
 				return v;
 			}
 		}
@@ -111,7 +111,7 @@ public class Graph {
 	 */
 	public boolean hasVertex(int id){
 		for (Vertex v: vertices){
-			if (v.getID() == id){
+			if (v.getVertexID() == id){
 				return true;
 			}
 		}
@@ -222,15 +222,19 @@ public class Graph {
 	
 	public String toString(){
 		String result = "";
+		int flow = 0;
 		for (Reader r: readers){
-			result += "Reader id " + r.getID();
+			result += "Reader id " + r.getID() + ", capacity " + r.getCapacity();
+			int count = 1;
 			for (Edge e: r.getVertex().getOutEdges()){
 				if (e.getFlow() > 0){
-					result += "\n\t" + e;
+					result += "\n"+ count++ + " \t assigned project ID " + e.getDestination().getObjectID();
+					flow++;
 				}
 			}
 			result += "\n";
 		}
+		result += "\ntotal flow: " + flow;
 		return result;
 	}
 	
@@ -265,12 +269,13 @@ public class Graph {
 			addEdge(sourceReaderEdge);	
 		}
 		
+		int preference = 1;
 		for (Project project : reader.getPreferences()){
 			if (!hasProject(project.getId())){
 				addProject(project);
 			}
 			
-			Edge readerProjectEdge = new Edge(reader.getVertex(), project.getVertex(), READERS_TO_PROJECTS_CONSTANT, project.getPreference());
+			Edge readerProjectEdge = new Edge(reader.getVertex(), project.getVertex(), READERS_TO_PROJECTS_CONSTANT, preference++);
 			addEdge(readerProjectEdge);
 			
 		}
