@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
+import ford_fulkerson.graph.Project;
+import ford_fulkerson.graph.Reader;
+
 /**
  * This class reads in the information required for the program, draws graph and
  * runs program, updates the data with and saves the results.
@@ -201,6 +204,7 @@ public class Data {
 			// results in results text file
 			MinCostMaxFlow mf = new MinCostMaxFlow(g);
 			size = mf.getMinCostMaxFlow();
+			System.out.println();
 			writeResults(g);
 		}
 	}
@@ -212,17 +216,12 @@ public class Data {
 	 *            graph on which algorithm was run
 	 */
 	private void writeResults(Graph g) {
-		try {
+		
 			Vertex[] vertices = g.getVertices();
-			if (algNum == 1) {
-				pr = new PrintWriter(outputFileName);
-				pr.println("Min cost matching");
-			} else if (algNum == 2)
-				pr.println("Generous matching");
-			else
-				pr.println("Greedy matching");
-			pr.println();
-			pr.println("Student   Project   Rank");
+			
+			System.out.println("Min cost matching\n");
+			System.out.println("Student   Project");
+			
 			for (int i = 0; i < numStudents; i++) {
 				Vertex v1 = vertices[i + 1];
 				Linked_List adjList = v1.getEdgesOut();
@@ -233,8 +232,7 @@ public class Data {
 					if (e.getFlow() == 1) {
 						int projectNum = v2.getIndex() - numStudents;
 						int rank = studentRanks[i][projectNum - 1];
-						pr.printf("%5d     %5d   %5d %n", i + 1, projectNum,
-								rank);
+						System.out.printf("%5d     %5d    %n", i + 1, projectNum);
 						profile[rank]++;
 						allocatedStudents[projectNum - 1][projectAllocs[projectNum - 1]] = i + 1;
 						projectAllocs[projectNum - 1]++;
@@ -244,43 +242,138 @@ public class Data {
 				}
 				Edge e = g.getEdge(vertices[0], v1);
 				if (e.getFlow() == 0)
-					pr.printf("%5d   unmatched%n", i + 1);
+					System.out.printf("%5d   unmatched%n", i + 1);
 			}
-			pr.println();
-			pr.println("Project   Capacity   Filled   Assignees");
+			System.out.println();
+			System.out.println("Project   Capacity   Filled   Assignees");
 			for (int j = 0; j < numProjects; j++) {
-				pr.printf("%5d     %5d     %5d       ", j + 1, projectCaps[j],
+				System.out.printf("%5d     %5d     %5d       ", j + 1, projectCaps[j],
 						projectAllocs[j]);
 				for (int k = 0; k < projectAllocs[j]; k++) {
-					pr.print(allocatedStudents[j][k] + "  ");
+					System.out.print(allocatedStudents[j][k] + "  ");
 				}
-				pr.println();
+				System.out.println();
 			}
-			pr.println();
-			pr.print("Profile: (");
+			System.out.println();
+			System.out.print("Profile: (");
 			boolean first = true;
 			for (int j = 0; j < numProjects; j++)
 				if (profile[j] > 0) {
 					if (!first) {
-						pr.print(",");
+						System.out.print(",");
 					}
-					pr.print(profile[j]);
+					System.out.print(profile[j]);
 					first = false;
 				}
-			pr.println(")");
-			pr.println("Size: " + size);
-			pr.println("Cost: " + cost);
-			pr.println();
-			pr.println();
+			System.out.println(")");
+			System.out.println("Size: " + size);
+			System.out.println("Cost: " + cost);
+			System.out.println();
+			System.out.println();
 			cost = 0;
 			for (int j = 0; j < numProjects; j++) {
 				profile[j] = 0;
 				projectAllocs[j] = 0;
 			}
-			if (algNum == 3)
-				pr.close();
-		} catch (IOException e) {
-			System.out.println("Error writing to results file");
-		}
 	}
+	
+	/*
+	 * ==================================== 	MODIFICATIONS 	=========================================== 
+	 */
+	
+	public Data(){}
+	
+	/**
+	 * constructs a mcmf graph and runs the algorithm
+	 */
+	public void drawGraphRunMinCost(ford_fulkerson.graph.Graph myGraph){
+			
+			algNum = 1;
+			
+			Graph g = new Graph(myGraph.getVertices().size()); 
+			numStudents = myGraph.getReaders().size();
+			numProjects = myGraph.getProjects().size();
+			int numVertices = myGraph.getVertices().size();
+
+			g.addVertex(null); // add source, ignore return value
+			
+			// add vertex for each reader and project
+			for (int i = 0; i < numStudents; i++)
+				g.addVertex(null);
+			for (int i = 0; i < numProjects; i++)
+				g.addVertex(null);
+			
+			g.addVertex(null); // add sink, ignore return value
+
+			// add edges
+			Vertex[] vertices = g.getVertices();
+			for (int i = 0; i < numStudents; i++) {
+				g.addEdge(1, vertices[0], vertices[i + 1], 0); // source to student
+				
+				int prefCount = 1;
+				Reader reader = myGraph.getReaders().get(i);
+				for (Project p : reader.getPreferences()){
+					
+					int pref = 1;
+					for (Project proj: myGraph.getProjects()){
+						if (p.equals(proj)){
+							break;
+						}
+						pref ++;
+					}
+					
+					
+					int rank = prefCount++;
+					long cost = 0;
+					if (algNum == 1) // mincost
+						cost = rank;
+					else if (algNum == 2) { // generous
+						// long maxCost = Math.pow((double) numStudents,
+						// (double) numProjects - 1);
+						cost = (long) (Math.pow((double) numStudents,
+								(double) (rank - 1)) - 1.0);
+						if (cost > Long.MAX_VALUE) {
+							System.out.println("Weights are too large.");
+							System.exit(0);
+						}
+					} else { // greedy
+						long maxCost = (long) Math.pow((double) numStudents,
+								(double) (maxPrefListLen - 1));
+						if (maxCost == Long.MAX_VALUE) {
+							double cost0 = Math.pow((double) numStudents,
+									(double) (maxPrefListLen - 1));
+							double cost1 = Math.pow((double) numStudents,
+									(double) (maxPrefListLen - rank));
+							cost = (long) (cost0 - cost1);
+							if (cost == Long.MAX_VALUE) {
+								System.out.println("Weights are too large.");
+								System.exit(0);
+							} else
+								System.out
+										.println("Weights are too large.  Possible loss of precision.");
+						} else {
+							long cost1 = (long) Math.pow((double) numStudents,
+									(double) (maxPrefListLen - rank));
+							cost = maxCost - cost1;
+						}
+					}
+					// System.out.println((i+1)+" "+pref+" "+rank+"  "+cost);
+					g.addEdge(1, vertices[i + 1], vertices[pref + numStudents],
+							cost); // student to project
+				}
+			}
+			for (int j = 0; j < numProjects; j++)
+				
+					g.addEdge(1, vertices[numStudents + j + 1],
+							vertices[numVertices - 1], 0); // project to sink
+			// System.out.println((j+1)+" "+projectCaps[j]);
+
+			// perform allocation algorithm on graph and save the
+			// results in results text file
+			
+			MinCostMaxFlow mf = new MinCostMaxFlow(g);
+			size = mf.getMinCostMaxFlow();
+			System.out.println(size);
+	}
+	
 }

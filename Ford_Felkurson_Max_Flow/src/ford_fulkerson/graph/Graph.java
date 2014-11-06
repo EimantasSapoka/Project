@@ -223,24 +223,53 @@ public class Graph {
 		return null;
 	}
 	
+	/**
+	 * returns projects list
+	 * @return
+	 */
+	public ArrayList<Project> getProjects(){
+		return this.projects;
+	}
+	
 	/** 
 	 * prints out the readers and their assigned projects
 	 */
 	public String toString(){
 		String result = "";
+		
+		int numberProjects = this.getProjects().size();
 		int flow = 0;
+		
+		ArrayList<Project> unselected = (ArrayList<Project>) this.getProjects().clone();
+		
 		for (Reader r: readers){
 			result += "Reader id " + r.getID() + ", capacity " + r.getCapacity();
 			int count = 1;
 			for (Edge e: r.getVertex().getOutEdges()){
 				if (e.getFlow() > 0){
+					unselected.remove(this.getProject(e.getDestination().getObjectID()));
 					result += "\n"+ count++ + " \t assigned project ID " + e.getDestination().getObjectID();
 					flow++;
+				} else {
+					result += "\n" + count++ + " \t NOT ASSIGNED project ID " + e.getDestination().getObjectID();
 				}
 			}
 			result += "\n";
 		}
-		result += "\ntotal flow: " + flow;
+
+		String unselectedProjID = "";
+		for (Project p : unselected){
+			unselectedProjID += " " + p.getId();
+		}
+		result += String.format(""
+				+ "\n number of readers: %d"
+				+ "\n number of projects: %d, not assigned: %d [%s ]"
+				+ "\n total flow: %d", 
+				this.getReaders().size(),
+				numberProjects, 
+				unselected.size(),
+				unselectedProjID,
+				flow);
 		return result;
 	}
 	
