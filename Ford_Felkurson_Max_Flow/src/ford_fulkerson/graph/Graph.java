@@ -34,6 +34,10 @@ public class Graph {
 		addVertex(sink);
 	}
 	
+	/**
+	 * creates a residual graph from the given graph
+	 * @param g
+	 */
 	public Graph(Graph g){
 		
 		this.vertices = new ArrayList<Vertex>();
@@ -66,7 +70,6 @@ public class Graph {
 	 */
 	public void addEdge(Edge edge){
 		this.getVertex(edge.getParent().getVertexID()).addOutEdge(edge);
-		this.getVertex(edge.getDestination().getVertexID()).addInEdge(edge);
 		edges.add(edge);
 	}
 	
@@ -220,6 +223,9 @@ public class Graph {
 		return null;
 	}
 	
+	/** 
+	 * prints out the readers and their assigned projects
+	 */
 	public String toString(){
 		String result = "";
 		int flow = 0;
@@ -238,6 +244,9 @@ public class Graph {
 		return result;
 	}
 	
+	/**
+	 * prints out the graph's vertices and edges
+	 */
 	public void graphDescription(){
 		System.out.println("VERTICES: ");
 		for (Vertex v : vertices){
@@ -251,6 +260,10 @@ public class Graph {
 		
 	}	
 	
+	/**
+	 * adds a project to the graph
+	 * @param project
+	 */
 	private void addProject(Project project){
 		projects.add(project);
 		addVertex(project.getVertex());
@@ -260,21 +273,30 @@ public class Graph {
 		
 	}
 	
+	/**
+	 * adds a reader to the graph. This process includes adding all the reader's 
+	 * projects into the graph (if not yet present) and creating all the necessary
+	 * vertices and edges. 
+	 * @param reader
+	 */
 	public void addReader(Reader reader){
 		readers.add(reader);
 		addVertex(reader.getVertex());
 		
+		// if reader has any capacity, create an edge from source to the reader with the capacity
 		if (reader.getCapacity() > 0){
 			Edge sourceReaderEdge = new Edge(source,reader.getVertex(), reader.getCapacity());
 			addEdge(sourceReaderEdge);	
 		}
 		
-		int preference = 1;
+		int preference = 1; // the initial preference 
 		for (Project project : reader.getPreferences()){
+			
 			if (!hasProject(project.getId())){
-				addProject(project);
+				addProject(project); // if project not in graph, add it
 			}
 			
+			// create the edge between the reader and the project.
 			Edge readerProjectEdge = new Edge(reader.getVertex(), project.getVertex(), READERS_TO_PROJECTS_CONSTANT, preference++);
 			addEdge(readerProjectEdge);
 			

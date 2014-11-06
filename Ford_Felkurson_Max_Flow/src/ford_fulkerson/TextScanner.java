@@ -9,6 +9,11 @@ import ford_fulkerson.graph.Graph;
 import ford_fulkerson.graph.Project;
 import ford_fulkerson.graph.Reader;
 
+/**
+ * a text scanner class which takes a text file input and generates a graph from it
+ * @author Eimantas
+ *
+ */
 public class TextScanner {
 	private static Graph graph;
 

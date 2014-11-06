@@ -11,6 +11,12 @@ import ford_fulkerson.graph.Graph;
 import ford_fulkerson.graph.Vertex;
 import ford_fulkerson.residual_classes.ResidualEdge;
 
+/**
+ * class which runs the min cost max flow algorithm.
+ * contains dijkstra and the bfs implementations
+ * @author Eimantas
+ *
+ */
 public class Algorithm {
 	private final static Logger log = Logger.getLogger(Algorithm.class.getName()); 
 	
@@ -27,7 +33,6 @@ public class Algorithm {
 		
 		ArrayList<ResidualEdge> path;
 		while( (path = dijkstra(graph)) != null) {
-			log.info(path.toString());
 			int maxFlow = findPathCapacity(path);
 			updateEdges(path, maxFlow);
 		}
@@ -79,48 +84,7 @@ public class Algorithm {
 	
 	
 
-	/**
-	 * does a breadth first search on the given graph and if
-	 * a path is found, returns true, if not, returns false.
-	 * when visiting the edge, sets its visited flag and updates
-	 * the vertex's path variable with the edge it reached the vertex
-	 * (so it's possible to backtrack the path)
-	 * @param graph to traverse 
-	 * @return true if found path, false if not
-	 */
-	public static ArrayList<ResidualEdge> bfs(Graph graph){
-		log.info("RUNNING ALGORITHM!! ============");
-		Graph residualGraph = new Graph(graph); // creates a residual graph.
-		
-		LinkedList<Vertex> queue = new LinkedList<Vertex>();
-		Vertex current;
-		
-		// starting with source
-		Vertex currentVertex = residualGraph.source();
-		currentVertex.visit(null);
-		queue.add(currentVertex);
-		
-		while( !queue.isEmpty() ){
-			
-			currentVertex = queue.removeFirst();
-			log.info(currentVertex.getOutEdges().toString());
-			for (Edge edge : currentVertex.getOutEdges()){
-				
-				log.info(edge + " " + (edge instanceof ResidualEdge));
-				current = edge.getDestination();
-				
-				if ( current.equals(graph.sink()) ){
-					current.visit(edge);
-					return getPathArray(residualGraph);
-				} else if (! current.isVisited() ) {
-					current.visit(edge);
-					queue.add(current);
-				}
-			}
-		}
-		return null;
-		
-	}
+	
 
 	/**
 	 * method to traverse the graph backwards from the sink and return the path as an 
@@ -213,6 +177,50 @@ public class Algorithm {
 			
 			e.setWeight(currentWeight + sourceDistance - destinationDistance );
 		}
+		
+	}
+	
+	
+	/**
+	 * does a breadth first search on the given graph and if
+	 * a path is found, returns true, if not, returns false.
+	 * when visiting the edge, sets its visited flag and updates
+	 * the vertex's path variable with the edge it reached the vertex
+	 * (so it's possible to backtrack the path)
+	 * @param graph to traverse 
+	 * @return true if found path, false if not
+	 */
+	public static ArrayList<ResidualEdge> bfs(Graph graph){
+
+		Graph residualGraph = new Graph(graph); // creates a residual graph.
+		
+		LinkedList<Vertex> queue = new LinkedList<Vertex>();
+		Vertex current;
+		
+		// starting with source
+		Vertex currentVertex = residualGraph.source();
+		currentVertex.visit(null);
+		queue.add(currentVertex);
+		
+		while( !queue.isEmpty() ){
+			
+			currentVertex = queue.removeFirst();
+			log.info(currentVertex.getOutEdges().toString());
+			for (Edge edge : currentVertex.getOutEdges()){
+				
+				log.info(edge + " " + (edge instanceof ResidualEdge));
+				current = edge.getDestination();
+				
+				if ( current.equals(graph.sink()) ){
+					current.visit(edge);
+					return getPathArray(residualGraph);
+				} else if (! current.isVisited() ) {
+					current.visit(edge);
+					queue.add(current);
+				}
+			}
+		}
+		return null;
 		
 	}
 

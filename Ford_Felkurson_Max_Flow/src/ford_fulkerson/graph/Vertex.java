@@ -14,7 +14,6 @@ public class Vertex implements Comparable<Vertex>{
 	private long vertexID;
 	private int objectID;
 	private ArrayList<Edge> outEdges;
-	private ArrayList<Edge> inEdges;
 	private int distanceFromSource;
 	
 	private boolean visited;
@@ -22,7 +21,6 @@ public class Vertex implements Comparable<Vertex>{
 	
 	private Vertex(){
 		this.outEdges = new ArrayList<Edge>();
-		this.inEdges = new ArrayList<Edge>();
 		this.distanceFromSource = Integer.MAX_VALUE;
 	}
 
@@ -71,18 +69,12 @@ public class Vertex implements Comparable<Vertex>{
 		return outEdges;
 	}
 
-	public ArrayList<Edge> getInEdges() {
-		return inEdges;
-	}
+	
 
 	public void addOutEdge(Edge edge) {
 		this.outEdges.add(edge);
 	}
-	
-	public void addInEdge(Edge edge){
-		this.inEdges.add(edge);
-	}
-	
+
 	public boolean equals(Vertex v ){
 		return this.vertexID  == v.getVertexID();
 	}
