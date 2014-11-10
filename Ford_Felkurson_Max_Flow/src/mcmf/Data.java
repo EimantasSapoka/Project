@@ -286,7 +286,7 @@ public class Data {
 	/**
 	 * constructs a mcmf graph and runs the algorithm
 	 */
-	public void drawGraphRunMinCost(ford_fulkerson.graph.Graph myGraph){
+	public int drawGraphRunMinCost(ford_fulkerson.graph.Graph myGraph){
 			int numVertices = myGraph.getVertices().size();
 			
 			Graph g = new Graph(numVertices); 
@@ -296,12 +296,41 @@ public class Data {
 				g.addVertex(null);
 			}
 			
+			Vertex[] vertex = g.getVertices();
 			// add edges
-			
+			for (ford_fulkerson.graph.Edge e : myGraph.getEdges()){
+				int parentID;
+				int destID;
+				System.out.println();
+				System.out.println(e);
+				System.out.println("numVertices: " + numVertices);
+				// retrieving parent and destination id's which are index numbers.
+				
+				if (e.getParent().equals(myGraph.source())){
+					// if the edge is source-to-vertex, then parent index is 0
+					parentID = 0;
+				} else {
+					parentID = e.getParent().getVertexID();
+				}
+				
+				
+				if (e.getDestination().equals(myGraph.sink())){
+					// if the edge is vertex-to-sink, then destination index is the last vertex
+					destID = vertex.length-1;
+				} else {
+					System.out.println(e.getDestination().getVertexID());
+					destID = e.getDestination().getVertexID() ;
+				}
+				
+				
+				System.out.println("parent : "  + parentID + " dest : " + destID);
+				g.addEdge(e.getCapacity(), vertex[parentID], vertex[destID], e.getWeight());
+				
+			}
 			
 			MinCostMaxFlow mf = new MinCostMaxFlow(g);
 			size = mf.getMinCostMaxFlow();
-			System.out.println(size);
+			return size;
 	}
 	
 }

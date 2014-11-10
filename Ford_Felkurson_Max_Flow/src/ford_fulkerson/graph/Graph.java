@@ -238,6 +238,7 @@ public class Graph {
 		String result = "";
 		
 		int numberProjects = this.getProjects().size();
+		@SuppressWarnings("unchecked")
 		ArrayList<Project> unselected = (ArrayList<Project>) this.getProjects().clone();
 		
 		for (Reader r: readers){

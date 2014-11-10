@@ -10,8 +10,8 @@ import ford_fulkerson.residual_classes.ResidualVertex;
 public class Vertex implements Comparable<Vertex>{
 	private final static Logger log = Logger.getLogger(Algorithm.class.getName()); 
 
-	private static long vertexIdCounter = 1;
-	private long vertexID;
+	private static int vertexIdCounter = 1;
+	private int vertexID;
 	private int objectID;
 	private ArrayList<Edge> outEdges;
 	private int distanceFromSource;
@@ -37,13 +37,13 @@ public class Vertex implements Comparable<Vertex>{
 		this.objectID = id;
 	}
 	
-	public Vertex(int parentID, long vertexID){
+	public Vertex(int parentID, int vertexID){
 		this();
 		this.objectID = parentID;
 		this.vertexID = vertexID;
 	}
 	
-	public long getVertexID() {
+	public int getVertexID() {
 		return vertexID;
 	}
 	
