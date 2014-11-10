@@ -5,7 +5,7 @@ import mcmf.Data;
 import org.junit.Before;
 import org.junit.Test;
 
-import test.graph_creator.RandomGraph;
+import test.graph_creator.RandomReaderAllocationGraph;
 import ford_fulkerson.Algorithm;
 import ford_fulkerson.graph.Graph;
 
@@ -16,7 +16,7 @@ public class CorrectnessTest {
 	
 	@Before
 	public void createRandomGraph(){
-		graph = new RandomGraph();
+		graph = new RandomReaderAllocationGraph();
 		data = new Data();
 		
 	}

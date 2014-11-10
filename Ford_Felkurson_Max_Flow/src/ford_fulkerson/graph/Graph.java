@@ -9,8 +9,8 @@ public class Graph {
 	
 	private static final int PROJECT_READER_CAPACITY = 1;
 	private static final int READERS_TO_PROJECTS_CONSTANT = 1;
-	private static final int SOURCE_ID = -1;
-	private static final int SINK_ID = -2;
+	protected static final int SOURCE_ID = -1;
+	protected static final int SINK_ID = -2;
 
 	
 	private Vertex source;
@@ -238,8 +238,6 @@ public class Graph {
 		String result = "";
 		
 		int numberProjects = this.getProjects().size();
-		int flow = 0;
-		
 		ArrayList<Project> unselected = (ArrayList<Project>) this.getProjects().clone();
 		
 		for (Reader r: readers){
@@ -249,7 +247,6 @@ public class Graph {
 				if (e.getFlow() > 0){
 					unselected.remove(this.getProject(e.getDestination().getObjectID()));
 					result += "\n"+ count++ + " \t assigned project ID " + e.getDestination().getObjectID();
-					flow++;
 				} else {
 					result += "\n" + count++ + " \t NOT ASSIGNED project ID " + e.getDestination().getObjectID();
 				}
@@ -264,12 +261,14 @@ public class Graph {
 		result += String.format(""
 				+ "\n number of readers: %d"
 				+ "\n number of projects: %d, not assigned: %d [%s ]"
-				+ "\n total flow: %d", 
+				+ "\n total flow: %d"
+				+ "\n total weight: %d", 
 				this.getReaders().size(),
 				numberProjects, 
 				unselected.size(),
 				unselectedProjID,
-				flow);
+				this.getFlow(),
+				this.getWeight());
 		return result;
 	}
 	
@@ -286,8 +285,71 @@ public class Graph {
 			System.out.println("\t" + e);
 			 
 		}
+		statistics();
 		
+	}
+
+	/**
+	 * prints out graph statistics, capacity in, capacity out, total flow and total weight.
+	 */
+	public void statistics() {
+		System.out.println("CAPACITY IN: " + this.getCapacityIn());
+		System.out.println("CAPACITY OUT: " + this.getCapacityOut());
+		System.out.println("TOTAL FLOW: " + this.getFlow());
+		System.out.println("TOTAL WEIGHT: " + this.getWeight());
 	}	
+	
+	/**
+	 * returns the total capacity of edges going to the sink
+	 * @return
+	 */
+	private int getCapacityOut() {
+		int cap = 0;
+		for (Edge e : this.getEdges()){
+			if (e.getDestination().equals(this.sink)){
+				cap += e.getCapacity();
+			}
+		}
+		return cap;
+	}
+	
+
+	/**
+	 * returns the total capacity of edges going from the source
+	 * @return
+	 */
+	private int getCapacityIn() {
+		int cap = 0;
+		for (Edge e : this.source.getOutEdges()){
+			cap += e.getCapacity();	
+		}
+		return cap;
+	}
+
+	/**
+	 * returns the total flow in the graph
+	 * @return
+	 */
+	public int getFlow(){
+		int flow = 0;
+		for (Edge e: this.source.getOutEdges()){
+			flow += e.getFlow();
+		}
+		return flow;
+	}
+	
+	/**
+	 * returns the graph's weight, which is each edge's flow 
+	 * multiplied by it's weight, summed up.
+	 * @return
+	 */
+	public int getWeight(){
+		int weight = 0;
+		for (Edge e : this.getEdges()){
+			weight += e.getFlow()*e.getWeight();
+		}
+		return weight;
+	}
 	
 	/**
 	 * adds a project to the graph

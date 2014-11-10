@@ -287,89 +287,17 @@ public class Data {
 	 * constructs a mcmf graph and runs the algorithm
 	 */
 	public void drawGraphRunMinCost(ford_fulkerson.graph.Graph myGraph){
-			
-			algNum = 1;
-			
-			Graph g = new Graph(myGraph.getVertices().size()); 
-			numStudents = myGraph.getReaders().size();
-			numProjects = myGraph.getProjects().size();
 			int numVertices = myGraph.getVertices().size();
-
-			g.addVertex(null); // add source, ignore return value
 			
-			// add vertex for each reader and project
-			for (int i = 0; i < numStudents; i++)
-				g.addVertex(null);
-			for (int i = 0; i < numProjects; i++)
-				g.addVertex(null);
+			Graph g = new Graph(numVertices); 
 			
-			g.addVertex(null); // add sink, ignore return value
-
-			// add edges
-			Vertex[] vertices = g.getVertices();
-			for (int i = 0; i < numStudents; i++) {
-				g.addEdge(1, vertices[0], vertices[i + 1], 0); // source to student
-				
-				int prefCount = 1;
-				Reader reader = myGraph.getReaders().get(i);
-				for (Project p : reader.getPreferences()){
-					
-					int pref = 1;
-					for (Project proj: myGraph.getProjects()){
-						if (p.equals(proj)){
-							break;
-						}
-						pref ++;
-					}
-					
-					
-					int rank = prefCount++;
-					long cost = 0;
-					if (algNum == 1) // mincost
-						cost = rank;
-					else if (algNum == 2) { // generous
-						// long maxCost = Math.pow((double) numStudents,
-						// (double) numProjects - 1);
-						cost = (long) (Math.pow((double) numStudents,
-								(double) (rank - 1)) - 1.0);
-						if (cost > Long.MAX_VALUE) {
-							System.out.println("Weights are too large.");
-							System.exit(0);
-						}
-					} else { // greedy
-						long maxCost = (long) Math.pow((double) numStudents,
-								(double) (maxPrefListLen - 1));
-						if (maxCost == Long.MAX_VALUE) {
-							double cost0 = Math.pow((double) numStudents,
-									(double) (maxPrefListLen - 1));
-							double cost1 = Math.pow((double) numStudents,
-									(double) (maxPrefListLen - rank));
-							cost = (long) (cost0 - cost1);
-							if (cost == Long.MAX_VALUE) {
-								System.out.println("Weights are too large.");
-								System.exit(0);
-							} else
-								System.out
-										.println("Weights are too large.  Possible loss of precision.");
-						} else {
-							long cost1 = (long) Math.pow((double) numStudents,
-									(double) (maxPrefListLen - rank));
-							cost = maxCost - cost1;
-						}
-					}
-					// System.out.println((i+1)+" "+pref+" "+rank+"  "+cost);
-					g.addEdge(1, vertices[i + 1], vertices[pref + numStudents],
-							cost); // student to project
-				}
+			// add vertices
+			for (int i = 0; i < numVertices; i++){
+				g.addVertex(null);
 			}
-			for (int j = 0; j < numProjects; j++)
-				
-					g.addEdge(1, vertices[numStudents + j + 1],
-							vertices[numVertices - 1], 0); // project to sink
-			// System.out.println((j+1)+" "+projectCaps[j]);
-
-			// perform allocation algorithm on graph and save the
-			// results in results text file
+			
+			// add edges
+			
 			
 			MinCostMaxFlow mf = new MinCostMaxFlow(g);
 			size = mf.getMinCostMaxFlow();

@@ -7,7 +7,12 @@ import ford_fulkerson.graph.Graph;
 import ford_fulkerson.graph.Project;
 import ford_fulkerson.graph.Reader;
 
-public class RandomGraph extends Graph{
+/**
+ * class which creates a random reader allocation graph. Used for testing.
+ * @author Eimantas
+ *
+ */
+public class RandomReaderAllocationGraph extends Graph{
 	private static final int PROJECT_ID_OFFSET = 50;
 	
 	private int readerIDcounter = 1;
@@ -16,7 +21,10 @@ public class RandomGraph extends Graph{
 	private ArrayList<Integer> projects;
 	Random rand;
 	
-	public RandomGraph(){
+	/**
+	 * creates a random reader allocation graph 
+	 */
+	public RandomReaderAllocationGraph(){
 		super();
 		rand = new Random();
 		READER_COUNT = rand.nextInt(7) * 3 + 4;
@@ -40,7 +48,6 @@ public class RandomGraph extends Graph{
 	@SuppressWarnings("unchecked")
 	public Reader generateReader(){
 		ArrayList<Integer> projectPreferenceList = (ArrayList<Integer>) projects.clone();
-		
 		
 		Reader r = new Reader(readerIDcounter++, rand.nextInt(PROJECT_COUNT/5 + 1));
 		

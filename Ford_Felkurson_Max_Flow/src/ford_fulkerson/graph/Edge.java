@@ -75,7 +75,7 @@ public class Edge{
 	
 	
 	public String toString(){
-		return "Edge capacity " + this.capacity + ", flow " + this.flow 
+		return "Edge capacity " + this.capacity + ", flow " + this.flow + ", weight " + this.weight
 				+ ", parent " + this.parent + ", destination " + this.destination;
 	}
 
