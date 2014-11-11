@@ -1,5 +1,10 @@
 package ford_fulkerson;
 
+/**
+ * exception class to denote the input provided by the user is invalid
+ * @author Eimantas
+ *
+ */
 public class InvalidInputException extends Exception{
 	
 	/**

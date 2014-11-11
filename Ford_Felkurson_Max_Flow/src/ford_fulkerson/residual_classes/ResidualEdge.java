@@ -1,19 +1,25 @@
-package ford_fulkerson;
+package ford_fulkerson.residual_classes;
+
+import ford_fulkerson.graph.Edge;
+import ford_fulkerson.graph.Vertex;
 
 public class ResidualEdge extends Edge {
 	private boolean isBackwards;
 	private Edge originalEdge;
 	
-	public ResidualEdge(Vertex parent, Vertex destination, int capacity, boolean isBackwards, Edge e){
+	public ResidualEdge(Vertex parent, Vertex destination, boolean isBackwards, Edge e){
 		if( isBackwards){
 			this.setParent(parent);
 			this.setDestination(destination);
+			this.setWeight(e.getWeight() * -1); 
+			this.setCapacity(e.getFlow());
 		} else {
 			this.setParent(parent);
 			this.setDestination(destination);
+			this.setWeight(e.getWeight());
+			this.setCapacity(e.getResidualCapacity());
 		}
 		
-		this.setCapacity(capacity);
 		this.isBackwards = isBackwards;
 		this.originalEdge = e;
 	}

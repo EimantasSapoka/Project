@@ -1,13 +1,16 @@
-package ford_fulkerson;
+package ford_fulkerson.graph;
 
 import java.util.ArrayList;
+
+import ford_fulkerson.residual_classes.ResidualEdge;
+import ford_fulkerson.residual_classes.ResidualVertex;
 
 public class Graph {
 	
 	private static final int PROJECT_READER_CAPACITY = 1;
 	private static final int READERS_TO_PROJECTS_CONSTANT = 1;
-	private static final int SOURCE_ID = -1;
-	private static final int SINK_ID = -2;
+	protected static final int SOURCE_ID = -1;
+	protected static final int SINK_ID = -2;
 
 	
 	private Vertex source;
@@ -31,21 +34,25 @@ public class Graph {
 		addVertex(sink);
 	}
 	
+	/**
+	 * creates a residual graph from the given graph
+	 * @param g
+	 */
 	public Graph(Graph g){
 		
 		this.vertices = new ArrayList<Vertex>();
 		this.edges = new ArrayList<Edge>();
 		
 		for (Vertex v : g.getVertices()){
-			this.vertices.add(new Vertex(v));
+			this.vertices.add(new ResidualVertex(v));
 		}
 		
 		for (Edge e : g.getEdges()){
 			if (e.getResidualCapacity() > 0){
-				this.addEdge(new ResidualEdge(this.getVertex(e.getParent()), this.getVertex(e.getDestination()), e.getResidualCapacity(), false, e));
+				this.addEdge(new ResidualEdge(this.getVertex(e.getParent()), this.getVertex(e.getDestination()), false, e));
 			}
 			if (e.getFlow() > 0 ){
-				ResidualEdge res = new ResidualEdge( this.getVertex(e.getDestination()), this.getVertex(e.getParent()), e.getFlow(), true, e);
+				ResidualEdge res = new ResidualEdge( this.getVertex(e.getDestination()), this.getVertex(e.getParent()), true, e);
 				this.addEdge(res);
 				
 			}
@@ -62,8 +69,7 @@ public class Graph {
 	 * @param edge
 	 */
 	public void addEdge(Edge edge){
-		this.getVertex(edge.getParent().getID()).addOutEdge(edge);
-		this.getVertex(edge.getDestination().getID()).addInEdge(edge);
+		this.getVertex(edge.getParent().getVertexID()).addOutEdge(edge);
 		edges.add(edge);
 	}
 	
@@ -94,7 +100,7 @@ public class Graph {
 	 */
 	public Vertex getVertex(long l){
 		for (Vertex v : vertices){
-			if ( v.getID() == l ){
+			if ( v.getVertexID() == l ){
 				return v;
 			}
 		}
@@ -108,7 +114,7 @@ public class Graph {
 	 */
 	public boolean hasVertex(int id){
 		for (Vertex v: vertices){
-			if (v.getID() == id){
+			if (v.getVertexID() == id){
 				return true;
 			}
 		}
@@ -217,20 +223,59 @@ public class Graph {
 		return null;
 	}
 	
+	/**
+	 * returns projects list
+	 * @return
+	 */
+	public ArrayList<Project> getProjects(){
+		return this.projects;
+	}
+	
+	/** 
+	 * prints out the readers and their assigned projects
+	 */
 	public String toString(){
 		String result = "";
+		
+		int numberProjects = this.getProjects().size();
+		@SuppressWarnings("unchecked")
+		ArrayList<Project> unselected = (ArrayList<Project>) this.getProjects().clone();
+		
 		for (Reader r: readers){
-			result += "Reader id " + r.getID();
+			result += "Reader id " + r.getID() + ", capacity " + r.getCapacity();
+			int count = 1;
 			for (Edge e: r.getVertex().getOutEdges()){
 				if (e.getFlow() > 0){
-					result += "\n\t" + e;
+					unselected.remove(this.getProject(e.getDestination().getObjectID()));
+					result += "\n"+ count++ + " \t assigned project ID " + e.getDestination().getObjectID();
+				} else {
+					result += "\n" + count++ + " \t NOT ASSIGNED project ID " + e.getDestination().getObjectID();
 				}
 			}
 			result += "\n";
 		}
+
+		String unselectedProjID = "";
+		for (Project p : unselected){
+			unselectedProjID += " " + p.getId();
+		}
+		result += String.format(""
+				+ "\n number of readers: %d"
+				+ "\n number of projects: %d, not assigned: %d [%s ]"
+				+ "\n total flow: %d"
+				+ "\n total weight: %d", 
+				this.getReaders().size(),
+				numberProjects, 
+				unselected.size(),
+				unselectedProjID,
+				this.getFlow(),
+				this.getWeight());
 		return result;
 	}
 	
+	/**
+	 * prints out the graph's vertices and edges
+	 */
 	public void graphDescription(){
 		System.out.println("VERTICES: ");
 		for (Vertex v : vertices){
@@ -241,9 +286,76 @@ public class Graph {
 			System.out.println("\t" + e);
 			 
 		}
+		statistics();
 		
+	}
+
+	/**
+	 * prints out graph statistics, capacity in, capacity out, total flow and total weight.
+	 */
+	public void statistics() {
+		System.out.println("CAPACITY IN: " + this.getCapacityIn());
+		System.out.println("CAPACITY OUT: " + this.getCapacityOut());
+		System.out.println("TOTAL FLOW: " + this.getFlow());
+		System.out.println("TOTAL WEIGHT: " + this.getWeight());
 	}	
 	
+	/**
+	 * returns the total capacity of edges going to the sink
+	 * @return
+	 */
+	private int getCapacityOut() {
+		int cap = 0;
+		for (Edge e : this.getEdges()){
+			if (e.getDestination().equals(this.sink)){
+				cap += e.getCapacity();
+			}
+		}
+		return cap;
+	}
+	
+
+	/**
+	 * returns the total capacity of edges going from the source
+	 * @return
+	 */
+	private int getCapacityIn() {
+		int cap = 0;
+		for (Edge e : this.source.getOutEdges()){
+			cap += e.getCapacity();	
+		}
+		return cap;
+	}
+
+	/**
+	 * returns the total flow in the graph
+	 * @return
+	 */
+	public int getFlow(){
+		int flow = 0;
+		for (Edge e: this.source.getOutEdges()){
+			flow += e.getFlow();
+		}
+		return flow;
+	}
+	
+	/**
+	 * returns the graph's weight, which is each edge's flow 
+	 * multiplied by it's weight, summed up.
+	 * @return
+	 */
+	public int getWeight(){
+		int weight = 0;
+		for (Edge e : this.getEdges()){
+			weight += e.getFlow()*e.getWeight();
+		}
+		return weight;
+	}
+	
+	/**
+	 * adds a project to the graph
+	 * @param project
+	 */
 	private void addProject(Project project){
 		projects.add(project);
 		addVertex(project.getVertex());
@@ -253,19 +365,31 @@ public class Graph {
 		
 	}
 	
+	/**
+	 * adds a reader to the graph. This process includes adding all the reader's 
+	 * projects into the graph (if not yet present) and creating all the necessary
+	 * vertices and edges. 
+	 * @param reader
+	 */
 	public void addReader(Reader reader){
 		readers.add(reader);
 		addVertex(reader.getVertex());
 		
-		Edge sourceReaderEdge = new Edge(source,reader.getVertex(), reader.getCapacity());
-		addEdge(sourceReaderEdge);	
+		// if reader has any capacity, create an edge from source to the reader with the capacity
+		if (reader.getCapacity() > 0){
+			Edge sourceReaderEdge = new Edge(source,reader.getVertex(), reader.getCapacity());
+			addEdge(sourceReaderEdge);	
+		}
 		
+		int preference = 1; // the initial preference 
 		for (Project project : reader.getPreferences()){
+			
 			if (!hasProject(project.getId())){
-				addProject(project);
+				addProject(project); // if project not in graph, add it
 			}
 			
-			Edge readerProjectEdge = new Edge(reader.getVertex(), project.getVertex(), READERS_TO_PROJECTS_CONSTANT);
+			// create the edge between the reader and the project.
+			Edge readerProjectEdge = new Edge(reader.getVertex(), project.getVertex(), READERS_TO_PROJECTS_CONSTANT, preference++);
 			addEdge(readerProjectEdge);
 			
 		}

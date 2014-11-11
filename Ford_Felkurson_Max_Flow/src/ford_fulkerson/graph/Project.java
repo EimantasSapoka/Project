@@ -1,4 +1,4 @@
-package ford_fulkerson;
+package ford_fulkerson.graph;
 
 public class Project {
 	private final int id;
@@ -20,6 +20,5 @@ public class Project {
 	public String toString(){
 		return this.id + "";
 	}
-	
 	
 }

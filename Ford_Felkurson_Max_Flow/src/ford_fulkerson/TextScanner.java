@@ -5,6 +5,15 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import ford_fulkerson.graph.Graph;
+import ford_fulkerson.graph.Project;
+import ford_fulkerson.graph.Reader;
+
+/**
+ * a text scanner class which takes a text file input and generates a graph from it
+ * @author Eimantas
+ *
+ */
 public class TextScanner {
 	private static Graph graph;
 
@@ -56,6 +65,7 @@ public class TextScanner {
 				project = new Project(id);
 			}
 			reader.addPreference(project);
+			
 			
 		}
 	}
