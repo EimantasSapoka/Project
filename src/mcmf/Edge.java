@@ -99,6 +99,10 @@ public class Edge
     */
    public void setWeight(long n) { weight = n; }
    
+   public String toString(){
+	   return "Edge " + this.getOrigin().getIndex() + " to " + this.getDestination().getIndex() +"; flow/cap " +
+			   				this.getFlow() + "/" + this.getCapacity() + " weight: " + this.getWeight();
+   }
 
    
    

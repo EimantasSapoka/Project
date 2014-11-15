@@ -9,8 +9,8 @@ public class Graph {
 	
 	private static final int PROJECT_READER_CAPACITY = 1;
 	private static final int READERS_TO_PROJECTS_CONSTANT = 1;
-	protected static final int SOURCE_ID = -1;
-	protected static final int SINK_ID = -2;
+	protected static final int SOURCE_ID = 0;
+	protected static final int SINK_ID = -1;
 
 	
 	private Vertex source;					// the source vertex reference

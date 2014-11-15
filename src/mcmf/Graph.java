@@ -1,5 +1,7 @@
 package mcmf;
 
+import java.util.ArrayList;
+
 /**
  * This class holds information about a graph. 
  */
@@ -300,6 +302,19 @@ public int getWeight() {
 		}
 	}
 	return totalWeight;
+}
+
+public ArrayList<Edge> getEdges(){
+	ArrayList<Edge> edges = new ArrayList<Edge>(numEdges);
+	for (int i = 0; i<matrix.length; i++){
+		for (int j = 0; j< matrix[i].length; j++){
+			if (matrix[i][j] != null){
+				Edge edge = matrix[i][j];
+				edges.add(edge);
+			}
+		}
+	}
+	return edges;
 }
 
   
