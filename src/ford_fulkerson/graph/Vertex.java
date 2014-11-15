@@ -109,7 +109,7 @@ public class Vertex implements Comparable<Vertex>{
 
 	@Override
 	public int compareTo(Vertex o) {
-		if (this == o) {
+		if (this.equals(o)) {
 			return 0;
 		} else if (this.getDistanceFromSource() > o.getDistanceFromSource()){
 			return 1;
@@ -130,9 +130,7 @@ public class Vertex implements Comparable<Vertex>{
 	public void relaxation(int distance, Edge e) {
 		if (distance < this.distanceFromSource){
 			this.distanceFromSource = distance;
-			if (this instanceof ResidualVertex){
-				((ResidualVertex) this).getOriginalVertex().setDistanceFromSource(distance);						 
-			}
+			((ResidualVertex) this).getOriginalVertex().setDistanceFromSource(distance);						 
 			this.path = (ResidualEdge) e;
 		}
 	}

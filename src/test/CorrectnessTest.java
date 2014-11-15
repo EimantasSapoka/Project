@@ -72,11 +72,11 @@ public class CorrectnessTest {
 					
 					// same edge
 					if (!(e.getCapacity() == edge.getCapacity() && e.getFlow() == edge.getFlow() && e.getWeight() == edge.getWeight())){
-						
+						if (e.getWeight() != 0){
 							System.out.println("my edge: " + edge);
 							System.out.println("mcmf edge: " + e);
 							System.out.println();
-						
+						}
 					}
 				}
 				

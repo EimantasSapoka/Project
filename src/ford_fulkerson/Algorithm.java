@@ -140,9 +140,7 @@ public class Algorithm {
 			}
 			
 			// mark vertex as visited and remove it from unvisited list
-			current.visit();
-
-			unvisitedVertices.remove(current);		
+			current.visit();	
 		}
 		
 		if ( residualGraph.sink().getPath() == null ){
