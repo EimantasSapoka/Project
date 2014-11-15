@@ -13,21 +13,21 @@ public class Graph {
 	protected static final int SINK_ID = -2;
 
 	
-	private Vertex source;
-	private Vertex sink;
+	private Vertex source;					// the source vertex reference
+	private Vertex sink;					// the sink vertex reference
 	
-	private ArrayList<Vertex> vertices;
-	private ArrayList<Edge> edges;
+	private ArrayList<Vertex> vertices;		// all the vertices in the graph
+	private ArrayList<Edge> edges;			// all the edges in the graph
 	
-	private ArrayList<Reader> readers;
-	private ArrayList<Project> projects;
+	private ArrayList<Reader> readers;		// readers list
+	private ArrayList<Project> projects;	// projects list
 	
 	public Graph(){
 		this.vertices = new ArrayList<Vertex>();
 		this.edges = new ArrayList<Edge>();
 		this.readers = new ArrayList<Reader>();
 		this.projects = new ArrayList<Project>();
-		
+		Vertex.resetVertexCounter();
 		source = new Vertex(-1, SOURCE_ID);
 		sink = new Vertex(-2, SINK_ID);
 		addVertex(source);

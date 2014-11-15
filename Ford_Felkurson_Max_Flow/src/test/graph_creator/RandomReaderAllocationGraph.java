@@ -27,8 +27,8 @@ public class RandomReaderAllocationGraph extends Graph{
 	public RandomReaderAllocationGraph(){
 		super();
 		rand = new Random();
-		READER_COUNT = rand.nextInt(7) * 3 + 4;
-		PROJECT_COUNT = (rand.nextInt(3) + 2) * READER_COUNT;
+		READER_COUNT = rand.nextInt(20) + 5;
+		PROJECT_COUNT = (rand.nextInt(3) + 1)* READER_COUNT/2 * READER_COUNT;
 		projects = new ArrayList<Integer>(PROJECT_COUNT);
 		for (int i=0; i<PROJECT_COUNT; i++){
 			projects.add(i + PROJECT_ID_OFFSET);
@@ -48,12 +48,19 @@ public class RandomReaderAllocationGraph extends Graph{
 	@SuppressWarnings("unchecked")
 	public Reader generateReader(){
 		ArrayList<Integer> projectPreferenceList = (ArrayList<Integer>) projects.clone();
+		int readerCapacity = rand.nextInt(15);
 		
-		Reader r = new Reader(readerIDcounter++, rand.nextInt(PROJECT_COUNT/5 + 1));
+		if (readerCapacity > projectPreferenceList.size()){
+			readerCapacity = projectPreferenceList.size();
+		}
+		
+		Reader r = new Reader(readerIDcounter++, readerCapacity);
 		
 		// makes a preference list twice as big as reader's capacity
 		for (int i=0; i<r.getCapacity()*2; i++){
-			
+			if (projectPreferenceList.size()  == 0){
+				break;
+			}
 			// selects a random project number from list
 			int randomProjectIndex = rand.nextInt(projectPreferenceList.size()); 
 			

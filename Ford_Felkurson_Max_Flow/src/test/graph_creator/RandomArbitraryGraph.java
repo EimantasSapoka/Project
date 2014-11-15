@@ -1,5 +1,6 @@
 package test.graph_creator;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import ford_fulkerson.graph.Edge;
@@ -13,14 +14,11 @@ import ford_fulkerson.graph.Vertex;
  */
 public class RandomArbitraryGraph extends Graph {
 	
-	private static final int SOURCE_SINK_PROBABILITY_OFFSET = 15;
 	private static final int PROBABILITY_CEILING = 100;
 	private static final int EDGE_CAPACITY = 10;
-	private static final int EDGE_WEIGHT_MAX = 9;
+	private static final int EDGE_WEIGHT_MAX = 3;
 	Random rand;
 	
-	private int sourceEdges;
-	private int sinkEdges;
 	private int pEdge;
 	private int numVertices;
 	
@@ -32,18 +30,17 @@ public class RandomArbitraryGraph extends Graph {
 		super();
 		rand = new Random();
 		
-		this.pEdge = rand.nextInt(20)+ 10; // 10 <= n < 30
+		
 		this.numVertices = rand.nextInt(50) + 50; // 50 <= n < 100
-		
-		this.sourceEdges = 0;
-		this.sinkEdges = 0;
-		
+		this.pEdge = rand.nextInt(100/numVertices)+1; // 1 <= n < 21
+
 		for (int i = 1; i < numVertices+1; i++){
 			this.addVertex(new Vertex(i));
 		}
 		
+		add_source_sink_edges();
 		generate_random_edges();
-
+		
 	}
 	
 	
@@ -67,7 +64,6 @@ public class RandomArbitraryGraph extends Graph {
 	private void generate_random_edges() {
 		for (Vertex v: this.getVertices()){
 			if (v.getObjectID() != Graph.SINK_ID && v.getObjectID() != Graph.SOURCE_ID){
-				add_source_sink_edges(v);
 				add_vertex_to_vertex_edges(v);
 			}
 		}
@@ -102,28 +98,29 @@ public class RandomArbitraryGraph extends Graph {
 	 * or the vertex and the source
 	 * @param v
 	 */
-	private void add_source_sink_edges(Vertex v) {
+	@SuppressWarnings("unchecked")
+	private void add_source_sink_edges() {
 		
-		/*
-		 * the probability of a source edge is equal to the regular edge probability with an offset to 
-		 * make it more likely. Also, number of source to vertex edges cannot be greater than half the 
-		 * number of vertices. And also, if the number of s-t-v edges is 0, automatic probability hit.
-		 */
-		if (  ((rand.nextInt(PROBABILITY_CEILING) <= (pEdge + SOURCE_SINK_PROBABILITY_OFFSET)) 
-				&& sourceEdges <= numVertices/2 ) || sourceEdges == 0) {
-			Edge sourceVertexEdge = new Edge(this.source(), v, rand.nextInt(EDGE_CAPACITY*4)+1, rand.nextInt(EDGE_WEIGHT_MAX)+1);
+		ArrayList<Vertex> vertices = (ArrayList<Vertex>) this.getVertices().clone();
+		vertices.remove(this.source());
+		vertices.remove(this.sink());
+		int randomInt; 
+		
+		// a quarter of random vertices will have the source-to-vertex edge
+		
+		for (int i = 0; i< vertices.size()/4 ; i++){
+			randomInt = rand.nextInt(vertices.size());
+			Edge sourceVertexEdge = new Edge(this.source(), vertices.remove(randomInt), rand.nextInt(EDGE_CAPACITY*4)+1, rand.nextInt(EDGE_WEIGHT_MAX)+1);
 			this.addEdge(sourceVertexEdge);
-			sourceEdges++;
-		} 
-		
-		// same as source ^
-		if (  ((rand.nextInt(PROBABILITY_CEILING) <= (pEdge + SOURCE_SINK_PROBABILITY_OFFSET)) 
-				&& sinkEdges <= numVertices/2 ) || sinkEdges == 0) {
-			Edge vertexSinkEdge = new Edge(v, this.sink(), rand.nextInt(EDGE_CAPACITY*4)+1, rand.nextInt(EDGE_WEIGHT_MAX)+1);
-			this.addEdge(vertexSinkEdge);
-			sinkEdges++;
 		}
 		
+		// and a quarter of random vertices will have a vertex-to-sink edge
+		
+		for (int i = 0; i< vertices.size()/4 ; i++){
+			randomInt = rand.nextInt(vertices.size());
+			Edge vertexSinkEdge = new Edge(vertices.remove(randomInt), this.sink(), rand.nextInt(EDGE_CAPACITY*4)+1, rand.nextInt(EDGE_WEIGHT_MAX)+1);
+			this.addEdge(vertexSinkEdge);
+		}
 	}
 	
 

@@ -139,7 +139,7 @@ public class Dijkstra
       }
       if (total < 0) {
 	 System.out.println("Weights too large.");
-         System.exit(1);
+         //System.exit(1);
       }
       return total;
    }

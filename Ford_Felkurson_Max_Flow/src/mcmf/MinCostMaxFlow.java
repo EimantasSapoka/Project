@@ -15,6 +15,7 @@ public class MinCostMaxFlow
    private Graph graph;             // graph to apply algorithm to
    private long [] distance;        // array of shortest distances to vertices
    private Vertex [] vertices;      // array of vertices in graph
+   private int flow;				// the max flow through the graph
    
    
    /**
@@ -25,6 +26,8 @@ public class MinCostMaxFlow
    { 
       graph = g; 
       vertices = graph.getVertices();
+      flow = 0;
+      
    }
    
    
