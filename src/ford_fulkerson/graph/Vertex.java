@@ -10,14 +10,15 @@ import ford_fulkerson.residual_classes.ResidualVertex;
 public class Vertex implements Comparable<Vertex>{
 	private final static Logger log = Logger.getLogger(Algorithm.class.getName()); 
 
-	private static int vertexIdCounter = 1;
-	private int vertexID;
-	private int objectID;
-	private ArrayList<Edge> outEdges;
-	private int distanceFromSource;
+	private static int vertexIdCounter = 1;			// counter to keep track of how many vertices are in the graph, as well as
+													// as used to give each vertex a unique ID
+	private int vertexID;							// this vertex ID, equal to current vertexIdCounter value
+	private int objectID;							// the object this vertex represents (project, reader, etc) ID
+	private ArrayList<Edge> outEdges;				// list of outgoing edges
+	private int distanceFromSource;					// the vertex distance from source
 	
-	private boolean visited;
-	private ResidualEdge path;
+	private boolean visited;						// is the vertex visited
+	private ResidualEdge path;						// an edge taken to come to this vertex
 	
 	private Vertex(){
 		this.outEdges = new ArrayList<Edge>();

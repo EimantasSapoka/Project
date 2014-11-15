@@ -58,7 +58,9 @@ public class RandomReaderAllocationGraph extends Graph{
 		
 		// makes a preference list twice as big as reader's capacity
 		for (int i=0; i<r.getCapacity()*2; i++){
-			
+			if (projectPreferenceList.size()  == 0){
+				break;
+			}
 			// selects a random project number from list
 			int randomProjectIndex = rand.nextInt(projectPreferenceList.size()); 
 			

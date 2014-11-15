@@ -3,11 +3,11 @@ package ford_fulkerson.graph;
 import java.util.ArrayList;
 
 public class Reader {
-	private final int id;
-	private final Vertex vertex;
-	private final int capacity;
-	private ArrayList<Integer> supervisorProjects;
-	private ArrayList<Project> preferences;
+	private final int id;								// reader id
+	private final Vertex vertex;						// it's vertex
+	private final int capacity;							// it's project preference capacity
+	private ArrayList<Integer> supervisorProjects;		// list of already assigned projects
+	private ArrayList<Project> preferences;				// list of project preferences
 	
 	public Reader(int id, int capacity){
 		this.id = id;

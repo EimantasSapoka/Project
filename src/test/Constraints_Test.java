@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import test.graph_creator.RandomArbitraryGraph;
@@ -17,30 +16,36 @@ import ford_fulkerson.graph.Reader;
 
 public class Constraints_Test {
 	
+	private static final int TEST_COUNT = 200;
 	Graph arbitraryGraph,readerGraph;
-	
-	
-	
-	@Before 
-	public void createGraph(){
-		arbitraryGraph = new RandomArbitraryGraph();
-		readerGraph = new RandomReaderAllocationGraph();
-	}
 	
 	/**
 	 * checks that the constraints hold after running the algorithm on the 
 	 * reader allocation graph
 	 */
 	@Test
-	public void checkReaderGraph(){
-		
-		Algorithm.runAlgorithm(readerGraph);
+	public void testReaderGraph(){
+		for (int i=0; i<TEST_COUNT; i++){
+			readerGraph = new RandomReaderAllocationGraph();
+			Algorithm.runAlgorithm(readerGraph);
+			checkReaderConstraints(readerGraph);
+		}
+	}
+
+	/**
+	 * loops through graph's readers list and checks constraints, 
+	 * such as if the reader has the assigned project in it's preference
+	 * list as well as more general tests like the edge flow can't exceed 
+	 * its capacity
+	 * @param graph
+	 */
+	public static void checkReaderConstraints(Graph graph) {
 		int capacity;
 		int assigned;
 		ArrayList<Integer> alreadyTaken = new ArrayList<Integer>();
 		
 		
-		for (Reader r: readerGraph.getReaders()){
+		for (Reader r: graph.getReaders()){
 			assigned = 0;
 			capacity = r.getCapacity();
 			for (Edge e : r.getVertex().getOutEdges()){
@@ -67,9 +72,11 @@ public class Constraints_Test {
 		
 	@Test
 	public void testArbitraryGraph(){
-		Algorithm.runAlgorithm(arbitraryGraph);
-		graphConstraintsTests(arbitraryGraph);
-		arbitraryGraph.statistics();
+		for (int i = 0; i< TEST_COUNT ; i++){
+			arbitraryGraph = new RandomArbitraryGraph();
+			Algorithm.runAlgorithm(arbitraryGraph);
+			graphConstraintsTests(arbitraryGraph);
+		}
 	}
 
 	

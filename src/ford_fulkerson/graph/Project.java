@@ -1,8 +1,8 @@
 package ford_fulkerson.graph;
 
 public class Project {
-	private final int id;
-	private final Vertex vertex;
+	private final int id;			// project id
+	private final Vertex vertex;	// vertex associated with the project
 	
 	public Project (int id){
 		this.id = id;

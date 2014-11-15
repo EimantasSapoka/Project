@@ -2,11 +2,11 @@ package ford_fulkerson.graph;
 
 public class Edge{
 	
-	protected int capacity;
-	protected int weight;
- 	protected int flow;
-	protected Vertex parent;
-	protected Vertex destination;
+	protected int capacity;			// edge capacity
+	protected int weight;			// edge weight
+ 	protected int flow;				// flow going through this edge
+	protected Vertex parent;		// where the edge is coming from, origin
+	protected Vertex destination;	// where the edge is going to, destination
 	
 	public Edge(){
 		this.parent = null;
@@ -75,8 +75,9 @@ public class Edge{
 	
 	
 	public String toString(){
-		return "Edge capacity " + this.capacity + ", flow " + this.flow + ", weight " + this.weight
-				+ ", parent " + this.parent + ", destination " + this.destination;
+		return "Edge " + this.parent + " to " + this.destination +
+				"; flow/cap " + this.flow + "/"+ this.capacity +" weight: " + this.weight;
+				
 	}
 
 }

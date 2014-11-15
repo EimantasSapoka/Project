@@ -34,6 +34,7 @@ public class Data {
 	public Data(String s1, String s2) {
 		inputFileName = s1;
 		outputFileName = s2;
+		
 	}
 
 	/**
@@ -203,7 +204,7 @@ public class Data {
 			// perform allocation algorithm on graph and save the
 			// results in results text file
 			MinCostMaxFlow mf = new MinCostMaxFlow(g);
-			size = mf.getMinCostMaxFlow();
+			mf.getMinCostMaxFlow();
 			System.out.println();
 			writeResults(g);
 		}
@@ -286,7 +287,7 @@ public class Data {
 	/**
 	 * constructs a mcmf graph and runs the algorithm
 	 */
-	public int drawGraphRunMinCost(ford_fulkerson.graph.Graph myGraph){
+	public Graph drawGraphRunMinCost(ford_fulkerson.graph.Graph myGraph){
 			int numVertices = myGraph.getVertices().size();
 			
 			Graph g = new Graph(numVertices); 
@@ -323,8 +324,8 @@ public class Data {
 			}
 			
 			MinCostMaxFlow mf = new MinCostMaxFlow(g);
-			size = mf.getMinCostMaxFlow();
-			return size;
+			Graph graph = mf.getMinCostMaxFlow();
+			return graph;
 	}
 	
 }

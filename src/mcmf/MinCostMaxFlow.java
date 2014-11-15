@@ -15,6 +15,8 @@ public class MinCostMaxFlow
    private Graph graph;             // graph to apply algorithm to
    private long [] distance;        // array of shortest distances to vertices
    private Vertex [] vertices;      // array of vertices in graph
+   private int flow;				// the max flow through the graph
+   private long totalWeight; 		// the total weight of the graph. for each edge: weight += edge.flow * edge.weight
    
    
    /**
@@ -25,14 +27,17 @@ public class MinCostMaxFlow
    { 
       graph = g; 
       vertices = graph.getVertices();
+      flow = 0;
+      totalWeight = 0;
+      
    }
    
    
    /**
     * returns the maximum flow of a network
-    * @return     value of maximum flow
+    * @return     the modified graph
     */
-   public int getMinCostMaxFlow()
+   public Graph getMinCostMaxFlow()
    {
       int max =0; // maximum flow value
       boolean success = false; // indicates when min cost-max flow found
@@ -141,42 +146,81 @@ public class MinCostMaxFlow
                Vertex v2 = (Vertex)rVertices[i]; 
                Vertex v1 = predecessor[i]; // parent of v2
                int edgeCap = residual.getEdge(v1,v2).getCapacity();
-               if(edgeCap<min)
+               
+               if(edgeCap<min){
                   min = edgeCap;
+               }
                i = v1.getIndex();
             }
             
             // augment flow by that many units 
             int j = sink;
+            long weight = 0 ;
             while(j>source)
             {
+               
                Vertex v2 = vertices[j]; 
                Vertex v1 = vertices[predecessor[j].getIndex()];
                Edge ed = graph.getEdge(v1,v2);
                /* the edge from v1 to v2 on the path is a forward edge in 
                 * the original graph if min units can be added to the
                 * edge from v1 to v2 without violating its capacity */
-               if((ed != null) && ((ed.getFlow()+min)<=ed.getCapacity()))
+               if((ed != null) && ((ed.getFlow()+min)<=ed.getCapacity())){
                   ed.adjustFlow(min); // forward edge
-               else
+                  weight += (ed.getWeight()) * ed.getFlow();
+                  //System.out.println("edge weight: " + ed.getWeight() + " edge flow: " + ed.getFlow() + " weight: " + weight);
+               }
+               else{
                /* else if edge from v1 to v2 on the path is not a forward
               * edge in the original graph then it must be a backward edge.
               * min must then be subtracted from the edge in the original 
               * graph from v2 to v1 */ 
                   graph.getEdge(v2,v1).adjustFlow(-min); // backward edge
+                  weight -= (graph.getEdge(v2, v1).getWeight()) * graph.getEdge(v2, v1).getFlow();
+               }
+               
+               
+               
+               
                j = v1.getIndex(); // increment
             }
+            
+           /* Vertex vert1 = predecessor[sink];
+            Vertex vert2 = (Vertex)rVertices[sink];
+            Edge sinkEdge =  graph.getEdge(vert1,vert2);
+            long weight = sinkEdge.getWeight()* sinkEdge.getFlow();
+            
+            int s = sink;
+            while(s > source)
+            {
+               Vertex v2 = (Vertex)rVertices[s]; 
+               Vertex v1 = predecessor[s]; // parent of v2
+               weight += graph.getEdge(v1,v2).getWeight() * graph.getEdge(v1,v2).getFlow();
+               s = v1.getIndex();
+            }
+            */
+            
             // augment total flow by min units
             max += min;
+            this.totalWeight += weight;
+            
             // set old residual to copy of current residual 
             oldResidual = residual.copy();  
          }
          else
             success = true; // maximum flow found
       }
-      return max;
+      graph.setFlow(max);
+      return graph;
    }
    
+   public long getTotalWeight(){
+	   return this.totalWeight;
+   }
+   
+   public int getTotalFlow(){
+	   return this.flow;
+   }
    
    /**
     * returns the current residual graph
