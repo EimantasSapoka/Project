@@ -2,25 +2,22 @@ package ford_fulkerson.graph;
 
 import java.util.ArrayList;
 
-import ford_fulkerson.residual_classes.ResidualEdge;
-import ford_fulkerson.residual_classes.ResidualVertex;
-
 public class Graph {
 	
 	private static final int PROJECT_READER_CAPACITY = 1;
 	private static final int READERS_TO_PROJECTS_CONSTANT = 1;
-	protected static final int SOURCE_ID = -1;
-	protected static final int SINK_ID = -2;
+	protected static final int SOURCE_ID = 0;
+	protected static final int SINK_ID = 1;
 
 	
-	private Vertex source;					// the source vertex reference
-	private Vertex sink;					// the sink vertex reference
+	public Vertex source;					// the source vertex reference
+	public Vertex sink;					// the sink vertex reference
 	
-	private ArrayList<Vertex> vertices;		// all the vertices in the graph
-	private ArrayList<Edge> edges;			// all the edges in the graph
+	public ArrayList<Vertex> vertices;		// all the vertices in the graph
+	public ArrayList<Edge> edges;			// all the edges in the graph
 	
-	private ArrayList<Reader> readers;		// readers list
-	private ArrayList<Project> projects;	// projects list
+	public ArrayList<Reader> readers;		// readers list
+	public ArrayList<Project> projects;	// projects list
 	
 	public Graph(){
 		this.vertices = new ArrayList<Vertex>();
@@ -28,40 +25,12 @@ public class Graph {
 		this.readers = new ArrayList<Reader>();
 		this.projects = new ArrayList<Project>();
 		Vertex.resetVertexCounter();
-		source = new Vertex(-1, SOURCE_ID);
-		sink = new Vertex(-2, SINK_ID);
+		source = new Vertex(SOURCE_ID, SOURCE_ID);
+		sink = new Vertex(SINK_ID, SINK_ID);
 		addVertex(source);
 		addVertex(sink);
 	}
 	
-	/**
-	 * creates a residual graph from the given graph
-	 * @param g
-	 */
-	public Graph(Graph g){
-		
-		this.vertices = new ArrayList<Vertex>();
-		this.edges = new ArrayList<Edge>();
-		
-		for (Vertex v : g.getVertices()){
-			this.vertices.add(new ResidualVertex(v));
-		}
-		
-		for (Edge e : g.getEdges()){
-			if (e.getResidualCapacity() > 0){
-				this.addEdge(new ResidualEdge(this.getVertex(e.getParent()), this.getVertex(e.getDestination()), false, e));
-			}
-			if (e.getFlow() > 0 ){
-				ResidualEdge res = new ResidualEdge( this.getVertex(e.getDestination()), this.getVertex(e.getParent()), true, e);
-				this.addEdge(res);
-				
-			}
-		}
-		
-		this.source = this.getVertex(SOURCE_ID);
-		this.sink = this.getVertex(SINK_ID);
-		
-	}
 	
 	/**
 	 * adds the edge to the graph and updates the edge's parent
@@ -77,8 +46,9 @@ public class Graph {
 		vertices.add(vertex);
 	}
 
+	@SuppressWarnings("unchecked")
 	public ArrayList<Vertex> getVertices() {
-		return vertices;
+		return (ArrayList<Vertex>) vertices.clone();
 	}
 
 	public ArrayList<Edge> getEdges() {
@@ -286,7 +256,6 @@ public class Graph {
 			System.out.println("\t" + e);
 			 
 		}
-		statistics();
 		
 	}
 

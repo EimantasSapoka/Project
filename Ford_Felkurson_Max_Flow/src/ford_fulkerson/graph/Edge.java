@@ -75,8 +75,9 @@ public class Edge{
 	
 	
 	public String toString(){
-		return "Edge capacity " + this.capacity + ", flow " + this.flow + ", weight " + this.weight
-				+ ", parent " + this.parent + ", destination " + this.destination;
+		return "Edge " + this.parent.getVertexID() + " to " + this.destination.getVertexID() +
+				"; flow/cap " + this.flow + "/"+ this.capacity +" weight: " + this.weight;
+				
 	}
 
 }

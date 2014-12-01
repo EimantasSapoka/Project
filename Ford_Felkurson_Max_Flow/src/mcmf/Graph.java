@@ -1,5 +1,7 @@
 package mcmf;
 
+import java.util.ArrayList;
+
 /**
  * This class holds information about a graph. 
  */
@@ -12,6 +14,7 @@ public class Graph
    Vertex [] vertices;        // array of vertices in graph 
    Edge [] [] matrix;         // 2d array of edges in graph
    int numVertices, numEdges; // number of vertices and edges
+   int flow;				  // flow of the graph
       
    /**
     * constructor - initialises instance variables
@@ -24,6 +27,7 @@ public class Graph
       vertices = new Vertex [numV];
       matrix = new Edge [numV] [numV]; 
       initialiseMatrix(numV);
+      this.flow = 0;
    }
 
    public void incNumVertices() {
@@ -277,7 +281,43 @@ public class Graph
    {
       return matrix[u.getIndex()][v.getIndex()];
    }
-   
+
+public void setFlow(int max) {
+	this.flow = max;
+	
+}
+
+public int getFlow() {
+	return this.flow;
+}
+
+public int getWeight() {
+	int totalWeight = 0;
+	for (int i = 0; i<matrix.length; i++){
+		for (int j = 0; j< matrix[i].length; j++){
+			if (matrix[i][j] != null){
+				Edge edge = matrix[i][j];
+				totalWeight += edge.getFlow() * edge.getWeight();
+			}
+		}
+	}
+	return totalWeight;
+}
+
+public ArrayList<Edge> getEdges(){
+	ArrayList<Edge> edges = new ArrayList<Edge>(numEdges);
+	for (int i = 0; i<matrix.length; i++){
+		for (int j = 0; j< matrix[i].length; j++){
+			if (matrix[i][j] != null){
+				Edge edge = matrix[i][j];
+				edges.add(edge);
+			}
+		}
+	}
+	return edges;
+}
+
+  
    
  
 }
