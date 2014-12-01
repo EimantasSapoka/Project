@@ -37,6 +37,11 @@ public class ResidualVertex extends Vertex{
 		}
 	}
 	
+	/**
+	 * used in bfs
+	 * @param e
+	 */
+	@Deprecated
 	public void visit(Edge e){
 		this.setPath((ResidualEdge) e);
 		this.visited = true;

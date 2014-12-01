@@ -23,12 +23,10 @@ public class ResidualGraph extends ford_fulkerson.graph.Graph {
 		
 		for (Edge e : g.getEdges()){
 			if (e.getResidualCapacity() > 0){
-				this.addEdge(new ResidualEdge(this.getVertex(e.getParent()), this.getVertex(e.getDestination()), false, e));
+				this.addEdge(new ResidualEdge(this.getVertex(e.getParent()), this.getVertex(e.getDestination()),e.getResidualCapacity(), false, e));
 			}
 			if (e.getFlow() > 0 ){
-				ResidualEdge res = new ResidualEdge( this.getVertex(e.getDestination()), this.getVertex(e.getParent()), true, e);
-				this.addEdge(res);
-				
+				this.addEdge(new ResidualEdge( this.getVertex(e.getDestination()), this.getVertex(e.getParent()), e.getFlow(), true, e));
 			}
 		}
 		
