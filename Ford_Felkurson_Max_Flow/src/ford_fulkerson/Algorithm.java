@@ -2,12 +2,12 @@ package ford_fulkerson;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import ford_fulkerson.graph.Edge;
 import ford_fulkerson.graph.Graph;
+import ford_fulkerson.graph.Reader;
 import ford_fulkerson.graph.Vertex;
 import ford_fulkerson.residual_classes.ResidualEdge;
 import ford_fulkerson.residual_classes.ResidualGraph;
@@ -21,24 +21,55 @@ import ford_fulkerson.residual_classes.ResidualVertex;
  */
 public class Algorithm {
 	private final static Logger log = Logger.getLogger(Algorithm.class.getName()); 
-	
+
 	/**
-	 * runs the algorithm with the given graph.
+	 * runs the algorithm with the given graph. Tries to make it load balanced.
 	 * traverses the graph with breadth first search and looks 
 	 * for a path. if one is found, starts from the sink and 
 	 * takes the path backwards looking for maximum flow
 	 * for all edges on path. Then updates the flows on the edges.
 	 * @param graph
 	 */
-	public static void runAlgorithm(Graph graph){
+	public static void runLoadBalancedAlgorithm(Graph graph){
 		log.setLevel(Level.SEVERE);
 		
-		ArrayList<ResidualEdge> path;
+		/*
+		 *  one of the rare cases where a do-while loop is appropriate
+		 *  need to solve the graph first and only then check if it is load 
+		 *  balanced and repeat if it's not.
+		 */
+		solveGraph(graph);
+		/*int iteration = 0;
 		
-		while( (path = dijkstra(graph)) != null) {
+		do{
+			System.out.println("iteration " + iteration);
+			if (iteration++ != 0){
+				graph.decreaseCapacityOffset();
+			}
+			
+			graph.reset();
+			solveGraph(graph);
+		} while( !graph.isLoadBalanced());
+		
+		while (graph.getLowerCapacityOffset() != 0){
+			graph.increaseCapacityOffset();
+			solveGraph(graph);
+		}
+		
+		if (!graph.isLoadBalanced()){
+			graph.reset();
+			solveGraph(graph);
+		}*/
+	}
+
+
+	private static void solveGraph(Graph graph) {
+		
+		ResidualGraph residualGraph = null;
+		while( (residualGraph = dijkstra(graph, residualGraph)) != null) {
+			ArrayList<ResidualEdge> path = getPathArray(residualGraph);
 			int maxFlow = findPathCapacity(path);
 			updateEdges(path, maxFlow);
-			
 		}
 	}
 	
@@ -48,12 +79,11 @@ public class Algorithm {
 	 * find the shortest path from source to sink. 
 	 * @param realGraph
 	 */
-	public static ArrayList<ResidualEdge> dijkstra(Graph realGraph){
-		Graph residualGraph = new ResidualGraph(realGraph); // creates a residual graph
+	public static ResidualGraph dijkstra(Graph realGraph, ResidualGraph previousGraph){
+		ResidualGraph residualGraph = new ResidualGraph(realGraph, previousGraph); // creates a residual graph
 		
 		ArrayList<Vertex> unvisitedVertices = residualGraph.getVertices(); // list of all vertices
 		Vertex current;
-		
 		residualGraph.source().setDistanceFromSource(0); // set source distance from itself to be 0
 		realGraph.source().setDistanceFromSource(0); 
 
@@ -84,7 +114,7 @@ public class Algorithm {
 		if ( residualGraph.sink().getPath() == null ){
 			return null;
 		} else {
-			return getPathArray(residualGraph);
+			return residualGraph;
 		}
 		
 	}
@@ -102,11 +132,13 @@ public class Algorithm {
 		
 		for (ResidualEdge edge: path){
 			realEdge = edge.getOriginalEdge();
+			
 			// check if edge is a forward one
 			if (! edge.isBackwards()){
 				log.info("adding flow " + maxFlow + " to edge " + realEdge);
 				realEdge.setFlow(realEdge.getFlow() + maxFlow);			
 			} else { // backwards edge
+				
 				log.info("taking away flow " + maxFlow + " from edge " + realEdge);
 				realEdge.setFlow(realEdge.getFlow() - maxFlow);
 			}
@@ -158,69 +190,4 @@ public class Algorithm {
 		return maxFlow;
 	}
 	
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	/**
-	 * does a breadth first search on the given graph and if
-	 * a path is found, returns true, if not, returns false.
-	 * when visiting the edge, sets its visited flag and updates
-	 * the vertex's path variable with the edge it reached the vertex
-	 * (so it's possible to backtrack the path)
-	 * @param graph to traverse 
-	 * @return true if found path, false if not
-	 */
-	@Deprecated
-	public static ArrayList<ResidualEdge> bfs(Graph graph){
-
-		Graph residualGraph = new ResidualGraph(graph); // creates a residual graph.
-		
-		LinkedList<Vertex> queue = new LinkedList<Vertex>();
-		ResidualVertex current;
-		
-		// starting with source
-		Vertex currentVertex = residualGraph.source();
-		currentVertex.visit();
-		queue.add(currentVertex);
-		
-		while( !queue.isEmpty() ){
-			
-			currentVertex = queue.removeFirst();
-			log.info(currentVertex.getOutEdges().toString());
-			for (Edge edge : currentVertex.getOutEdges()){
-				
-				log.info(edge + " " + (edge instanceof ResidualEdge));
-				current = (ResidualVertex) edge.getDestination();
-				
-				if ( current.equals(graph.sink()) ){
-					current.visit(edge);
-					return getPathArray(residualGraph);
-				} else if (! current.isVisited() ) {
-					current.visit(edge);
-					queue.add(current);
-				}
-			}
-		}
-		return null;
-		
-	}
-
 }

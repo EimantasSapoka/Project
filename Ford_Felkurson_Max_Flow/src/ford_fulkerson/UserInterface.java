@@ -27,7 +27,7 @@ public class UserInterface {
 			System.exit(1);
 		}
 		if (graph != null){
-			Algorithm.runAlgorithm(graph);
+			Algorithm.runLoadBalancedAlgorithm(graph);
 			System.out.println(graph);
 		}
 	}

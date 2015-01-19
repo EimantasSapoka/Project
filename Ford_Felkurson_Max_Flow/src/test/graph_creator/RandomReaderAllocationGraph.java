@@ -13,8 +13,8 @@ import ford_fulkerson.graph.Reader;
  *
  */
 public class RandomReaderAllocationGraph extends Graph{
-	private static final int PROJECT_ID_OFFSET = 50;
 	
+	private final int READER_CAPACITY;
 	private int readerIDcounter = 1;
 	private final int PROJECT_COUNT;
 	private final int READER_COUNT;
@@ -22,16 +22,23 @@ public class RandomReaderAllocationGraph extends Graph{
 	Random rand;
 	
 	/**
-	 * creates a random reader allocation graph 
+	 * creates a random reader allocation graph with a random 
+	 * number of readers up to the reader limit. 
+	 * also creates number of projects equal to the number of readers multiplied 
+	 * by the projectMultiplier. 
 	 */
-	public RandomReaderAllocationGraph(){
+	public RandomReaderAllocationGraph(int readerLimit, int projectMultiplier, int readerCapacity){
 		super();
+		
 		rand = new Random();
-		READER_COUNT = rand.nextInt(20) + 5;
-		PROJECT_COUNT = (rand.nextInt(3) + 1)* READER_COUNT/2 * READER_COUNT;
+		READER_CAPACITY = readerCapacity;
+		READER_COUNT = rand.nextInt(readerLimit -5) + 5;
+		PROJECT_COUNT = READER_COUNT * projectMultiplier;
+		
 		projects = new ArrayList<Integer>(PROJECT_COUNT);
+		
 		for (int i=0; i<PROJECT_COUNT; i++){
-			projects.add(i + PROJECT_ID_OFFSET);
+			projects.add(i + READER_COUNT);
 		}
 		
 		for (int i=0; i<READER_COUNT; i++){
@@ -39,6 +46,19 @@ public class RandomReaderAllocationGraph extends Graph{
 		}
 	}
 	
+	/**
+	 * constructor taking reader count limit. 
+	 * will create graph with random number of readers up to the limit
+	 * and number of projects twice the reader count. 
+	 * @param readerLimit
+	 */
+	public RandomReaderAllocationGraph(int readerLimit){
+		this(readerLimit, 2, 8);
+	}
+	
+	public RandomReaderAllocationGraph(){
+		this(15);
+	}
 	
 	/**
 	 * generates and returns a single reader instance with a sequentially 
@@ -48,16 +68,19 @@ public class RandomReaderAllocationGraph extends Graph{
 	@SuppressWarnings("unchecked")
 	public Reader generateReader(){
 		ArrayList<Integer> projectPreferenceList = (ArrayList<Integer>) projects.clone();
-		int readerCapacity = rand.nextInt(15);
+		int readerCapacity = rand.nextInt(READER_CAPACITY);
 		
-		if (readerCapacity > projectPreferenceList.size()){
-			readerCapacity = projectPreferenceList.size();
+		if (readerCapacity > PROJECT_COUNT){
+			readerCapacity = PROJECT_COUNT/2;
 		}
 		
 		Reader r = new Reader(readerIDcounter++, readerCapacity);
 		
-		// makes a preference list twice as big as reader's capacity
-		for (int i=0; i<r.getCapacity()*2; i++){
+		// preference list size is up to twice as big as the reader capacity. 
+		int prefListSize = readerCapacity == 0? 0:rand.nextInt(readerCapacity) + readerCapacity;
+		
+		// makes a preference list
+		for (int i=0; i<prefListSize; i++){
 			if (projectPreferenceList.size()  == 0){
 				break;
 			}

@@ -36,6 +36,13 @@ public class Node implements Comparable<Node>
 		PROJECT_MATCH_SIZE_DEC; // number of students currently assigned to this project (decreasing)
 	}
 	
+	/* added */ public int capacity;
+
+	public Node(int id, String name, NodeType type, int capacity){
+		this(id, name, type);
+		this.capacity = capacity;
+	}
+	
 	public Node(int id, String name, NodeType type)
 	{
 		this.id = id;

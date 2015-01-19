@@ -1,19 +1,16 @@
 package ford_fulkerson.graph;
 
 import java.util.ArrayList;
-import java.util.logging.Logger;
 
-import ford_fulkerson.Algorithm;
 import ford_fulkerson.residual_classes.ResidualEdge;
-import ford_fulkerson.residual_classes.ResidualVertex;
 
 public class Vertex implements Comparable<Vertex>{
-	private final static Logger log = Logger.getLogger(Algorithm.class.getName()); 
 
 	private static int vertexIdCounter = 2;			// counter to keep track of how many vertices are in the graph, as well as
 													// as used to give each vertex a unique ID
 	private int vertexID;							// this vertex ID, equal to current vertexIdCounter value
 	private int objectID;							// the object this vertex represents (project, reader, etc) ID
+	private Object object;
 	private ArrayList<Edge> outEdges;				// list of outgoing edges
 	private int distanceFromSource;					// the vertex distance from source
 	private boolean reachable;						// is the vertex reachable from source
@@ -21,26 +18,27 @@ public class Vertex implements Comparable<Vertex>{
 	protected boolean visited;						// is the vertex visited
 	private ResidualEdge path;						// an edge taken to come to this vertex
 	
-	private Vertex(){
+	private Vertex(Object objectReference){
+		this.object = objectReference;
 		this.outEdges = new ArrayList<Edge>();
 		this.distanceFromSource = Integer.MAX_VALUE;
 	}
 
 	public Vertex(Vertex v){
-		this();
+		this(v.getObject());
 		this.vertexID = v.getVertexID();
 		this.objectID = v.getObjectID();
 	}
 
 	
-	public Vertex( int id){
-		this();
+	public Vertex(int id, Object obj){
+		this(obj);
 		this.vertexID = vertexIdCounter++;
 		this.objectID = id;
 	}
 	
-	public Vertex(int parentID, int vertexID){
-		this();
+	public Vertex(int parentID, int vertexID, Object obj){
+		this(obj);
 		this.objectID = parentID;
 		this.vertexID = vertexID;
 	}
@@ -66,7 +64,9 @@ public class Vertex implements Comparable<Vertex>{
 		return outEdges;
 	}
 
-	
+	public Object getObject(){
+		return this.object;
+	}
 
 	public void addOutEdge(Edge edge) {
 		this.outEdges.add(edge);

@@ -32,18 +32,21 @@ public class RandomArbitraryGraph extends Graph {
 		
 		
 		this.numVertices = rand.nextInt(50) + 50; // 50 <= n < 100
-		this.pEdge = rand.nextInt(100/numVertices)+1; // 1 <= n < 21
-
+		this.pEdge = rand.nextInt(1000/numVertices)+1; // 1 <= n < 21
+		System.out.println("Vertices: " + numVertices + " pEdge: " + pEdge);
 		for (int i = 1; i < numVertices+1; i++){
-			this.addVertex(new Vertex(i));
+			this.addVertex(new Vertex(i,null));
 		}
 		
 		add_source_sink_edges();
 		generate_random_edges();
-		
 	}
 	
-	
+	/**
+	 * creates a random graph with the probability of the edge between any two 
+	 * vertices being probEdge 
+	 * @param probEdge (0<=pEdge<=100)
+	 */
 	public RandomArbitraryGraph(int probEdge){
 		this();
 
@@ -52,6 +55,12 @@ public class RandomArbitraryGraph extends Graph {
 		} 
 	}
 	
+	/**
+	 * creates a random graph with the number of vertices 
+	 * and the edge pobability between them provided
+	 * @param probEdge
+	 * @param numVertices
+	 */
 	public RandomArbitraryGraph(int probEdge, int numVertices){
 		this(probEdge);
 		this.numVertices = numVertices;
@@ -106,7 +115,7 @@ public class RandomArbitraryGraph extends Graph {
 		vertices.remove(this.sink());
 		int randomInt; 
 		
-		// a quarter of random vertices will have the source-to-vertex edge
+		// a number of random vertices will have the source-to-vertex edge
 		
 		for (int i = 0; i< vertices.size()/4 ; i++){
 			randomInt = rand.nextInt(vertices.size());
@@ -114,7 +123,7 @@ public class RandomArbitraryGraph extends Graph {
 			this.addEdge(sourceVertexEdge);
 		}
 		
-		// and a quarter of random vertices will have a vertex-to-sink edge
+		// and a number of random vertices will have a vertex-to-sink edge
 		
 		for (int i = 0; i< vertices.size()/4 ; i++){
 			randomInt = rand.nextInt(vertices.size());

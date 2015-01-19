@@ -3,6 +3,8 @@ package augustineMCMF;
 import java.util.ArrayList;
 
 import ford_fulkerson.graph.Graph;
+import ford_fulkerson.graph.Project;
+import ford_fulkerson.graph.Reader;
 import ford_fulkerson.graph.Vertex;
 import augustineMCMF.Edge;
 
@@ -282,11 +284,13 @@ public class MinCostMaxFlowSPA
 				{
 					networkEdge.increaseFlow(path.getCapacity());
 				}
+				else System.out.println("error. suppressed exception would be thrown.");
+			/*
 				else
 					throw new Exception("Seems the flow cannot accomodate the capacity of the path. " +
 							"It failed while trying to increase the flow through edge "+networkEdge+ " by "+path.getCapacity()+" units.");
+			*/
 			}
-			
 			// otherwise, it must be that the path edge is in the reverse direction. So lets find it
 			else
 			{
@@ -341,16 +345,54 @@ public class MinCostMaxFlowSPA
 		for (ford_fulkerson.graph.Edge e : graph.getEdges()){
 			Edge edge = new Edge(network.getNode((e.getParent().getVertexID())+""), network.getNode((e.getDestination().getVertexID())+""), 0, e.getCapacity(), e.getWeight());
 			network.addEdge(edge);
-			//System.out.println("Added edge " + edge );
 		}
 		
 		return network;
 	}
 	
 	
-	
-	
-	
+	/**
+	 * creates a network from the given graph using the reader and project classes. 
+	 * The created network has nodes with types which specify either LECTURER for reader vertex
+	 * or PROJECT for project vertices.
+	 * @param graph
+	 * @return
+	 */
+	public Network createReaderNetworkFromGraph(Graph graph){
+		Network network = new Network();
+		
+		Vertex source = graph.source();
+		Node node = new Node(source.getVertexID(), (source.getVertexID())+"", null);
+		network.addNode(node);
+		network.setSource(node);
+		
+		Vertex sink = graph.sink();
+		node = new Node(sink.getVertexID(), (sink.getVertexID())+"", null);
+		network.addNode(node);
+		network.setSink(node);
+		
+		for (Reader reader: graph.getReaders()){
+			Vertex v = reader.getVertex();
+			node = new Node(v.getVertexID(), (v.getVertexID())+"", NodeType.LECTURER, reader.getCapacity());
+			network.addNode(node);
+			
+		}
+		
+		for (Project project : graph.getProjects()){
+			Vertex v = project.getVertex();
+			node = new Node(v.getVertexID(), (v.getVertexID())+"", NodeType.PROJECT);
+			network.addNode(node);
+		}
+		
+		// copy edges
+		for (ford_fulkerson.graph.Edge e : graph.getEdges()){
+			Edge edge = new Edge(network.getNode((e.getParent().getVertexID())+""), network.getNode((e.getDestination().getVertexID())+""), 0, e.getCapacity(), e.getWeight());
+			network.addEdge(edge);
+		}
+				
+		
+		return network;
+	}
 	
 	
 }

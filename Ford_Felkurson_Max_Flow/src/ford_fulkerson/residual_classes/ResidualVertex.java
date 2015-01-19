@@ -1,5 +1,7 @@
 package ford_fulkerson.residual_classes;
 
+import java.util.ArrayList;
+
 import ford_fulkerson.graph.Edge;
 import ford_fulkerson.graph.Vertex;
 
@@ -36,6 +38,7 @@ public class ResidualVertex extends Vertex{
 			this.setPath(e);
 		}
 	}
+
 	
 	/**
 	 * used in bfs

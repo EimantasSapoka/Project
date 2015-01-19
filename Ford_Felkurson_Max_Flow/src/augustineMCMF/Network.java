@@ -2,6 +2,8 @@ package augustineMCMF;
 
 import java.util.ArrayList;
 
+import ford_fulkerson.graph.Reader;
+
 public class Network 
 {
 	private ArrayList<Edge> edges;
@@ -196,4 +198,53 @@ public class Network
 		
 		return outputBuilder.toString();
 	}
+	
+	/************* ADDED METHODS ******************/
+	
+	public void networkDescription(){
+		for (Node n : this.nodes){
+			if (NodeType.LECTURER.equals(n.getType())){
+				
+				System.out.print("\nReader " + n.getId() + " has been assigned projects: ");
+				for (Edge e : n.getOutgoingEdges()){
+					if (e.getFlow() > 0){
+						System.out.print(e.getDestNode().getId() + " ");
+					}
+				}
+				
+			}
+		}
+	}
+	
+	public boolean isLoadBalanced(){
+		int capacityFlowGap = 0;
+		boolean capacitySet = false;
+		
+		
+		for (Node n : this.nodes){
+			if (NodeType.LECTURER.equals(n.getType())){
+				
+				int readerFlow = 0;
+				for (Edge e : n.getOutgoingEdges()){
+					if (e.getFlow() > 0){
+						readerFlow++;
+					}
+				}
+				
+				if (!capacitySet){
+					capacityFlowGap = n.capacity - readerFlow;
+					capacitySet = true;
+				} else {
+					if (n.capacity -readerFlow > capacityFlowGap+1){
+						return false;
+					}
+				}
+			}
+		}
+		
+		
+		return true;
+	}
+	
+	
 }

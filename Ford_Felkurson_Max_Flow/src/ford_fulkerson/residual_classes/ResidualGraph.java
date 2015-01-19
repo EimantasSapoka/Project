@@ -10,19 +10,21 @@ public class ResidualGraph extends ford_fulkerson.graph.Graph {
 
 	/**
 	 * creates a residual graph from the given graph
-	 * @param g
+	 * @param realGraph
 	 */
-	public ResidualGraph(Graph g){
+	public ResidualGraph(Graph realGraph, Graph previous){
 		
 		this.vertices = new ArrayList<Vertex>();
 		this.edges = new ArrayList<Edge>();
 		
-		for (Vertex v : g.getVertices()){
+		// copy vertices
+		for (Vertex v : realGraph.getVertices()){
 			this.vertices.add(new ResidualVertex(v));
 		}
 		
-		for (Edge e : g.getEdges()){
-			if (e.getResidualCapacity() > 0){
+		// ceate residual edges
+		for (Edge e : realGraph.getEdges()){
+			if (e.getResidualCapacity() + realGraph.getLowerCapacityOffset() > 0){
 				this.addEdge(new ResidualEdge(this.getVertex(e.getParent()), this.getVertex(e.getDestination()),e.getResidualCapacity(), false, e));
 			}
 			if (e.getFlow() > 0 ){
@@ -30,6 +32,26 @@ public class ResidualGraph extends ford_fulkerson.graph.Graph {
 			}
 		}
 		
+		
+		
+		if (previous == null){
+			previous = realGraph;
+		}
+		
+		
+		// update the edge weights 
+		for (Edge e: this.edges){
+			Edge previousEdge = previous.getEdge(e);
+			if (previousEdge != null){
+				
+				// calculate the new edge weight: previousWeight + sourceVertexDistance - destinationVertexDistance
+				int weight = previous.getVertex(e.getParent()).getDistanceFromSource() + previousEdge.getWeight() - previous.getVertex(e.getDestination()).getDistanceFromSource();
+				e.setWeight(weight);
+			}
+		}
+		
+		
+		// set source and sink vertices
 		this.source = this.getVertex(SOURCE_ID);
 		this.sink = this.getVertex(SINK_ID);
 		

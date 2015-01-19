@@ -1,6 +1,9 @@
 package ford_fulkerson.graph;
 
 import java.util.ArrayList;
+import java.util.Random;
+
+import ford_fulkerson.residual_classes.ResidualVertex;
 
 public class Graph {
 	
@@ -9,26 +12,33 @@ public class Graph {
 	protected static final int SOURCE_ID = 0;
 	protected static final int SINK_ID = 1;
 
+	public int lowerCapacityOffset; 		// the offset used to calculate the lower capacity of edges. 
 	
 	public Vertex source;					// the source vertex reference
-	public Vertex sink;					// the sink vertex reference
+	public Vertex sink;						// the sink vertex reference
 	
 	public ArrayList<Vertex> vertices;		// all the vertices in the graph
 	public ArrayList<Edge> edges;			// all the edges in the graph
 	
 	public ArrayList<Reader> readers;		// readers list
-	public ArrayList<Project> projects;	// projects list
+	public ArrayList<Project> projects;		// projects list
 	
 	public Graph(){
+		
 		this.vertices = new ArrayList<Vertex>();
 		this.edges = new ArrayList<Edge>();
 		this.readers = new ArrayList<Reader>();
 		this.projects = new ArrayList<Project>();
+		
 		Vertex.resetVertexCounter();
-		source = new Vertex(SOURCE_ID, SOURCE_ID);
-		sink = new Vertex(SINK_ID, SINK_ID);
+		
+		source = new Vertex(SOURCE_ID, SOURCE_ID, null);
+		sink = new Vertex(SINK_ID, SINK_ID, null);
+		
 		addVertex(source);
 		addVertex(sink);
+		
+		this.lowerCapacityOffset = 0;
 	}
 	
 	
@@ -40,6 +50,20 @@ public class Graph {
 	public void addEdge(Edge edge){
 		this.getVertex(edge.getParent().getVertexID()).addOutEdge(edge);
 		edges.add(edge);
+	}
+	
+	public int getLowerCapacityOffset(){
+		return this.lowerCapacityOffset;
+	}
+	
+	public void increaseCapacityOffset(){
+		if (this.lowerCapacityOffset < 0){
+			this.lowerCapacityOffset++;
+		}
+	}
+	
+	public void decreaseCapacityOffset(){
+		this.lowerCapacityOffset--;
 	}
 	
 	public void addVertex(Vertex vertex){
@@ -115,6 +139,20 @@ public class Graph {
 	}
 	
 	/**
+	 * gets the edge of this graph identical to given another edge
+	 * @param e
+	 * @return
+	 */
+	public Edge getEdge(Edge edge){
+		for (Edge e: this.edges){
+			if (e.equals(edge)){
+				return e;
+			}
+		}
+		return null;
+	}
+	
+	/**
 	 * method to check if the graph contains the reader
 	 * @param id
 	 * @return
@@ -142,6 +180,20 @@ public class Graph {
 		return false;
 	}
 	
+	/**
+	 * gets the largest project capacity amongst all the readers
+	 * @return
+	 */
+	public int getLargestCapacity(){
+		int max = 0;
+		for (Reader reader: this.getReaders()){
+			if (reader.getCapacity() > max){
+				max = reader.getCapacity();
+			}
+		}
+				
+		return max;
+	}
 	
 	public ArrayList<Reader> getReaders(){
 		return this.readers;
@@ -193,6 +245,7 @@ public class Graph {
 		return null;
 	}
 	
+	
 	/**
 	 * returns projects list
 	 * @return
@@ -212,22 +265,22 @@ public class Graph {
 		ArrayList<Project> unselected = (ArrayList<Project>) this.getProjects().clone();
 		
 		for (Reader r: readers){
-			result += "Reader id " + r.getID() + ", capacity " + r.getCapacity();
+			result += "Reader id " + r.getVertex().getVertexID() + ", capacity " + r.getCapacity();
 			int count = 1;
 			for (Edge e: r.getVertex().getOutEdges()){
 				if (e.getFlow() > 0){
 					unselected.remove(this.getProject(e.getDestination().getObjectID()));
-					result += "\n"+ count++ + " \t assigned project ID " + e.getDestination().getObjectID();
-				} else {
-					result += "\n" + count++ + " \t NOT ASSIGNED project ID " + e.getDestination().getObjectID();
-				}
+					result += "\n"+ count++ + " \t assigned project ID " + e.getDestination().getVertexID();
+				} /*else {
+					result += "\n" + count++ + " \t NOT ASSIGNED project ID " + e.getDestination().getVertexID();
+				}*/
 			}
 			result += "\n";
 		}
 
 		String unselectedProjID = "";
 		for (Project p : unselected){
-			unselectedProjID += " " + p.getId();
+			unselectedProjID += " " + p.getVertex().getVertexID();
 		}
 		result += String.format(""
 				+ "\n number of readers: %d"
@@ -295,6 +348,55 @@ public class Graph {
 		}
 		return cap;
 	}
+	
+	/**
+	 * returns weather the graph has a saturating flow, 
+	 * that is weather 
+	 * @return
+	 */
+	public boolean isSaturatingFlow(){
+		return getCapacityIn() == getFlow();
+	}
+	
+	/**
+	 * returns if the graph is load balanced. That is weather
+	 * all the reader's in the graph have no more than one less 
+	 * project assigned with respect to their capacities than any other reader.
+	 * Example: if a reader has capacity 7 and flow 4, load balanced graph would
+	 * mean that no other reader has flow higher than their capacity - 3 or lower
+	 * than their capacity - 4. 
+	 * @return
+	 */
+	public boolean isLoadBalanced() {
+		int capacityFlowGap = 0;
+		boolean capacitySet = false;
+		
+		for (Reader reader : this.readers){
+			if (!capacitySet){
+				capacityFlowGap = reader.getCapacity() + lowerCapacityOffset - reader.getAssignedProjects().size();
+				if (capacityFlowGap >= 0){
+					capacitySet = true;
+				}
+			} else {
+				if (reader.getCapacity() + lowerCapacityOffset - reader.getAssignedProjects().size() > capacityFlowGap+1){
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	
+	/**
+	 * method which traverses all outgoing edges from the source 
+	 * (source to reader edges) which capacities' represent reader capacities.
+	 * updates their capacities to be equal to reader project limit capacity. 
+	 */
+	public void updateReaderCapacities(){
+		for (Edge e: this.source.getOutEdges()){
+			Reader reader = (Reader) e.getDestination().getObject();
+			e.setCapacity(reader.getProjectUpperLimit());
+		}
+	}
 
 	/**
 	 * returns the total flow in the graph
@@ -326,12 +428,13 @@ public class Graph {
 	 * @param project
 	 */
 	private void addProject(Project project){
-		projects.add(project);
-		addVertex(project.getVertex());
-		
-		Edge projectSinkEdge = new Edge(project.getVertex(), sink, PROJECT_READER_CAPACITY);
-		addEdge(projectSinkEdge);
-		
+		if (! projects.contains(project)){
+			projects.add(project);
+			addVertex(project.getVertex());
+			
+			Edge projectSinkEdge = new Edge(project.getVertex(), sink, PROJECT_READER_CAPACITY);
+			addEdge(projectSinkEdge);
+		}
 	}
 	
 	/**
@@ -342,26 +445,73 @@ public class Graph {
 	 */
 	public void addReader(Reader reader){
 		readers.add(reader);
-		addVertex(reader.getVertex());
-		
-		// if reader has any capacity, create an edge from source to the reader with the capacity
-		if (reader.getCapacity() > 0){
-			Edge sourceReaderEdge = new Edge(source,reader.getVertex(), reader.getCapacity());
-			addEdge(sourceReaderEdge);	
-		}
-		
-		int preference = 1; // the initial preference 
-		for (Project project : reader.getPreferences()){
-			
-			if (!hasProject(project.getId())){
-				addProject(project); // if project not in graph, add it
-			}
-			
-			// create the edge between the reader and the project.
-			Edge readerProjectEdge = new Edge(reader.getVertex(), project.getVertex(), READERS_TO_PROJECTS_CONSTANT, preference++);
-			addEdge(readerProjectEdge);
-			
+		for (Project p : reader.getPreferences()){
+			this.addProject(p);
 		}
 	}
 	
+	/**
+	 * creates the vertices and edges between them according to the reader
+	 * and preference information.
+	 */
+	public void createGraph(){
+		fixGraph();
+		
+		for (Reader reader : this.readers){
+			
+			addVertex(reader.getVertex());
+			// if reader has any capacity, create an edge from source to the reader with the capacity
+			if (reader.getCapacity() > 0){
+				Edge sourceReaderEdge = new Edge(source,reader.getVertex(), reader.getCapacity());
+				addEdge(sourceReaderEdge);	
+			}
+			
+			int preference = 1; // the initial preference 
+			for (Project project : reader.getPreferences()){
+				
+				// create the edge between the reader and the project.
+				Edge readerProjectEdge = new Edge(reader.getVertex(), project.getVertex(), READERS_TO_PROJECTS_CONSTANT, preference++);
+				addEdge(readerProjectEdge);
+				
+			}
+		}
+	}
+
+
+	/**
+	 * method which resets the graph - removes all flow from edges.
+	 */
+	public void reset() {
+		for (Edge e : edges){
+			e.setFlow(0);
+		}
+		for (Vertex v: vertices){
+			v.setDistanceFromSource(Integer.MAX_VALUE);
+		}
+	}
+
+
+	public void fixGraph() {
+		//this.extendPreferenceLists();
+	}
+
+	/**
+	 * method which extends readers preference lists to 2x their capacities
+	 */
+	private void extendPreferenceLists() {
+		Random random = new Random();
+		for (Reader r: this.readers){
+			ArrayList<Project> preferences = r.getPreferences();
+
+			while (preferences.size() < 2*r.getCapacity() && preferences.size() != projects.size()){
+				Project proj = projects.get(random.nextInt(projects.size()));
+				if (!preferences.contains(proj) && !r.getSupervisorProjects().contains(proj)){
+					r.addPreference(proj);
+				}
+			}
+			
+		}
+	}
+
+
 }

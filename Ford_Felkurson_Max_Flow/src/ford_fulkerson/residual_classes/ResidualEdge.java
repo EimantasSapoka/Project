@@ -17,24 +17,9 @@ public class ResidualEdge extends Edge {
 	private Edge originalEdge;					// reference to the real graph edge this residual edge was created from
 	
 	public ResidualEdge(Vertex parent, Vertex destination, int capacity,  boolean isBackwards, Edge e){
+		super(parent, destination, capacity, 0);
 		this.originalEdge = e;
 		this.isBackwards = isBackwards;
-		this.setCapacity(capacity);
-
-		if( isBackwards){
-			this.setParent(parent);
-			this.setDestination(destination);
-			this.setWeight((e.getWeight()*-1) + e.getDestination().getDistanceFromSource() - e.getParent().getDistanceFromSource());
-			System.out.println("BACKWARD Edge weight:" + (e.getWeight()*-1) + "+SD:" +e.getDestination().getDistanceFromSource()+
-								"-DD:" + e.getParent().getDistanceFromSource() + "=" + this.getWeight());
-		} else {
-			this.setParent(parent);
-			this.setDestination(destination);
-			this.setWeight(e.getWeight() + e.getParent().getDistanceFromSource() - e.getDestination().getDistanceFromSource());
-			System.out.println("Edge weight:" + e.getWeight() + "+SD:" +e.getParent().getDistanceFromSource()+
-					"-DD:" + e.getDestination().getDistanceFromSource() + "=" + this.getWeight());
-		}	
-		
 	}
 
 	public boolean isBackwards() {

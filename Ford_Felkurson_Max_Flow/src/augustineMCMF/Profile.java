@@ -11,13 +11,12 @@ public class Profile
 {
 	private int[] profile;
 	private boolean isPosInfinity, isNegInfinity;
-	private int cost;
+
 	
 	public Profile(int size)
 	{
 		profile = new int[size];
 		isPosInfinity = isNegInfinity = false;
-		cost = 0;
 	}
 	
 	public int getCountAtRank(int index) throws Exception
