@@ -12,6 +12,8 @@ public class Edge{
 		this.parent = null;
 		this.destination = null;
 		this.capacity = 0;
+		this.weight = 0;
+		this.flow = 0;
 	}
 	
 	public Edge (Vertex parent, Vertex destination, int capacity){
@@ -71,6 +73,14 @@ public class Edge{
 	
 	public void setWeight(int weight){
 		this.weight = weight;
+	}
+	
+	public boolean equals(Edge e){
+		if (this.parent.equals(e.getParent()) && this.destination.equals(e.getDestination())){
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	

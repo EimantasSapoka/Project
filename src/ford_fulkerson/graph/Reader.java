@@ -9,12 +9,24 @@ public class Reader {
 	private ArrayList<Integer> supervisorProjects;		// list of already assigned projects
 	private ArrayList<Project> preferences;				// list of project preferences
 	
+	private int projectUpperLimit;						// the reader's limit of how many projects he can take.
+														// Used for load balancing
+	
 	public Reader(int id, int capacity){
 		this.id = id;
-		this.vertex = new Vertex(id);
+		this.vertex = new Vertex(id, this);
 		this.capacity = capacity;
 		this.supervisorProjects = new ArrayList<Integer>();
 		this.preferences = new ArrayList<Project>();
+		this.projectUpperLimit = 0;
+	}
+	
+	public void incrementLimit(){
+		this.projectUpperLimit++;
+	}
+	
+	public int getProjectUpperLimit(){
+		return this.projectUpperLimit;
 	}
 	
 	public void addSupervisingProject(int projectID){
@@ -22,6 +34,7 @@ public class Reader {
 	}
 	
 	public void addPreference(Project project){
+		project.select();
 		this.preferences.add(project);
 	}
 
@@ -37,12 +50,31 @@ public class Reader {
 		return supervisorProjects;
 	}
 
+	/**
+	 * returns shallow copy of readers preferences
+	 * @return
+	 */
 	public ArrayList<Project> getPreferences() {
 		return preferences;
 	}
 	
 	public int getID(){
 		return this.id;
+	}
+	
+	/**
+	 * returns all assigned projects
+	 * @return
+	 */
+	public ArrayList<Project> getAssignedProjects(){
+		ArrayList<Project> projects = new ArrayList<Project>();
+		for (Edge edge : this.vertex.getOutEdges()){
+			if (edge.getFlow() > 0){
+				Project project = (Project) edge.getDestination().getObject();
+				projects.add(project);
+			}
+		}
+		return projects;
 	}
 	
 	public boolean equals(Reader r){

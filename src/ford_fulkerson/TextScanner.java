@@ -20,7 +20,6 @@ public class TextScanner {
 
 	public static Graph parse(File textFile) throws IOException{
 		graph = new Graph();
-		
 		BufferedReader textReader = new BufferedReader(new FileReader(textFile));
 		String line = "";
 		while ( ( line = textReader.readLine() )  != null){
@@ -41,7 +40,6 @@ public class TextScanner {
 			}
 			
 		}
-		
 		textReader.close();
 		return graph;
 	}
@@ -64,8 +62,8 @@ public class TextScanner {
 			if( (project = graph.getProject(id)) == null){
 				project = new Project(id);
 			}
-			reader.addPreference(project);
 			
+			reader.addPreference(project);
 			
 		}
 	}

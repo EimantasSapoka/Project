@@ -16,8 +16,8 @@ import ford_fulkerson.graph.Reader;
 
 public class Constraints_Test {
 	
-	private static final int TEST_COUNT = 200;
-	Graph arbitraryGraph,readerGraph;
+	private static final int TEST_COUNT = 100;
+	Graph arbitraryGraph,readerGraph;;
 	
 	/**
 	 * checks that the constraints hold after running the algorithm on the 
@@ -26,8 +26,9 @@ public class Constraints_Test {
 	@Test
 	public void testReaderGraph(){
 		for (int i=0; i<TEST_COUNT; i++){
+
 			readerGraph = new RandomReaderAllocationGraph();
-			Algorithm.runAlgorithm(readerGraph);
+			Algorithm.runLoadBalancedAlgorithm(readerGraph);
 			checkReaderConstraints(readerGraph);
 		}
 	}
@@ -74,7 +75,7 @@ public class Constraints_Test {
 	public void testArbitraryGraph(){
 		for (int i = 0; i< TEST_COUNT ; i++){
 			arbitraryGraph = new RandomArbitraryGraph();
-			Algorithm.runAlgorithm(arbitraryGraph);
+			Algorithm.runLoadBalancedAlgorithm(arbitraryGraph);
 			graphConstraintsTests(arbitraryGraph);
 		}
 	}
