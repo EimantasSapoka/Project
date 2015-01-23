@@ -37,7 +37,7 @@ public class Algorithm {
 		graph.createGraph();
 		solveGraph(graph);
 		loadBalance(graph);
-		assignUnassignedProjects(graph);
+		//assignUnassignedProjects(graph);
 	}
 
 	/**
