@@ -1,10 +1,14 @@
 package test;
 
+<<<<<<< HEAD
 import static org.junit.Assert.*;
 
+=======
+>>>>>>> dijkstra
 import java.util.ArrayList;
 
-import org.junit.Test;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 import test.graph_creator.RandomArbitraryGraph;
 import test.graph_creator.RandomReaderAllocationGraph;
