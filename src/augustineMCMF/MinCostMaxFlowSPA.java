@@ -10,22 +10,6 @@ import augustineMCMF.Edge;
 
 public class MinCostMaxFlowSPA 
 {
-	public static void main(String[] args) throws Exception
-	{
-		MinCostMaxFlowSPA alg = new MinCostMaxFlowSPA();
-		
-		// generate a random network
-		Network netW = alg.generateRandomNetwork();
-		
-		// find a min cost max flow
-		netW = alg.solve(netW);
-		
-		// print the final flow
-		System.out.println("Flow Size = " + netW.getFlowSize());
-		System.out.println("Flow Cost = " + netW.getFlowCost());
-		System.out.println("Flow edges: ");
-		System.out.println(netW.toString());
-	}
 	
 	/**
 	 * Main entry point for the algorithm. Throws any exceptions it encounters to the calling method

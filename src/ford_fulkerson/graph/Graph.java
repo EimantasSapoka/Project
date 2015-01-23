@@ -2,7 +2,6 @@ package ford_fulkerson.graph;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Random;
 
 public class Graph {
 	
@@ -272,14 +271,17 @@ public class Graph {
 		int numberProjects = this.getProjects().size();
 		
 		for (Reader r: readers){
-			result += "Reader id " + r.getVertex().getObjectID() + ", capacity " + r.getCapacity();
-			int count = 1;
+			result += "Reader " + r.getVertex().getObjectID();
+			
+			int assigned = 0;
+			String assignedProj = "";
 			for (Edge e: r.getVertex().getOutEdges()){
 				if (e.getFlow() > 0){
-					result += "\n"+ count++ + " \t assigned project ID " + e.getDestination().getObjectID();
+					assigned++;
+					assignedProj += " " + e.getDestination().getObjectID();
 				} 
 			}
-			result += "\n";
+			result +=  " (" + assigned + "/" + r.getCapacity() + ") :" + assignedProj + "\n";
 		}
 		
 		String unselectedProjID = "";
@@ -430,6 +432,16 @@ public class Graph {
 
 		for (Reader reader : this.readers){
 			
+			if (reader.getPreferences().size() < reader.getCapacity()){
+				System.err.println("ERROR! READER " + reader.getID() + " HAS CAPACITY OF " + reader.getCapacity() 
+						+ " AND PREFERENCE LIST SIZE "  + reader.getPreferences().size());
+				System.exit(1);
+			} else if (reader.getPreferences().size() < reader.getCapacity()*2){
+				System.out.println("WARNING! reader " + reader.getID() + " has capacity of " + reader.getCapacity()
+						+ " and preference list size " + reader.getPreferences().size());
+			}
+			
+			
 			addVertex(reader.getVertex());
 			// if reader has any capacity, create an edge from source to the reader with the capacity
 			if (reader.getCapacity() > 0){
@@ -445,10 +457,7 @@ public class Graph {
 				addEdge(readerProjectEdge);
 				
 			}
-			
-			
 		}
-		
 	}
 
 
