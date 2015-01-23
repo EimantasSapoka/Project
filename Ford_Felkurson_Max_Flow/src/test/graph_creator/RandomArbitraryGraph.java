@@ -16,7 +16,7 @@ public class RandomArbitraryGraph extends Graph {
 	
 	private static final int PROBABILITY_CEILING = 100;
 	private static final int EDGE_CAPACITY = 10;
-	private static final int EDGE_WEIGHT_MAX = 3;
+	private static final int EDGE_WEIGHT_MAX = 4;
 	Random rand;
 	
 	private int pEdge;
@@ -31,10 +31,9 @@ public class RandomArbitraryGraph extends Graph {
 		rand = new Random();
 		
 		
-		this.numVertices = rand.nextInt(50) + 50; // 50 <= n < 100
-		this.pEdge = rand.nextInt(1000/numVertices)+1; // 1 <= n < 21
-		System.out.println("Vertices: " + numVertices + " pEdge: " + pEdge);
-		for (int i = 1; i < numVertices+1; i++){
+		this.numVertices = rand.nextInt(8) + 25; 
+		this.pEdge = rand.nextInt(20)+1; // 1 <= n < 21
+		for (int i = 2; i < numVertices+2; i++){
 			this.addVertex(new Vertex(i,null));
 		}
 		

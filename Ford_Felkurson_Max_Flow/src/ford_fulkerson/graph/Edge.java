@@ -8,13 +8,6 @@ public class Edge{
 	protected Vertex parent;		// where the edge is coming from, origin
 	protected Vertex destination;	// where the edge is going to, destination
 	
-	public Edge(){
-		this.parent = null;
-		this.destination = null;
-		this.capacity = 0;
-		this.weight = 0;
-		this.flow = 0;
-	}
 	
 	public Edge (Vertex parent, Vertex destination, int capacity){
 		this(parent, destination, capacity, 0);
@@ -75,19 +68,30 @@ public class Edge{
 		this.weight = weight;
 	}
 	
-	public boolean equals(Edge e){
-		if (this.parent.equals(e.getParent()) && this.destination.equals(e.getDestination())){
-			return true;
-		} else {
+	@Override
+	public boolean equals(Object o){
+		if (!(o instanceof Edge)){
 			return false;
 		}
+
+		Edge e = (Edge) o;
+		return this.parent.equals(e.getParent()) && this.destination.equals(e.getDestination()) && this.capacity == e.getCapacity();
 	}
 	
 	
 	public String toString(){
-		return "Edge " + this.parent.getVertexID() + " to " + this.destination.getVertexID() +
-				"; flow/cap " + this.flow + "/"+ this.capacity +" weight: " + this.weight;
-				
+		return String.format("%d (%d) -> %d (%d) ; weight: %d  -- flow/cap: %d/%d ",
+				this.parent.getVertexID(),this.parent.getDistanceFromSource(),
+				this.destination.getVertexID(), this.destination.getDistanceFromSource(), this.weight,
+				this.flow, this.capacity);				
+	}
+
+	public void decreaseCapacity() {
+		this.capacity--;
+	}
+	
+	public void increaseCapacity(){
+		this.capacity++;
 	}
 
 }

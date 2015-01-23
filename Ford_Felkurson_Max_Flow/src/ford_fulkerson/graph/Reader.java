@@ -29,8 +29,8 @@ public class Reader {
 		return this.projectUpperLimit;
 	}
 	
-	public void addSupervisingProject(int projectID){
-		this.supervisorProjects.add(projectID);
+	public void addSupervisingProject(int id){
+		this.supervisorProjects.add(id);
 	}
 	
 	public void addPreference(Project project){
@@ -84,7 +84,7 @@ public class Reader {
 	public String toString(){
 		String result = "Reader id: " +id + ", project capacity: " + capacity;
 		result += "\nSupervised projects: ";
-		for (int p: supervisorProjects){
+		for (Integer p: supervisorProjects){
 			result += "\n" + p;
 		}
 		result += "\nPreferences: ";
@@ -93,4 +93,13 @@ public class Reader {
 		}
 		return result;
 	}
+
+	/**
+	 * returns how many projects can the reader still take.
+	 * @return
+	 */
+	public int getResidualCapacity() {
+		return this.getCapacity() - this.getAssignedProjects().size();
+	}
+
 }

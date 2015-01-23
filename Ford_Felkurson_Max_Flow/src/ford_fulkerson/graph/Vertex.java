@@ -15,13 +15,12 @@ public class Vertex implements Comparable<Vertex>{
 	private int distanceFromSource;					// the vertex distance from source
 	private boolean reachable;						// is the vertex reachable from source
 	
-	protected boolean visited;						// is the vertex visited
 	private ResidualEdge path;						// an edge taken to come to this vertex
 	
 	private Vertex(Object objectReference){
 		this.object = objectReference;
 		this.outEdges = new ArrayList<Edge>();
-		this.distanceFromSource = Integer.MAX_VALUE;
+		this.distanceFromSource = 0;
 	}
 
 	public Vertex(Vertex v){
@@ -54,12 +53,7 @@ public class Vertex implements Comparable<Vertex>{
 	public static void resetVertexCounter(){
 		vertexIdCounter = 2;
 	}
-	
-	
-	public void visit(){
-		this.visited = true;
-	}
-	
+
 	public ArrayList<Edge> getOutEdges() {
 		return outEdges;
 	}
@@ -72,26 +66,27 @@ public class Vertex implements Comparable<Vertex>{
 		this.outEdges.add(edge);
 	}
 
-	public boolean equals(Vertex v ){
-		return this.vertexID  == v.getVertexID();
+	@Override
+	public boolean equals(Object o){
+		if ( !(o instanceof Vertex) ) {
+			return false;
+		}
+		Vertex v = (Vertex) o;
+		return this.vertexID  == v.getVertexID() && this.objectID == v.getObjectID();
 	}
 	
-	
-	public boolean isVisited() {
-		return visited;
-	}
 	
 	public int getDistanceFromSource(){
 		return this.distanceFromSource;
 	}
 	
-	public boolean isRreachable(){
+	public boolean isReachable(){
 		return this.reachable;
 	}
 	
 	public void setDistanceFromSource(int distance){
 		this.reachable = true;
-		this.distanceFromSource = Math.abs(distance);
+		this.distanceFromSource = distance;
 	}
 
 	public ResidualEdge getPath() {
@@ -104,12 +99,7 @@ public class Vertex implements Comparable<Vertex>{
 
 
 	public String toString(){
-		String outEdgeIDs = "";
-		for (Edge e: this.getOutEdges()){
-			outEdgeIDs += e.getDestination().getVertexID() + " ";
-		}
-		return "Vertex id:" + this.getVertexID()+ " obj:" + this.getObjectID() + " DIST: "+this.getDistanceFromSource()+
-				" edges to vertices: [" + outEdgeIDs + "]";
+		return ""+this.getDistanceFromSource();
 	}
 
 

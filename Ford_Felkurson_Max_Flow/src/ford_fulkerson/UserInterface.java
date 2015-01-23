@@ -3,6 +3,8 @@ package ford_fulkerson;
 import java.io.File;
 import java.io.IOException;
 
+import augustineMCMF.MinCostMaxFlowSPA;
+import augustineMCMF.Network;
 import ford_fulkerson.graph.Graph;
 
 /**
@@ -29,6 +31,16 @@ public class UserInterface {
 		if (graph != null){
 			Algorithm.runLoadBalancedAlgorithm(graph);
 			System.out.println(graph);
+			/*graph.createGraph();
+			MinCostMaxFlowSPA alg = new MinCostMaxFlowSPA();
+			Network network = alg.createReaderNetworkFromGraph(graph);
+			try {
+				alg.solve(network);
+			} catch (Exception e) {
+				System.out.println("error");
+			}
+			
+			network.networkDescription();*/
 		}
 	}
 	

@@ -1,9 +1,8 @@
 package ford_fulkerson.graph;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
-
-import ford_fulkerson.residual_classes.ResidualVertex;
 
 public class Graph {
 	
@@ -48,8 +47,10 @@ public class Graph {
 	 * @param edge
 	 */
 	public void addEdge(Edge edge){
-		this.getVertex(edge.getParent().getVertexID()).addOutEdge(edge);
-		edges.add(edge);
+		if (! edges.contains(edge)){
+			this.getVertex(edge.getParent().getVertexID()).addOutEdge(edge);
+			edges.add(edge);
+		}
 	}
 	
 	public int getLowerCapacityOffset(){
@@ -60,14 +61,22 @@ public class Graph {
 		if (this.lowerCapacityOffset < 0){
 			this.lowerCapacityOffset++;
 		}
+		for (Edge e : this.source.getOutEdges()){
+			e.increaseCapacity();
+		}
 	}
 	
 	public void decreaseCapacityOffset(){
 		this.lowerCapacityOffset--;
+		for (Edge e : this.source.getOutEdges()){
+			e.decreaseCapacity();
+		}
 	}
 	
 	public void addVertex(Vertex vertex){
-		vertices.add(vertex);
+		if (!vertices.contains(vertex)){
+			vertices.add(vertex);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -261,66 +270,40 @@ public class Graph {
 		String result = "";
 		
 		int numberProjects = this.getProjects().size();
-		@SuppressWarnings("unchecked")
-		ArrayList<Project> unselected = (ArrayList<Project>) this.getProjects().clone();
 		
 		for (Reader r: readers){
-			result += "Reader id " + r.getVertex().getVertexID() + ", capacity " + r.getCapacity();
+			result += "Reader id " + r.getVertex().getObjectID() + ", capacity " + r.getCapacity();
 			int count = 1;
 			for (Edge e: r.getVertex().getOutEdges()){
 				if (e.getFlow() > 0){
-					unselected.remove(this.getProject(e.getDestination().getObjectID()));
-					result += "\n"+ count++ + " \t assigned project ID " + e.getDestination().getVertexID();
-				} /*else {
-					result += "\n" + count++ + " \t NOT ASSIGNED project ID " + e.getDestination().getVertexID();
-				}*/
+					result += "\n"+ count++ + " \t assigned project ID " + e.getDestination().getObjectID();
+				} 
 			}
 			result += "\n";
 		}
-
+		
 		String unselectedProjID = "";
-		for (Project p : unselected){
-			unselectedProjID += " " + p.getVertex().getVertexID();
+		for (Project p : this.findUnassignedProjects()){
+			unselectedProjID += " " + p.getId();
 		}
 		result += String.format(""
 				+ "\n number of readers: %d"
-				+ "\n number of projects: %d, not assigned: %d [%s ]"
+				+ "\n number of projects: %d, not assigned: [%s ]"
 				+ "\n total flow: %d"
-				+ "\n total weight: %d", 
+				+ "\n total weight: %d"
+				+ "\n load balanced? : %b"
+				+ "\n saturating flow? : %b", 
 				this.getReaders().size(),
 				numberProjects, 
-				unselected.size(),
 				unselectedProjID,
 				this.getFlow(),
-				this.getWeight());
+				this.getWeight(),
+				this.isLoadBalanced(),
+				this.isSaturatingFlow());
+		
 		return result;
 	}
-	
-	/**
-	 * prints out the graph's vertices and edges
-	 */
-	public void graphDescription(){
-		System.out.println("VERTICES: ");
-		for (Vertex v : vertices){
-			System.out.println("\t" + v);
-		}
-		System.out.println("EDGES: ");
-		for(Edge e: edges){
-			System.out.println("\t" + e);
-			 
-		}
-		
-	}
 
-	/**
-	 * prints out graph statistics, capacity in, capacity out, total flow and total weight.
-	 */
-	public void statistics() {
-		System.out.println("CAPACITY IN: " + this.getCapacityIn());
-		System.out.println("CAPACITY OUT: " + this.getCapacityOut());
-		System.out.println("TOTAL FLOW: " + this.getFlow());
-		System.out.println("TOTAL WEIGHT: " + this.getWeight());
-	}	
 	
 	/**
 	 * returns the total capacity of edges going to the sink
@@ -355,7 +338,7 @@ public class Graph {
 	 * @return
 	 */
 	public boolean isSaturatingFlow(){
-		return getCapacityIn() == getFlow();
+		return getCapacityIn() == getFlow() || getCapacityOut() == getFlow();
 	}
 	
 	/**
@@ -386,17 +369,6 @@ public class Graph {
 		return true;
 	}
 	
-	/**
-	 * method which traverses all outgoing edges from the source 
-	 * (source to reader edges) which capacities' represent reader capacities.
-	 * updates their capacities to be equal to reader project limit capacity. 
-	 */
-	public void updateReaderCapacities(){
-		for (Edge e: this.source.getOutEdges()){
-			Reader reader = (Reader) e.getDestination().getObject();
-			e.setCapacity(reader.getProjectUpperLimit());
-		}
-	}
 
 	/**
 	 * returns the total flow in the graph
@@ -455,8 +427,7 @@ public class Graph {
 	 * and preference information.
 	 */
 	public void createGraph(){
-		fixGraph();
-		
+
 		for (Reader reader : this.readers){
 			
 			addVertex(reader.getVertex());
@@ -466,7 +437,7 @@ public class Graph {
 				addEdge(sourceReaderEdge);	
 			}
 			
-			int preference = 1; // the initial preference 
+			int preference = 1; // the initial preference weight
 			for (Project project : reader.getPreferences()){
 				
 				// create the edge between the reader and the project.
@@ -474,7 +445,10 @@ public class Graph {
 				addEdge(readerProjectEdge);
 				
 			}
+			
+			
 		}
+		
 	}
 
 
@@ -486,31 +460,50 @@ public class Graph {
 			e.setFlow(0);
 		}
 		for (Vertex v: vertices){
-			v.setDistanceFromSource(Integer.MAX_VALUE);
+			v.setDistanceFromSource(0);
 		}
-	}
-
-
-	public void fixGraph() {
-		//this.extendPreferenceLists();
 	}
 
 	/**
 	 * method which extends readers preference lists to 2x their capacities
 	 */
-	private void extendPreferenceLists() {
-		Random random = new Random();
+	@SuppressWarnings("unchecked")
+	public void extendPreferenceLists() {
 		for (Reader r: this.readers){
+			
 			ArrayList<Project> preferences = r.getPreferences();
-
-			while (preferences.size() < 2*r.getCapacity() && preferences.size() != projects.size()){
-				Project proj = projects.get(random.nextInt(projects.size()));
-				if (!preferences.contains(proj) && !r.getSupervisorProjects().contains(proj)){
-					r.addPreference(proj);
+			ArrayList<Project> projectList = (ArrayList<Project>) this.projects.clone();
+			
+			while (preferences.size() < 2*r.getCapacity() && !projectList.isEmpty()){
+				
+				Collections.sort(projectList);
+				Project proj = projectList.remove(0);
+				
+				if (!preferences.contains(proj)){
+					if( !r.getSupervisorProjects().contains(proj.getId())){
+						System.out.println("Extended reader's " + r.getID() + " pref list with project " + proj.getId());
+						r.addPreference(proj);
+					}
 				}
 			}
 			
 		}
+	}
+
+	/**
+	 * finds the unassigned projects and returns them in a list
+	 * @return
+	 */
+	public ArrayList<Project> findUnassignedProjects() {
+		ArrayList<Project> unassigned = new ArrayList<Project>();
+		for (Edge e : edges){
+			if (e.getDestination().equals(this.sink)){
+				if (e.getFlow() == 0){
+					unassigned.add((Project) e.getParent().getObject());
+				}
+			}
+		}
+		return unassigned;
 	}
 
 

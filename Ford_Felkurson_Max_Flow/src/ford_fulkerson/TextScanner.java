@@ -22,17 +22,21 @@ public class TextScanner {
 		graph = new Graph();
 		BufferedReader textReader = new BufferedReader(new FileReader(textFile));
 		String line = "";
-		while ( ( line = textReader.readLine() )  != null){
-			String[] barSplit = line.split("\\|");
+		while ( ( line = textReader.readLine() )  != null ){
+			if (line.isEmpty()){
+				continue;
+			}
 			
+			String[] barSplit = line.split("\\|");
 			int readerID = Integer.parseInt(barSplit[0].trim());
 			int readerCapacity = Integer.parseInt(barSplit[2].trim());
 			
 			if (! graph.hasReader(readerID)){
 				Reader reader = new Reader(readerID, readerCapacity);
-			
 				parseSupervisingProjects(barSplit[1], reader);
-				parseProjectPreferences(barSplit[3], reader);
+				if (barSplit.length == 4){
+					parseProjectPreferences(barSplit[3], reader);
+				}
 				graph.addReader(reader);
 			} else {
 				textReader.close();
@@ -75,12 +79,15 @@ public class TextScanner {
 	 */
 	private static void parseSupervisingProjects(String projects,
 			Reader reader) {
+		
 		String[] supervisedProjects = projects.split(" ");
+
 		for (String projectID: supervisedProjects){
 			if (projectID.trim().isEmpty()){
 				continue;
 			}
 			int id = Integer.parseInt(projectID.trim());
+			
 			reader.addSupervisingProject(id);
 		}
 	}
