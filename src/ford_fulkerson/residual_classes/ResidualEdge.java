@@ -30,10 +30,11 @@ public class ResidualEdge extends Edge {
 		return originalEdge;
 	}
 	
-	@Override
+	
 	public String toString(){
 		String backwards = this.isBackwards? "BACKWARDS ":"";
-		return super.toString() + " " +backwards;
+		return "Edge " + this.parent.getVertexID() + "->"+ this.destination.getVertexID() + " ("+this.getWeight()+") cap:" + this.capacity + " "+ backwards + 
+				"dist:["+ this.parent.getDistanceFromSource()+"/"+this.destination.getDistanceFromSource()+"]";
 	}
 	
 }

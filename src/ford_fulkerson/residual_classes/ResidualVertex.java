@@ -1,5 +1,8 @@
 package ford_fulkerson.residual_classes;
 
+import java.util.ArrayList;
+
+import ford_fulkerson.graph.Edge;
 import ford_fulkerson.graph.Vertex;
 
 /**
@@ -15,6 +18,10 @@ public class ResidualVertex extends Vertex{
 		super(v);
 		this.originalVertex = v;
 	}
+
+	public Vertex getOriginalVertex(){
+		return this.originalVertex;
+	}
 	
 	
 	/**
@@ -25,11 +32,24 @@ public class ResidualVertex extends Vertex{
 	 * @param distance
 	 */
 	public void relaxation(int distance, ResidualEdge e) {		
-		if (distance < this.getDistanceFromSource() || !this.isReachable() ){
+		if (distance < this.getDistanceFromSource() ){
 			this.setDistanceFromSource(distance);
-			originalVertex.setDistanceFromSource(distance);						 
+			this.getOriginalVertex().setDistanceFromSource(distance);						 
 			this.setPath(e);
 		}
-	}	
+	}
+
+	
+	/**
+	 * used in bfs
+	 * @param e
+	 */
+	@Deprecated
+	public void visit(Edge e){
+		this.setPath((ResidualEdge) e);
+		this.visited = true;
+	}
+
+	
 	
 }

@@ -2,6 +2,8 @@ package augustineMCMF;
 
 import java.util.ArrayList;
 
+import ford_fulkerson.graph.Reader;
+
 public class Network 
 {
 	private ArrayList<Edge> edges;
@@ -203,7 +205,7 @@ public class Network
 		for (Node n : this.nodes){
 			if (NodeType.LECTURER.equals(n.getType())){
 				
-				System.out.print("\nReader " + n.getId() + " cap: " + n.capacity + " assigned: ");
+				System.out.print("\nReader " + n.getId() + " has been assigned projects: ");
 				for (Edge e : n.getOutgoingEdges()){
 					if (e.getFlow() > 0){
 						System.out.print(e.getDestNode().getId() + " ");
@@ -212,38 +214,8 @@ public class Network
 				
 			}
 		}
-		
-		System.out.println(String.format(""
-				+ "\n total flow: %d"
-				+ "\n total weight: %d"
-				+ "\n load balanced? : %b"
-				+ "\n saturating flow? : %b", 
-				this.getFlowSize(),
-				this.getFlowCost(),
-				this.isLoadBalanced(),
-				this.isSaturatingFlow()));
 	}
 	
-	private boolean isSaturatingFlow() {
-		return this.getCapacityIn() == this.getFlowSize() || this.getCapacityOut() == this.getFlowSize();
-	}
-
-	private int getCapacityOut() {
-		int cap = 0; 
-		for (Edge e : this.sink.getIncommingEdges()){
-			cap += e.getUpperQuota();
-		}
-		return cap;
-	}
-
-	private int getCapacityIn() {
-		int cap = 0; 
-		for (Edge e : this.source.getOutgoingEdges()){
-			cap += e.getUpperQuota();
-		}
-		return cap;
-	}
-
 	public boolean isLoadBalanced(){
 		int capacityFlowGap = 0;
 		boolean capacitySet = false;

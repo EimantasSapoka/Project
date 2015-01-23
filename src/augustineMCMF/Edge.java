@@ -105,7 +105,7 @@ public class Edge
 	public String toString() 
 	{
 		if(nodes!=null && nodes.length==2)
-			return nodes[0] + "->" + nodes[1] +" ; capacity " + lowerQuota +" weight: "+cost;
+			return nodes[0]+"--["+flow+","+lowerQuota+","+upperQuota+","+cost+"]-->"+nodes[1];
 		else
 			return "Edge is not consistent with requirements";
 	}
