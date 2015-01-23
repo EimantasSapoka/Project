@@ -20,7 +20,7 @@ public class Project implements Comparable<Project> {
 	}
 	
 	public String toString(){
-		return this.id + "";
+		return "id: " + this.id + " times selected: " + timesSelected;
 	}
 	
 	public void select(){
@@ -32,7 +32,7 @@ public class Project implements Comparable<Project> {
 	}
 
 	@Override
-	public int compareTo(Project proj) {
-		return this.timesSelected - proj.getSelectedCount();
+	public int compareTo(Project project) { 
+		return this.timesSelected - project.getSelectedCount();
 	}
 }

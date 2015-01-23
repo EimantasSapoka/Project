@@ -22,9 +22,11 @@ public class ResidualGraph extends ford_fulkerson.graph.Graph {
 			this.vertices.add(new ResidualVertex(v));
 		}
 		
-		// ceate residual edges
+		// create residual edges
 		for (Edge e : realGraph.getEdges()){
-			if (e.getResidualCapacity() + realGraph.getLowerCapacityOffset() > 0){
+			
+			if (e.getResidualCapacity() > 0){
+				
 				this.addEdge(new ResidualEdge(this.getVertex(e.getParent()), this.getVertex(e.getDestination()),e.getResidualCapacity(), false, e));
 			}
 			if (e.getFlow() > 0 ){
@@ -32,20 +34,12 @@ public class ResidualGraph extends ford_fulkerson.graph.Graph {
 			}
 		}
 		
-		
-		
-		if (previous == null){
-			previous = realGraph;
-		}
-		
-		
 		// update the edge weights 
 		for (Edge e: this.edges){
 			Edge previousEdge = previous.getEdge(e);
 			if (previousEdge != null){
-				
 				// calculate the new edge weight: previousWeight + sourceVertexDistance - destinationVertexDistance
-				int weight = previous.getVertex(e.getParent()).getDistanceFromSource() + previousEdge.getWeight() - previous.getVertex(e.getDestination()).getDistanceFromSource();
+				int weight = realGraph.getVertex(e.getParent()).getDistanceFromSource() + previousEdge.getWeight() - realGraph.getVertex(e.getDestination()).getDistanceFromSource();
 				e.setWeight(weight);
 			}
 		}
