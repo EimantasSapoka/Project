@@ -1,6 +1,6 @@
 package ford_fulkerson.graph;
 
-public class Project {
+public class Project implements Comparable<Project> {
 	private final int id;			// project id
 	private final Vertex vertex;	// vertex associated with the project
 	private int timesSelected;		// number of times the project had been added to a pref list. 
@@ -29,5 +29,10 @@ public class Project {
 	
 	public int getSelectedCount(){
 		return this.timesSelected;
+	}
+
+	@Override
+	public int compareTo(Project proj) {
+		return this.timesSelected - proj.getSelectedCount();
 	}
 }

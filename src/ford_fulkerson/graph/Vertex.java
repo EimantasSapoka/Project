@@ -85,7 +85,7 @@ public class Vertex implements Comparable<Vertex>{
 		return this.distanceFromSource;
 	}
 	
-	public boolean isRreachable(){
+	public boolean isReachable(){
 		return this.reachable;
 	}
 	
