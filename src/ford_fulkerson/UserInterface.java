@@ -34,8 +34,10 @@ public class UserInterface {
 			
 			
 			if (args.length >1 && args[1].equalsIgnoreCase("balance") ){
+				System.out.println("running load balanced algorithm");
 				Algorithm.runLoadBalancedAlgorithm(graph);
 			} else {
+				System.out.println("running not load balanced algoritm");
 				Algorithm.runUnbalancedAlgorithm(graph);
 
 			}
