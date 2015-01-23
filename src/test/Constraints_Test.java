@@ -1,12 +1,9 @@
 package test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 
-import org.junit.Test;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 import test.graph_creator.RandomArbitraryGraph;
 import test.graph_creator.RandomReaderAllocationGraph;
@@ -18,7 +15,7 @@ import ford_fulkerson.graph.Reader;
 
 public class Constraints_Test {
 	
-	private static final int TEST_COUNT = 10000;
+	private static final int TEST_COUNT = 100;
 	Graph arbitraryGraph,readerGraph;;
 	
 	/**
@@ -28,7 +25,8 @@ public class Constraints_Test {
 	@Test
 	public void testReaderGraph(){
 		for (int i=0; i<TEST_COUNT; i++){
-			readerGraph = new RandomReaderAllocationGraph(i%80 + 20, 3, 3);
+
+			readerGraph = new RandomReaderAllocationGraph();
 			Algorithm.runLoadBalancedAlgorithm(readerGraph);
 			checkReaderConstraints(readerGraph);
 		}
