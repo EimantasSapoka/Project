@@ -16,7 +16,7 @@ import ford_fulkerson.graph.Reader;
 
 public class CorrectnessTest {
 
-	private static final int TEST_COUNT = 100000;
+	private static final int TEST_COUNT = 1000;
 	MinCostMaxFlowSPA alg;
 	
 	@Before 
@@ -55,9 +55,13 @@ public class CorrectnessTest {
 		testGraph.createGraph();
 		
 		Network network = alg.createReaderNetworkFromGraph(testGraph);
-		runTests(testGraph, network);
-		System.out.println("\n");
-		System.out.println(testGraph);
+		
+
+		Algorithm.runLoadBalancedAlgorithm(testGraph);
+		network = alg.solve(network);
+		
+		assertTrue(testGraph.isLoadBalanced() && !network.isLoadBalanced());
+		
 		network.networkDescription();
 	}
 	
@@ -72,19 +76,18 @@ public class CorrectnessTest {
 	public void readerAllocationGraphTest() throws Exception{
 		System.out.println("STARTING READER GRAPH TESTS");
 		for (int i=0; i<TEST_COUNT; i++){
-			System.out.println("TEST " + i);
-			
+			if (i%1000 == 0){
+				System.out.println("TEST " + i);
+			}
 			// create a new random reader graph
 			Graph testGraph = new RandomReaderAllocationGraph(i%40 + 10, 2, 7);
 			testGraph.createGraph();
 			Network network = alg.createReaderNetworkFromGraph(testGraph);
+			
 			runTests(testGraph, network);
 			
 			// check reader graph constraints
-			Constraints_Test.checkReaderConstraints(testGraph);
-			
-			
-			
+			Constraints_Test.checkReaderConstraints(testGraph);			
 		}
 	}
 	
@@ -118,7 +121,7 @@ public class CorrectnessTest {
 		
 		//run against both algorithms, measuring performance
 		long start = System.nanoTime();
-		Algorithm.runLoadBalancedAlgorithm(testGraph);
+		Algorithm.runUnbalancedAlgorithm(testGraph);
 		long performanceMine = System.nanoTime() - start;
 		
 		long start2 = System.nanoTime();
@@ -137,17 +140,8 @@ public class CorrectnessTest {
 		
 		
 		// assert equal flow sizes and weights 
-		assertTrue(network.getFlowSize() <= testGraph.getFlow());
-		if (testGraph.isLoadBalanced() && !network.isLoadBalanced()){
-			System.out.println("SUCCESSFULLY LOAD BALANCED");
-			System.out.println("my graph: flow " + testGraph.getFlow() + " weight " + testGraph.getWeight() + " balanced? " + testGraph.isLoadBalanced()  );
-			System.out.println("Augustine: flow " + network.getFlowSize() + " weight " + network.getFlowCost() + " balanced? " + network.isLoadBalanced() );
-		}
-		if (!(testGraph.isLoadBalanced() || !network.isLoadBalanced())){
-			System.out.println("my alg: " + testGraph.isLoadBalanced() + " augustine: " + network.isLoadBalanced());
-		}
-		
-		assertTrue(network.getFlowCost() >= testGraph.getWeight() || testGraph.getFlow() != network.getFlowSize() || (testGraph.isLoadBalanced() && !network.isLoadBalanced()));
+		assertTrue(network.getFlowSize() <= testGraph.getFlow());		
+		assertTrue(network.getFlowCost() >= testGraph.getWeight());
 		assertTrue(testGraph.isLoadBalanced() || !network.isLoadBalanced());
 		
 	}
