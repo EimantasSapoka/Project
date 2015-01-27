@@ -11,7 +11,7 @@ public class Reader  implements TreeObjectInterface{
 	private final int capacity;							// it's project preference capacity
 	private ArrayList<Integer> supervisorProjects;		// list of already assigned projects
 	private ArrayList<Project> preferences;				// list of project preferences
-	
+	private String name;
 	private int projectUpperLimit;						// the reader's limit of how many projects he can take.
 														// Used for load balancing
 	
@@ -22,7 +22,13 @@ public class Reader  implements TreeObjectInterface{
 		this.supervisorProjects = new ArrayList<Integer>();
 		this.preferences = new ArrayList<Project>();
 		this.projectUpperLimit = 0;
+                this.name = String.valueOf(id);
 	}
+        
+        public Reader(String readerName, int id){
+            this(id,0);
+            this.name = readerName;
+        }
 	
 	public void incrementLimit(){
 		this.projectUpperLimit++;
@@ -81,20 +87,11 @@ public class Reader  implements TreeObjectInterface{
 	}
 	
 	public boolean equals(Reader r){
-		return this.id == r.getID();
+		return this.id == r.getID() && this.vertex.equals(r.getVertex());
 	}
 	
 	public String toString(){
-		String result = "Reader id: " +id + ", project capacity: " + capacity;
-		result += "\nSupervised projects: ";
-		for (Integer p: supervisorProjects){
-			result += "\n" + p;
-		}
-		result += "\nPreferences: ";
-		for (Project p: preferences){
-			result += "\n" + p;
-		}
-		return result;
+		return name + "; capacity: " + this.getCapacity() + ", preferences: " + this.getPreferences().size();
 	}
 
 	/**

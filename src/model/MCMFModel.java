@@ -26,7 +26,7 @@ public class MCMFModel {
 
     public MCMFModel(File file) {
        this();
-       this.loadGraphFromFile(file);
+       loadGraphFromFile(file);
     }
     
     public MCMFModel(){
@@ -91,6 +91,18 @@ public class MCMFModel {
         }
         return null;
     }
+    
+    public Project getProject(Project project){
+        if (project == null){
+            return null;
+        }
+         for (Project p : projects) {
+            if (p.equals(project)) {
+                return p;
+            }
+        }
+        return null;
+    }
 
     /**
      * returns projects list
@@ -105,6 +117,14 @@ public class MCMFModel {
         return this.readers;
     }
 
+    public Reader getReader(Reader r){
+        for (Reader reader : this.getReaders()){
+            if (reader.equals(r)){
+                return r;
+            }
+        }
+        return null;
+    }
     /**
      * returns if the graph is load balanced. That is weather all the reader's
      * in the graph have no more than one less project assigned with respect to
@@ -226,7 +246,7 @@ public class MCMFModel {
     public String toString() {
         String result = "";
 
-        int numberProjects = this.getProjects().size();
+        int numberProjects = this.projects.size();
 
         for (Reader r : readers) {
             result += "Reader " + r.getVertex().getObjectID();
@@ -261,6 +281,19 @@ public class MCMFModel {
                 this.isLoadBalanced(),
                 graph.isSaturatingFlow());
         return result;
+    }
+
+    public boolean movePreference(Reader reader, Project project) {
+        
+        for (Reader r : this.readers){
+            if (r.getPreferences().contains(project)){
+                r.getPreferences().remove(project);
+                reader.addPreference(project);
+                return true;
+            }
+                
+        }
+        return false;
     }
 
 }

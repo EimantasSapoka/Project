@@ -27,6 +27,7 @@ import javafx.scene.input.TransferMode;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import model.Project;
 
 /**
  *
@@ -55,18 +56,16 @@ public class FXMLDocumentController implements Initializable {
         File file = fileChooser.showOpenDialog(menuBar.getScene().getWindow());
         if (file != null){
             System.out.println(file);
-            model = new MCMFModel(file);
-        }
-        
-        modelTreeViewWithGraph(model.getGraph());
-        
+            model = new MCMFModel(file); 
+            createTreeViewFromGraph(model);
+        }        
     }
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         initializeTreeCells();
-        
-        TreeItem<TreeObjectInterface> rootItem = new TreeItem<TreeObjectInterface>(new TreeObject("root"));
+        Reader root = new Reader("root", -1);
+        TreeItem<TreeObjectInterface> rootItem = new TreeItem<TreeObjectInterface>(root);
         treeView.setRoot(rootItem);
         treeView.setShowRoot(false);
        
@@ -100,7 +99,7 @@ public class FXMLDocumentController implements Initializable {
                                 
                                 /* put a string on dragboard */
                                 ClipboardContent content = new ClipboardContent();
-                                content.putString(treeCell.getText());
+                                content.putString(((Project)treeItem.getValue()).getId()+"");
                                 db.setContent(content);
                                 mouseEvent.consume();
                             }
@@ -170,13 +169,19 @@ public class FXMLDocumentController implements Initializable {
                             System.out.println("onDragDropped");
                             /* if there is a string data on dragboard, read it and use it */
                             Dragboard db = event.getDragboard();
-                            boolean success = false;
-                            if (db.hasString()) {
-                                treeCell.setText(db.getString());
-                                success = true;
-                            }
+                           TreeItem<TreeObjectInterface> treeItem = treeCell.getTreeItem();
+                           boolean success = false;
+                           if (treeItem.isLeaf()){
+                               
+                           } else {
+                               Reader reader = (Reader) treeItem.getValue();
+                               Project projectToMove = model.getProject(Integer.parseInt(db.getString()));
+                               success = model.movePreference(model.getReader(reader), projectToMove );
+                           }
+                            createTreeViewFromGraph(model);
                             /* let the source know whether the string was successfully 
                              * transferred and used */
+                            System.out.println(success);
                             event.setDropCompleted(success);
 
                             event.consume();
@@ -202,10 +207,21 @@ public class FXMLDocumentController implements Initializable {
                 });
     }
 
-    private void modelTreeViewWithGraph(Graph graph) {
-        if (graph == null){
+    private void createTreeViewFromGraph(MCMFModel model) {
+        if (model.getGraph() == null){
             System.out.println("Graph instance empty");
             return;
+        } 
+        this.treeView.getRoot().getChildren().clear();
+        
+        for (Reader reader : model.getReaders()){
+            TreeItem<TreeObjectInterface> readerNode = new TreeItem<TreeObjectInterface>(reader);
+            for (Project preference: reader.getPreferences()){
+                 TreeItem<TreeObjectInterface> projectNode = new TreeItem<TreeObjectInterface>(preference);
+                 readerNode.getChildren().add(projectNode);
+            }
+            
+            this.treeView.getRoot().getChildren().add(readerNode);
         }
     }
 }
