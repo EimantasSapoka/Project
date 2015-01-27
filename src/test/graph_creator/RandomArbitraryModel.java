@@ -6,18 +6,21 @@ import java.util.Random;
 import ford_fulkerson.graph.Edge;
 import ford_fulkerson.graph.Graph;
 import ford_fulkerson.graph.Vertex;
+import model.MCMFModel;
 
 /**
  * class which creates a random arbitrary graph
  * @author Eimantas
  *
  */
-public class RandomArbitraryGraph extends Graph {
+public class RandomArbitraryModel extends MCMFModel {
 	
 	private static final int PROBABILITY_CEILING = 100;
 	private static final int EDGE_CAPACITY = 10;
 	private static final int EDGE_WEIGHT_MAX = 4;
 	Random rand;
+        
+        private Graph graph;
 	
 	private int pEdge;
 	private int numVertices;
@@ -26,15 +29,15 @@ public class RandomArbitraryGraph extends Graph {
 	 * creates a random arbitrary graph with the default 
 	 * probability values
 	 */
-	public RandomArbitraryGraph(){
+	public RandomArbitraryModel(){
 		super();
 		rand = new Random();
-		
+		graph = this.getGraph();
 		
 		this.numVertices = rand.nextInt(8) + 25; 
 		this.pEdge = rand.nextInt(20)+1; // 1 <= n < 21
 		for (int i = 2; i < numVertices+2; i++){
-			this.addVertex(new Vertex(i,null));
+			graph.addVertex(new Vertex(i,null));
 		}
 		
 		add_source_sink_edges();
@@ -46,7 +49,7 @@ public class RandomArbitraryGraph extends Graph {
 	 * vertices being probEdge 
 	 * @param probEdge (0<=pEdge<=100)
 	 */
-	public RandomArbitraryGraph(int probEdge){
+	public RandomArbitraryModel(int probEdge){
 		this();
 
 		if (probEdge > 0 && probEdge < 100){
@@ -60,7 +63,7 @@ public class RandomArbitraryGraph extends Graph {
 	 * @param probEdge
 	 * @param numVertices
 	 */
-	public RandomArbitraryGraph(int probEdge, int numVertices){
+	public RandomArbitraryModel(int probEdge, int numVertices){
 		this(probEdge);
 		this.numVertices = numVertices;
 	}
@@ -70,7 +73,7 @@ public class RandomArbitraryGraph extends Graph {
 	 * method which creates random edges between all the vertices
 	 */
 	private void generate_random_edges() {
-		for (Vertex v: this.getVertices()){
+		for (Vertex v: graph.getVertices()){
 			if (v.getObjectID() != Graph.SINK_ID && v.getObjectID() != Graph.SOURCE_ID){
 				add_vertex_to_vertex_edges(v);
 			}
@@ -86,7 +89,7 @@ public class RandomArbitraryGraph extends Graph {
 	 */
 	private void add_vertex_to_vertex_edges(Vertex v) {
 		// for every other vertex, if it's not itself, the source or sink, add an edge at a probability pEdge
-		for (Vertex vert: this.getVertices()){
+		for (Vertex vert: graph.getVertices()){
 			if (vert.getObjectID() != Graph.SINK_ID && 
 				vert.getObjectID() != Graph.SOURCE_ID && 
 				vert.getObjectID() != v.getObjectID() ){
@@ -94,7 +97,7 @@ public class RandomArbitraryGraph extends Graph {
 				// if the random integer is lower than the probability, it's considered a hit
 				if (rand.nextInt(PROBABILITY_CEILING) <= pEdge){
 					Edge vertexVertexEdge = new Edge(v, vert, rand.nextInt(EDGE_CAPACITY)+1, rand.nextInt(EDGE_WEIGHT_MAX)+1);
-					this.addEdge(vertexVertexEdge);
+					graph.addEdge(vertexVertexEdge);
 				}
 			}
 		}
@@ -109,25 +112,25 @@ public class RandomArbitraryGraph extends Graph {
 	@SuppressWarnings("unchecked")
 	private void add_source_sink_edges() {
 		
-		ArrayList<Vertex> vertices = (ArrayList<Vertex>) this.getVertices().clone();
-		vertices.remove(this.source());
-		vertices.remove(this.sink());
+		ArrayList<Vertex> vertices = (ArrayList<Vertex>) graph.getVertices().clone();
+		vertices.remove(graph.source());
+		vertices.remove(graph.sink());
 		int randomInt; 
 		
 		// a number of random vertices will have the source-to-vertex edge
 		
 		for (int i = 0; i< vertices.size()/4 ; i++){
 			randomInt = rand.nextInt(vertices.size());
-			Edge sourceVertexEdge = new Edge(this.source(), vertices.remove(randomInt), rand.nextInt(EDGE_CAPACITY*4)+1, rand.nextInt(EDGE_WEIGHT_MAX)+1);
-			this.addEdge(sourceVertexEdge);
+			Edge sourceVertexEdge = new Edge(graph.source(), vertices.remove(randomInt), rand.nextInt(EDGE_CAPACITY*4)+1, rand.nextInt(EDGE_WEIGHT_MAX)+1);
+			graph.addEdge(sourceVertexEdge);
 		}
 		
 		// and a number of random vertices will have a vertex-to-sink edge
 		
 		for (int i = 0; i< vertices.size()/4 ; i++){
 			randomInt = rand.nextInt(vertices.size());
-			Edge vertexSinkEdge = new Edge(vertices.remove(randomInt), this.sink(), rand.nextInt(EDGE_CAPACITY*4)+1, rand.nextInt(EDGE_WEIGHT_MAX)+1);
-			this.addEdge(vertexSinkEdge);
+			Edge vertexSinkEdge = new Edge(vertices.remove(randomInt), graph.sink(), rand.nextInt(EDGE_CAPACITY*4)+1, rand.nextInt(EDGE_WEIGHT_MAX)+1);
+			graph.addEdge(vertexSinkEdge);
 		}
 	}
 	

@@ -1,4 +1,6 @@
-package ford_fulkerson.graph;
+package model;
+
+import ford_fulkerson.graph.Vertex;
 
 public class Project implements Comparable<Project> {
 	private final int id;			// project id

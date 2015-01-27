@@ -1,8 +1,11 @@
-package ford_fulkerson.graph;
+package model;
 
+import ford_fulkerson.graph.Edge;
+import ford_fulkerson.graph.Vertex;
 import java.util.ArrayList;
+import mcmfuserinterface.TreeObjectInterface;
 
-public class Reader {
+public class Reader  implements TreeObjectInterface{
 	private final int id;								// reader id
 	private final Vertex vertex;						// it's vertex
 	private final int capacity;							// it's project preference capacity

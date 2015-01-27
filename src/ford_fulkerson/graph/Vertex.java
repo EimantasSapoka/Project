@@ -2,7 +2,7 @@ package ford_fulkerson.graph;
 
 import java.util.ArrayList;
 
-import ford_fulkerson.residual_classes.ResidualEdge;
+import ford_fulkerson.graph.residual_classes.ResidualEdge;
 
 public class Vertex implements Comparable<Vertex>{
 

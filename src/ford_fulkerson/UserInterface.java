@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 
 import ford_fulkerson.graph.Graph;
+import model.MCMFModel;
 
 /**
  * class to run the application. Will need to be extended with an elaborate UI 
@@ -21,27 +22,20 @@ public class UserInterface {
 			System.out.println("enter file path!");
 			System.exit(1);
 		}
+                MCMFModel model = new MCMFModel(new File(args[0]));
 		
-		Graph graph = null;
-		try {
-			graph = TextScanner.parse(new File(args[0]));
-		} catch (IOException e) {
-			System.out.println("error reading file");
-			e.printStackTrace();
-			System.exit(1);
-		}
-		if (graph != null){
+		if (model.getGraph() != null){
 			
 			
-			if (args.length >1 && args[1].equalsIgnoreCase("balance") ){
+			if (args.length >1 && args[1].equalsIgnoreCase("balanced") ){
 				System.out.println("running load balanced algorithm");
-				Algorithm.runLoadBalancedAlgorithm(graph);
+				Algorithm.runLoadBalancedAlgorithm(model);
 			} else {
 				System.out.println("running not load balanced algoritm");
-				Algorithm.runUnbalancedAlgorithm(graph);
+				Algorithm.runUnbalancedAlgorithm(model);
 
 			}
-			writeToFile("results.txt", graph);
+			writeToFile("results.txt", model);
 		}
 	}
 
@@ -50,7 +44,7 @@ public class UserInterface {
 	 * @param String fileName the file name
 	 * @param Graph graph the graph to output
 	 */
-	private static void writeToFile(String fileName, Graph graph) {
+	private static void writeToFile(String fileName, MCMFModel model) {
 		PrintWriter writer = null;
 		try {
 			writer = new PrintWriter(fileName, "UTF-8");
@@ -59,7 +53,7 @@ public class UserInterface {
 		} catch (UnsupportedEncodingException e) {
 			System.out.println("Unsupported exception!" + e.getMessage());
 		}
-		writer.println(graph.toString());
+		writer.println(model.toString());
 		writer.close();
 	}
 	

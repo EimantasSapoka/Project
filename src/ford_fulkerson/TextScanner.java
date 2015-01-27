@@ -6,8 +6,9 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import ford_fulkerson.graph.Graph;
-import ford_fulkerson.graph.Project;
-import ford_fulkerson.graph.Reader;
+import model.MCMFModel;
+import model.Project;
+import model.Reader;
 
 /**
  * a text scanner class which takes a text file input and generates a graph from it
@@ -15,11 +16,9 @@ import ford_fulkerson.graph.Reader;
  *
  */
 public class TextScanner {
-	private static Graph graph;
+	
 
-
-	public static Graph parse(File textFile) throws IOException{
-		graph = new Graph();
+	public static void parse(File textFile, MCMFModel model) throws IOException{
 		BufferedReader textReader = new BufferedReader(new FileReader(textFile));
 		String line = "";
 		while ( ( line = textReader.readLine() )  != null ){
@@ -31,13 +30,13 @@ public class TextScanner {
 			int readerID = Integer.parseInt(barSplit[0].trim());
 			int readerCapacity = Integer.parseInt(barSplit[2].trim());
 			
-			if (! graph.hasReader(readerID)){
+			if (! model.hasReader(readerID)){
 				Reader reader = new Reader(readerID, readerCapacity);
 				parseSupervisingProjects(barSplit[1], reader);
 				if (barSplit.length == 4){
-					parseProjectPreferences(barSplit[3], reader);
+					parseProjectPreferences(barSplit[3], reader, model);
 				}
-				graph.addReader(reader);
+				model.addReader(reader);
 			} else {
 				textReader.close();
 				System.out.println("reader id repeated! " + readerID);
@@ -45,7 +44,6 @@ public class TextScanner {
 			
 		}
 		textReader.close();
-		return graph;
 	}
 
 	/**
@@ -53,7 +51,7 @@ public class TextScanner {
 	 * @param barSplit
 	 * @param reader
 	 */
-	private static void parseProjectPreferences(String projects, Reader reader) {
+	private static void parseProjectPreferences(String projects, Reader reader, MCMFModel model) {
 		String[] projectsSplit = projects.split(" ");
 		
 		for (String projectID: projectsSplit){
@@ -63,7 +61,7 @@ public class TextScanner {
 			int id = Integer.parseInt(projectID.trim());
 			
 			Project project = null;
-			if( (project = graph.getProject(id)) == null){
+			if( (project = model.getProject(id)) == null){
 				project = new Project(id);
 			}
 			
