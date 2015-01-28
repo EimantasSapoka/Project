@@ -8,11 +8,15 @@ package mcmfuserinterface;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.layout.HBox;
 import javafx.util.Callback;
 import model.MCMFModel;
+import model.Project;
 import model.Reader;
 
 /**
@@ -32,24 +36,26 @@ public class TableCellWithListFactory implements Callback<TableColumn<TableObjec
     @Override 
     public TableCell<TableObjectInterface, TableObjectInterface> call(TableColumn<TableObjectInterface, TableObjectInterface> btnCol) {
         return new TableCell<TableObjectInterface, TableObjectInterface>() {
-          final ListView<TableObjectInterface> list = new ListView<TableObjectInterface>(); {
-             list.setOrientation(Orientation.HORIZONTAL);
-             list.setCellFactory(new ListCellFactory(model, controller));
-             list.setMaxHeight(50);
-             
-          }
-          final ObservableList<TableObjectInterface> items = FXCollections.observableArrayList();
-          @Override public void updateItem(final TableObjectInterface reader, boolean empty) {
-            super.updateItem(reader, empty);
-            if (!empty && reader != null && items.size() == 0){
+            ScrollPane scrollPane = new ScrollPane();
+            HBox hbox = new HBox();
+            
+            
+            
+            @Override 
+            public void updateItem(final TableObjectInterface reader, boolean empty) {
                 
-                items.addAll(((Reader) reader).getPreferences());
-                list.setItems(items);
-                this.setGraphic(list);
-            } else {
-                list.setItems(items);
+                  if (!empty && reader != null){
+                      hbox.getChildren().clear();
+                      for (Project project : ((Reader) reader).getPreferences()){
+                          Label label = new Label(project.toString());
+                          label.setUserData(project);
+                          hbox.getChildren().add(label);
+                          hbox.setSpacing(10);
+                          scrollPane.setContent(hbox);
+                      }
+                      this.setGraphic(scrollPane);
+                  } 
             }
-          }
         };
       }
 }

@@ -17,6 +17,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
@@ -82,7 +83,7 @@ public class FXMLDocumentController implements Initializable, Controller {
         
         
         tableView.setStyle(".table-row-cell {-fx-cell-size: 50px;}");
-        tableView.setFixedCellSize(50);
+        tableView.setFixedCellSize(40);
        
     }
     
