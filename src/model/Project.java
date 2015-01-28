@@ -1,9 +1,9 @@
 package model;
 
 import ford_fulkerson.graph.Vertex;
-import mcmfuserinterface.TreeObjectInterface;
+import mcmfuserinterface.TableObjectInterface;
 
-public class Project implements Comparable<Project>, TreeObjectInterface{
+public class Project implements Comparable<Project>, TableObjectInterface{
 	private final int id;			// project id
 	private final Vertex vertex;	// vertex associated with the project
 	private int timesSelected;		// number of times the project had been added to a pref list. 
@@ -13,7 +13,7 @@ public class Project implements Comparable<Project>, TreeObjectInterface{
 		this.id = id;
 		this.vertex = new Vertex(id, this);
 		this.timesSelected = 0;
-                this.name = String.valueOf(id);
+                this.name = id+"";
 	}
         
         public Project(String projectName, int id){

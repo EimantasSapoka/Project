@@ -6,7 +6,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="500.0" prefWidth="800.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="mcmfuserinterface.FXMLDocumentController">
+<AnchorPane id="AnchorPane" prefHeight="500.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mcmfuserinterface.FXMLDocumentController">
    <children>
       <BorderPane layoutX="-72.0" layoutY="-27.0" prefHeight="200.0" prefWidth="320.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <top>
@@ -22,7 +22,11 @@
             </MenuBar>
          </top>
          <center>
-            <TreeView fx:id="treeView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+            <TableView fx:id="tableView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
+            </TableView>
          </center>
       </BorderPane>
    </children>

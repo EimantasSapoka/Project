@@ -3,9 +3,9 @@ package model;
 import ford_fulkerson.graph.Edge;
 import ford_fulkerson.graph.Vertex;
 import java.util.ArrayList;
-import mcmfuserinterface.TreeObjectInterface;
+import mcmfuserinterface.TableObjectInterface;
 
-public class Reader  implements TreeObjectInterface{
+public class Reader  implements TableObjectInterface{
 	private final int id;								// reader id
 	private final Vertex vertex;						// it's vertex
 	private final int capacity;							// it's project preference capacity
@@ -33,6 +33,14 @@ public class Reader  implements TreeObjectInterface{
 	public void incrementLimit(){
 		this.projectUpperLimit++;
 	}
+        
+        public String getName(){
+            return this.name;
+        }
+        
+        public void setName(String name){
+            this.name = name ;
+        }
 	
 	public int getProjectUpperLimit(){
 		return this.projectUpperLimit;

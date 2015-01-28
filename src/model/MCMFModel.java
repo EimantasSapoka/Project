@@ -283,17 +283,19 @@ public class MCMFModel {
         return result;
     }
 
-    public boolean movePreference(Reader reader, Project project) {
-        
-        for (Reader r : this.readers){
-            if (r.getPreferences().contains(project)){
-                r.getPreferences().remove(project);
-                reader.addPreference(project);
-                return true;
+    public void movePreference(Reader reader, Reader readerToRemoveFrom, Project projectToMove, Project projectToPlaceBefore) {
+       readerToRemoveFrom.getPreferences().remove(projectToMove);
+       int indexToPlace = reader.getPreferences().indexOf(projectToPlaceBefore);
+       reader.getPreferences().add(indexToPlace, projectToMove);
+    }
+
+    public Reader getReader(int readerID) {
+        for (Reader reader : readers){
+            if (reader.getID() == readerID){
+                return reader;
             }
-                
         }
-        return false;
+        return null;
     }
 
 }

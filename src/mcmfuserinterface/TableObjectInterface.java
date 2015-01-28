@@ -9,7 +9,7 @@ package mcmfuserinterface;
  *
  * @author Eimantas
  */
-public interface TreeObjectInterface {
+public interface TableObjectInterface {
     
     @Override
     public String toString();
