@@ -42,21 +42,11 @@ public class DragDropLabel extends Label{
         label.setOnDragDetected(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                System.out.println("Dragging!!");
-
                 Dragboard db = label.startDragAndDrop(TransferMode.MOVE);
-                
                 ClipboardContent content = new ClipboardContent();
 
-                Project project = (Project) label.getUserData();
-                HBox hbox = (HBox) label.getParent();
-                Reader reader = (Reader) hbox.getUserData();
-                
-                System.out.println("Project " + project + " reader " + reader);
-                if (reader != null && project != null){
-                    content.putString(reader.getID()+"/"+project.getId());
-                    db.setContent(content);
-                }
+                content.putString("test");
+                db.setContent(content);
                 mouseEvent.consume();
             }
         });
@@ -64,8 +54,6 @@ public class DragDropLabel extends Label{
         label.setOnDragOver(new EventHandler<DragEvent>() {
             @Override
             public void handle(DragEvent event) {
-                /* data is dragged over the listCell */
-                System.out.println("onDragOver");
                 event.acceptTransferModes(TransferMode.MOVE);
                 event.consume();
             }
@@ -74,15 +62,10 @@ public class DragDropLabel extends Label{
         label.setOnDragEntered(new EventHandler<DragEvent>() {
             @Override
             public void handle(DragEvent event) {
-                /* the drag-and-drop gesture entered the listCell */
-                System.out.println("onDragEntered");
-                /* show to the user that it is an actual gesture listCell */
-                if (event.getGestureSource() != label
-                        && event.getDragboard().hasString()) {
+                if ((event.getGestureSource() != label)) {
                     label.setOpacity(0.5);
                     label.setText("\t" + label.getText());
                 }
-                
                 event.consume();
             }
         });
@@ -90,7 +73,6 @@ public class DragDropLabel extends Label{
         label.setOnDragExited(new EventHandler<DragEvent>() {
             @Override
             public void handle(DragEvent event) {
-                /* mouse moved away, remove the graphical cues */
                 label.setText(label.getText().trim());
                 label.setOpacity(1);
                 event.consume();
@@ -101,22 +83,10 @@ public class DragDropLabel extends Label{
         label.setOnDragDropped(new EventHandler<DragEvent>() {
             @Override
             public void handle(DragEvent event) {
-                System.out.println("DROPPED!!!!");
-                /* if there is a string data on dragboard, read it and use it */
-                Dragboard db = event.getDragboard();
                 
-                if (label.getUserData() == null){
-                    event.consume();
-                    return;
-                }
-                String clipboard = db.getString();
-                System.out.println(clipboard);
-                
-                int readerID = Integer.parseInt(clipboard.split("/")[0]);
-                int projectID = Integer.parseInt(clipboard.split("/")[1]);
-                
-                Project projectToMove = controller.getModel().getProject(projectID);
-                Reader readerToRemoveFrom = controller.getModel().getReader(readerID);
+                Label sourceLabel = (Label)event.getGestureSource();
+                Project projectToMove = (Project) sourceLabel.getUserData();
+                Reader readerToRemoveFrom = (Reader) ((HBox) sourceLabel.getParent()).getUserData();
                 Project projectToPlaceBefore = (Project) label.getUserData();
                 HBox hbox = (HBox) label.getParent();
                 Reader readerToAdd = (Reader) hbox.getUserData();

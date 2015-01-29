@@ -5,22 +5,13 @@
  */
 package mcmfuserinterface;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
-import javafx.geometry.Orientation;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
-import javafx.scene.input.DragEvent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.TransferMode;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
 import javafx.util.Callback;
-import model.MCMFModel;
 import model.Project;
 import model.Reader;
 
@@ -52,11 +43,10 @@ public class TableCellWithListFactory implements Callback<TableColumn<TableObjec
                     hbox.getChildren().clear();
                     
                     for (Project project : ((Reader) reader).getPreferences()) {
-                        Label label = new DragDropLabel(project.toString(), controller);
+                        Label label = new DragDropLabel(project.getId()+"", controller);
                         label.setUserData(project);
+                        label.setTooltip(new Tooltip(project.toString()));
                         hbox.getChildren().add(label);
-                        
-
                     }
                     hbox.setUserData(reader);
                     this.setGraphic(scrollPane);

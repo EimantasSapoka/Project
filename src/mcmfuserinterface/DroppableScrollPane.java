@@ -6,6 +6,7 @@
 package mcmfuserinterface;
 
 import javafx.event.EventHandler;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
@@ -31,8 +32,6 @@ public class DroppableScrollPane extends ScrollPane {
         scrollPane.setOnDragOver(new EventHandler<DragEvent>() {
             @Override
             public void handle(DragEvent event) {
-                /* data is dragged over the listCell */
-                System.out.println("onDragOver");
                 event.acceptTransferModes(TransferMode.MOVE);
                 event.consume();
             }
@@ -41,9 +40,6 @@ public class DroppableScrollPane extends ScrollPane {
         scrollPane.setOnDragEntered(new EventHandler<DragEvent>() {
             @Override
             public void handle(DragEvent event) {
-                /* the drag-and-drop gesture entered the listCell */
-                System.out.println("onDragEntered");
-                /* show to the user that it is an actual gesture listCell */
                 event.consume();
             }
         });
@@ -51,7 +47,6 @@ public class DroppableScrollPane extends ScrollPane {
         scrollPane.setOnDragExited(new EventHandler<DragEvent>() {
             @Override
             public void handle(DragEvent event) {
-                /* mouse moved away, remove the graphical cues */
                 event.consume();
             }
         });
@@ -60,26 +55,18 @@ public class DroppableScrollPane extends ScrollPane {
         scrollPane.setOnDragDropped(new EventHandler<DragEvent>() {
             @Override
             public void handle(DragEvent event) {
-                System.out.println("DROPPED!!!!");
-                /* if there is a string data on dragboard, read it and use it */
-                Dragboard db = event.getDragboard();
-                
+               
                 HBox hbox = (HBox) scrollPane.getContent();
                 if (hbox.getUserData() == null){
                     event.consume();
                     return;
                 }
-                String clipboard = db.getString();
-                System.out.println(clipboard);
-                
-                int readerID = Integer.parseInt(clipboard.split("/")[0]);
-                int projectID = Integer.parseInt(clipboard.split("/")[1]);
-                
-                Project projectToMove = controller.getModel().getProject(projectID);
-                Reader readerToRemoveFrom = controller.getModel().getReader(readerID);
+               
+                Label sourceLabel = (Label)event.getGestureSource();
+                Project projectToMove = (Project) sourceLabel.getUserData();
+                Reader readerToRemoveFrom = (Reader) ((HBox) sourceLabel.getParent()).getUserData();
                 Reader readerToAdd = (Reader) hbox.getUserData();
                 
-                System.out.println("adding to reader " + readerToAdd + " project " + projectToMove);
                 controller.getModel().movePreference(readerToAdd, readerToRemoveFrom, projectToMove);
                 controller.refreshTable();
                 

@@ -107,7 +107,13 @@ public class FXMLDocumentController implements Initializable, Controller {
             return;
         }
      
-        tableView.getColumns().clear();
+        if (tableView.getColumns().isEmpty()){
+            tableView.getColumns().add(createReaderColumn());
+            tableView.getColumns().add(createCapacityColumn());
+            tableView.getColumns().add(createPreferenceListSizeColumn());
+            tableView.getColumns().add(createPreferencesColumn());
+        }
+        
         ObservableList<TableObjectInterface> items = FXCollections.observableArrayList();
         if (this.showZeroCapacityReaders()){
             items.addAll(model.getReaders());
@@ -120,14 +126,6 @@ public class FXMLDocumentController implements Initializable, Controller {
         }
         
         tableView.setItems(items);
-        
-        tableView.getColumns().add(createReaderColumn());
-        tableView.getColumns().add(createCapacityColumn());
-        tableView.getColumns().add(createPreferenceListSizeColumn());
-        tableView.getColumns().add(createPreferencesColumn());
-        
-        
-       
         tableView.setStyle(".table-row-cell {-fx-cell-size: 50px;}");
         tableView.setFixedCellSize(40);
         

@@ -287,12 +287,8 @@ public class MCMFModel {
         if (!reader.getPreferences().contains(projectToMove) || reader.equals(readerToRemoveFrom)) {
             
             int indexToPlace = reader.getPreferences().indexOf(projectToPlaceBefore);
-            
-            if ( reader.addPreference(indexToPlace, projectToMove)){
-                readerToRemoveFrom.removePreference(projectToMove);
-            } else {
-                // TODO: show incorrect action dialog box
-            }
+            readerToRemoveFrom.removePreference(projectToMove);
+            reader.addPreference(indexToPlace, projectToMove);
         }
     }
 
