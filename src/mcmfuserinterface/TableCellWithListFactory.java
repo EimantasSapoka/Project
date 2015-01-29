@@ -39,20 +39,21 @@ public class TableCellWithListFactory implements Callback<TableColumn<TableObjec
             ScrollPane scrollPane = new ScrollPane();
             HBox hbox = new HBox();
             
-            
-            
             @Override 
             public void updateItem(final TableObjectInterface reader, boolean empty) {
                 
                   if (!empty && reader != null){
-                      hbox.getChildren().clear();
-                      for (Project project : ((Reader) reader).getPreferences()){
-                          Label label = new Label(project.toString());
-                          label.setUserData(project);
-                          hbox.getChildren().add(label);
-                          hbox.setSpacing(10);
-                          scrollPane.setContent(hbox);
-                      }
+                    hbox.getChildren().clear();
+                    for (Project project : ((Reader) reader).getPreferences()){
+                        Label label = new Label(project.toString());
+                        label.setUserData(project);
+                        hbox.getChildren().add(label);
+                        hbox.setSpacing(10);
+                    } 
+                      
+                     
+                      
+                      scrollPane.setContent(hbox);
                       this.setGraphic(scrollPane);
                   } 
             }
