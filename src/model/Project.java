@@ -50,6 +50,10 @@ public class Project implements Comparable<Project>, TableObjectInterface{
         public boolean equals(Project project){
             return this.id == project.getId() && this.vertex.equals(project.getVertex());
         }
+
+    void unselect() {
+        this.timesSelected--;
+    }
 }
 
     

@@ -284,9 +284,16 @@ public class MCMFModel {
     }
 
     public void movePreference(Reader reader, Reader readerToRemoveFrom, Project projectToMove, Project projectToPlaceBefore) {
-       readerToRemoveFrom.getPreferences().remove(projectToMove);
-       int indexToPlace = reader.getPreferences().indexOf(projectToPlaceBefore);
-       reader.getPreferences().add(indexToPlace, projectToMove);
+        if (!reader.getPreferences().contains(projectToMove) || reader.equals(readerToRemoveFrom)) {
+            
+            int indexToPlace = reader.getPreferences().indexOf(projectToPlaceBefore);
+            
+            if ( reader.addPreference(indexToPlace, projectToMove)){
+                readerToRemoveFrom.removePreference(projectToMove);
+            } else {
+                // TODO: show incorrect action dialog box
+            }
+        }
     }
 
     public Reader getReader(int readerID) {
@@ -296,6 +303,17 @@ public class MCMFModel {
             }
         }
         return null;
+    }
+
+    public void movePreference(Reader readerToAdd, Reader readerToRemoveFrom, Project projectToMove) {
+        if (!readerToAdd.getPreferences().contains(projectToMove) || readerToAdd.equals(readerToRemoveFrom)) {
+            if (readerToAdd.addPreference(projectToMove)){
+                readerToRemoveFrom.removePreference(projectToMove);
+            } else {
+                // TODO: show incorrect action dialog box
+            }
+            
+        }
     }
 
 }

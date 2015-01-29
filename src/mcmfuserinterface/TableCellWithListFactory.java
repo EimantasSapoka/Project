@@ -7,13 +7,18 @@ package mcmfuserinterface;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 import javafx.util.Callback;
 import model.MCMFModel;
 import model.Project;
@@ -24,39 +29,39 @@ import model.Reader;
  * @author Eimantas
  */
 public class TableCellWithListFactory implements Callback<TableColumn<TableObjectInterface, TableObjectInterface>, TableCell<TableObjectInterface, TableObjectInterface>> {
-    private final MCMFModel model;
     private final Controller controller;
-    
-    public TableCellWithListFactory(MCMFModel model, Controller controller) {
-        this.model = model;
+
+    public TableCellWithListFactory(Controller controller) {
         this.controller = controller;
     }
 
-
-    @Override 
+    @Override
     public TableCell<TableObjectInterface, TableObjectInterface> call(TableColumn<TableObjectInterface, TableObjectInterface> btnCol) {
         return new TableCell<TableObjectInterface, TableObjectInterface>() {
-            ScrollPane scrollPane = new ScrollPane();
+            ScrollPane scrollPane = new DroppableScrollPane(controller);
             HBox hbox = new HBox();
-            
-            @Override 
+
+            {
+                hbox.setSpacing(10);
+                scrollPane.setContent(hbox);
+            }
+
+            @Override
             public void updateItem(final TableObjectInterface reader, boolean empty) {
-                
-                  if (!empty && reader != null){
+                if (!empty && reader != null) {
                     hbox.getChildren().clear();
-                    for (Project project : ((Reader) reader).getPreferences()){
-                        Label label = new Label(project.toString());
+                    
+                    for (Project project : ((Reader) reader).getPreferences()) {
+                        Label label = new DragDropLabel(project.toString(), controller);
                         label.setUserData(project);
                         hbox.getChildren().add(label);
-                        hbox.setSpacing(10);
-                    } 
-                      
-                     
-                      
-                      scrollPane.setContent(hbox);
-                      this.setGraphic(scrollPane);
-                  } 
+                        
+
+                    }
+                    hbox.setUserData(reader);
+                    this.setGraphic(scrollPane);
+                }
             }
         };
-      }
+    }
 }

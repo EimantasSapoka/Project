@@ -50,10 +50,27 @@ public class Reader  implements TableObjectInterface{
 		this.supervisorProjects.add(id);
 	}
 	
-	public void addPreference(Project project){
+	public boolean addPreference(Project project){
+            
+            if (this.capacity > 0){
 		project.select();
 		this.preferences.add(project);
+                return true;
+            } else {
+                return false;
+            }
 	}
+        
+        public boolean addPreference(int indexToPlace, Project project) {
+           
+            if (this.capacity > 0){
+		project.select();
+		this.preferences.add(indexToPlace, project);
+                return true;
+            } else {
+                return false;
+            }
+        }
 
 	public Vertex getVertex() {
 		return this.vertex;
@@ -109,5 +126,12 @@ public class Reader  implements TableObjectInterface{
 	public int getResidualCapacity() {
 		return this.getCapacity() - this.getAssignedProjects().size();
 	}
+
+    void removePreference(Project project) {
+        project.unselect();
+        this.preferences.remove(project);
+    }
+
+    
 
 }

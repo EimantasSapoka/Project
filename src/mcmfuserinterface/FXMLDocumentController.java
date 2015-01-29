@@ -11,12 +11,14 @@ import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.TableColumn;
@@ -37,10 +39,43 @@ public class FXMLDocumentController implements Initializable, Controller {
     @FXML
     private MenuBar menuBar;
 
-   
+    @FXML
+    private CheckBox zeroCapacityReaderCheckbox;
+    
     @FXML
     TableView<TableObjectInterface> tableView;
+    
+    
+    /******************    /
+     METHODS
+    /*********************/
 
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        zeroCapacityReaderCheckbox.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                zeroCapacityReaderCheckbox.setSelected(newValue);
+                 ObservableList<TableObjectInterface> items = FXCollections.observableArrayList();
+                if (newValue){
+                    items.addAll(model.getReaders());
+                } else {
+                    for (Reader r : model.getReaders()){
+                        if (!(r.getCapacity() == 0)){
+                            items.add(r);
+                        }
+                    }
+                }
+                tableView.setItems(null);
+                tableView.setItems(items);
+            }
+        });
+    }
+    
+    public boolean showZeroCapacityReaders(){
+        return zeroCapacityReaderCheckbox.isSelected();
+    }
+    
     @FXML
     private void exitSystem(ActionEvent event) {
         ((Stage) menuBar.getScene().getWindow()).close();
@@ -58,22 +93,32 @@ public class FXMLDocumentController implements Initializable, Controller {
         }
     }
 
+    
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
-       
-        
+    public MCMFModel getModel(){
+        return model;
     }
+    
+    
     
     public void createTableViewFromGraph(MCMFModel model) {
         if (model.getGraph() == null) {
             System.out.println("Graph instance empty");
             return;
         }
-        
+     
         tableView.getColumns().clear();
-
         ObservableList<TableObjectInterface> items = FXCollections.observableArrayList();
-        items.addAll(model.getReaders());
+        if (this.showZeroCapacityReaders()){
+            items.addAll(model.getReaders());
+        } else {
+            for (Reader r : model.getReaders()){
+                if (!(r.getCapacity() == 0)){
+                    items.add(r);
+                }
+            }
+        }
+        
         tableView.setItems(items);
         
         tableView.getColumns().add(createReaderColumn());
@@ -82,8 +127,11 @@ public class FXMLDocumentController implements Initializable, Controller {
         tableView.getColumns().add(createPreferencesColumn());
         
         
+       
         tableView.setStyle(".table-row-cell {-fx-cell-size: 50px;}");
         tableView.setFixedCellSize(40);
+        
+        this.refreshTable();
        
     }
     
@@ -119,7 +167,7 @@ public class FXMLDocumentController implements Initializable, Controller {
           }
         });
         
-        preferencesColumn.setCellFactory(new TableCellWithListFactory(model, this));
+        preferencesColumn.setCellFactory(new TableCellWithListFactory(this));
         return preferencesColumn;
     }
     
@@ -153,6 +201,11 @@ public class FXMLDocumentController implements Initializable, Controller {
         });
         
         return preferenceCountColumn;
+    }
+     
+    public void refreshTable(){
+        tableView.getColumns().get(0).setVisible(false);
+        tableView.getColumns().get(0).setVisible(true);
     }
 
        
