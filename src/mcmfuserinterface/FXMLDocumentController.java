@@ -8,11 +8,14 @@ package mcmfuserinterface;
 import ford_fulkerson.Algorithm;
 import model.MCMFModel;
 import model.Reader;
+
 import java.io.File;
 import java.net.URL;
 import java.util.Comparator;
 import java.util.ResourceBundle;
+
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -24,9 +27,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
@@ -256,11 +261,47 @@ public class FXMLDocumentController implements Initializable, Controller {
         preferenceCountColumn.setMaxWidth(60);
         
         preferenceCountColumn.setCellValueFactory(new Callback<CellDataFeatures<TableObjectInterface, TableObjectInterface>, ObservableValue<TableObjectInterface>>() {
-          @Override public ObservableValue<TableObjectInterface> call(CellDataFeatures<TableObjectInterface, TableObjectInterface> features) {
-              Reader reader = (Reader) features.getValue();
-              return new ReadOnlyObjectWrapper(reader.getPreferences().size());
-          }
+            @Override public ObservableValue<TableObjectInterface> call(CellDataFeatures<TableObjectInterface, TableObjectInterface> features) {
+                return new ReadOnlyObjectWrapper(features.getValue());
+            }
+          });
+        
+        preferenceCountColumn.setComparator(new Comparator<TableObjectInterface>(){
+
+			@Override
+			public int compare(TableObjectInterface o1, TableObjectInterface o2) {
+				return ((Reader) o1).getPreferences().size() - ((Reader) o2).getPreferences().size();
+			}
+        	
         });
+        
+        
+        
+        preferenceCountColumn.setCellFactory(new Callback<TableColumn<TableObjectInterface, TableObjectInterface>, TableCell<TableObjectInterface,TableObjectInterface>>() {
+
+			@Override
+			public TableCell<TableObjectInterface, TableObjectInterface> call(TableColumn<TableObjectInterface, TableObjectInterface> arg) {
+
+				TableCell<TableObjectInterface, TableObjectInterface> cell = new TableCell<TableObjectInterface, TableObjectInterface>(){
+					
+					@Override
+					protected void updateItem(TableObjectInterface arg0, boolean arg1) {
+						super.updateItem(arg0, arg1);
+						if (arg0 != null){
+							Label label = new Label();
+							label.textProperty().bind(((Reader)arg0).getPreferenceStringProperty());
+							System.out.println("value: " + ((Reader)arg0).getPreferenceStringProperty().getValue());
+							setGraphic(label);
+						}
+					}
+					
+				};
+				return cell;
+			}
+          
+        });
+        
+        
         
         return preferenceCountColumn;
     }

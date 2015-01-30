@@ -2,7 +2,10 @@ package model;
 
 import ford_fulkerson.graph.Edge;
 import ford_fulkerson.graph.Vertex;
+
 import java.util.ArrayList;
+
+import javafx.beans.property.SimpleStringProperty;
 import mcmfuserinterface.TableObjectInterface;
 
 public class Reader  implements TableObjectInterface{
@@ -15,6 +18,8 @@ public class Reader  implements TableObjectInterface{
 	private int projectUpperLimit;						// the reader's limit of how many projects he can take.
 														// Used for load balancing
 	
+	private SimpleStringProperty preferenceCountProperty;
+	
 	public Reader(int id, int capacity){
 		this.id = id;
 		this.vertex = new Vertex(id, this);
@@ -22,7 +27,8 @@ public class Reader  implements TableObjectInterface{
 		this.supervisorProjects = new ArrayList<Integer>();
 		this.preferences = new ArrayList<Project>();
 		this.projectUpperLimit = 0;
-                this.name = String.valueOf(id);
+		this.name = String.valueOf(id);
+		this.preferenceCountProperty = new SimpleStringProperty("0");  
 	}
         
         public Reader(String readerName, int id){
@@ -55,6 +61,8 @@ public class Reader  implements TableObjectInterface{
             if (this.capacity > 0){
 		project.select();
 		this.preferences.add(project);
+		this.preferenceCountProperty.set(preferences.size()+"");
+
                 return true;
             } else {
                 return false;
@@ -66,6 +74,7 @@ public class Reader  implements TableObjectInterface{
             if (this.capacity > 0){
 		project.select();
 		this.preferences.add(indexToPlace, project);
+		this.preferenceCountProperty.set(preferences.size()+"");
                 return true;
             } else {
                 return false;
@@ -130,8 +139,14 @@ public class Reader  implements TableObjectInterface{
     void removePreference(Project project) {
         project.unselect();
         this.preferences.remove(project);
+		this.preferenceCountProperty.set(preferences.size()+"");
+
     }
 
+    
+    public SimpleStringProperty getPreferenceStringProperty(){
+    	return this.preferenceCountProperty;
+    }
     
 
 }

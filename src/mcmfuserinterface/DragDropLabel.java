@@ -11,6 +11,7 @@ import javafx.scene.control.Cell;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
@@ -91,13 +92,11 @@ public class DragDropLabel extends Label{
                 Project projectToPlaceBefore = (Project) label.getUserData();
                 HBox hbox = (HBox) label.getParent();
                 Reader readerToAdd = (Reader) hbox.getUserData();
-                
-                
+               
                 int indexToPlace = controller.getModel().movePreference(readerToAdd, readerToRemoveFrom, projectToMove, projectToPlaceBefore);
                 if (indexToPlace != -1){
                     sourceHbox.getChildren().remove(sourceLabel);
                     hbox.getChildren().add(indexToPlace, sourceLabel);
-                    
                 }
                 
                 event.setDropCompleted(true);
