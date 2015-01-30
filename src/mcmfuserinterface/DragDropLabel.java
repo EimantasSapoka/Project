@@ -85,15 +85,20 @@ public class DragDropLabel extends Label{
             public void handle(DragEvent event) {
                 
                 Label sourceLabel = (Label)event.getGestureSource();
+                HBox sourceHbox = (HBox) sourceLabel.getParent();
                 Project projectToMove = (Project) sourceLabel.getUserData();
-                Reader readerToRemoveFrom = (Reader) ((HBox) sourceLabel.getParent()).getUserData();
+                Reader readerToRemoveFrom = (Reader) sourceHbox.getUserData();
                 Project projectToPlaceBefore = (Project) label.getUserData();
                 HBox hbox = (HBox) label.getParent();
                 Reader readerToAdd = (Reader) hbox.getUserData();
                 
                 
-                controller.getModel().movePreference(readerToAdd, readerToRemoveFrom, projectToMove, projectToPlaceBefore);
-                controller.refreshTable();
+                int indexToPlace = controller.getModel().movePreference(readerToAdd, readerToRemoveFrom, projectToMove, projectToPlaceBefore);
+                if (indexToPlace != -1){
+                    sourceHbox.getChildren().remove(sourceLabel);
+                    hbox.getChildren().add(indexToPlace, sourceLabel);
+                    
+                }
                 
                 event.setDropCompleted(true);
                 event.consume();

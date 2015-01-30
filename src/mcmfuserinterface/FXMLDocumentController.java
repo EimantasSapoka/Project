@@ -5,28 +5,36 @@
  */
 package mcmfuserinterface;
 
+import ford_fulkerson.Algorithm;
 import model.MCMFModel;
 import model.Reader;
 import java.io.File;
 import java.net.URL;
+import java.util.Comparator;
 import java.util.ResourceBundle;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import model.Project;
 
 /**
  *
@@ -40,10 +48,25 @@ public class FXMLDocumentController implements Initializable, Controller {
     private MenuBar menuBar;
 
     @FXML
+    private Button runAlgorithmButton;
+    
+    @FXML 
+    private CheckBox loadBalancedCheckbox;
+            
+    @FXML
     private CheckBox zeroCapacityReaderCheckbox;
     
     @FXML
+    private TextField projectLowSelectionLimitBox;
+    
+    @FXML
     TableView<TableObjectInterface> tableView;
+    
+    @FXML
+    private Button printPref;
+    
+    @FXML
+    private ListView<Project> lowSelectedList;
     
     
     /******************    /
@@ -70,6 +93,46 @@ public class FXMLDocumentController implements Initializable, Controller {
                 tableView.setItems(items);
             }
         });
+        
+        projectLowSelectionLimitBox.setOnAction(new EventHandler<ActionEvent>(){
+
+            @Override
+            public void handle(ActionEvent event) {
+                TextField textField = (TextField) event.getSource();
+                if (!textField.getText().matches("\\d+")
+                 || Integer.parseInt(textField.getText()) < 2
+                 || Integer.parseInt(textField.getText()) > 99){
+                    textField.setText("");
+                } else {
+                    if (model != null){
+                        createLowSelectedProjectsList();
+                    }
+                }
+            }
+            
+        });
+        
+        runAlgorithmButton.setOnAction(new EventHandler<ActionEvent>(){
+            @Override
+            public void handle(ActionEvent event) {
+                if (loadBalancedCheckbox.isSelected()){
+                    Algorithm.runLoadBalancedAlgorithm(model);
+                } else {
+                    Algorithm.runUnbalancedAlgorithm(model);
+                }
+                System.out.println(model);
+            }
+            
+        });
+        
+        printPref.setOnAction(new EventHandler<ActionEvent>(){
+            @Override
+            public void handle(ActionEvent event) {
+               for(Reader r : model.getReaders()){
+                   System.out.println("reader " + r.getID() + " : " + r.getPreferences());
+               }
+            }
+        });   
     }
     
     public boolean showZeroCapacityReaders(){
@@ -90,6 +153,7 @@ public class FXMLDocumentController implements Initializable, Controller {
             System.out.println(file);
             model = new MCMFModel(file);
             createTableViewFromGraph(model);
+            createLowSelectedProjectsList();
         }
     }
 
@@ -202,9 +266,47 @@ public class FXMLDocumentController implements Initializable, Controller {
     }
      
     public void refreshTable(){
-        tableView.getColumns().get(0).setVisible(false);
-        tableView.getColumns().get(0).setVisible(true);
+        tableView.getColumns().get(2).setVisible(false);
+        tableView.getColumns().get(2).setVisible(true);
     }
 
+    private void createLowSelectedProjectsList() {
+        ObservableList<Project> lowSelectedProjectList = FXCollections.observableArrayList();
+        SortedList sortedLowSelectedProjectList = new SortedList(lowSelectedProjectList, new Comparator<Project>() {
+
+            @Override
+            public int compare(Project o1, Project o2) {
+                return o1.getSelectedCount() - o2.getSelectedCount();
+            }
+        });
+
+        for (Project p : model.getProjects()) {
+            if (p.getSelectedCount() < Integer.parseInt(projectLowSelectionLimitBox.getText())) {
+                lowSelectedProjectList.add(p);
+            }
+        }
+
+        lowSelectedList.setItems(sortedLowSelectedProjectList.sorted());
+        lowSelectedList.setCellFactory(new Callback<ListView<Project>, ListCell<Project>>(){
+
+            @Override
+            public ListCell<Project> call(ListView<Project> param) {
+                final ListCell<Project> listCell =  new ListCell<Project>(){
+
+                    @Override
+                    protected void updateItem(Project item, boolean empty) {
+                        super.updateItem(item, empty); 
+                        if (item != null){
+                            setText(item.getId() + "\t\t("+item.getSelectedCount()+")");
+                        }
+                    }               
+                };
+                return listCell;
+            }
+            
+        });
        
+    }
+
+
 }

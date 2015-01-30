@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.effect.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
 <?import javafx.scene.*?>
@@ -22,20 +25,60 @@
             </MenuBar>
          </top>
          <center>
-            <TableView fx:id="tableView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <TableView fx:id="tableView" prefHeight="407.0" prefWidth="644.0" BorderPane.alignment="CENTER">
                <columnResizePolicy>
                   <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                </columnResizePolicy>
             </TableView>
          </center>
-         <bottom>
-            <Pane prefHeight="103.0" prefWidth="800.0" BorderPane.alignment="CENTER">
+         <right>
+            <VBox prefHeight="408.0" prefWidth="129.0" BorderPane.alignment="CENTER">
                <children>
-                  <CheckBox fx:id="zeroCapacityReaderCheckbox" layoutX="27.0" layoutY="43.0" mnemonicParsing="false" selected="true" text="Show Readers with zero capacity" />
-                  <Label layoutX="14.0" layoutY="14.0" text="Settings" />
-                  <Separator layoutX="14.0" layoutY="30.0" prefWidth="200.0" />
+                  <Pane prefHeight="54.0" prefWidth="129.0" style="-fx-background-color: whitesmoke;" VBox.vgrow="NEVER">
+                     <children>
+                        <Label focusTraversable="false" layoutX="3.0" prefHeight="39.0" prefWidth="124.0" text="Least selected projects (&lt;          )" textAlignment="CENTER" textFill="#3c0505" wrapText="true">
+                           <font>
+                              <Font size="13.0" />
+                           </font>
+                        </Label>
+                        <TextField fx:id="projectLowSelectionLimitBox" layoutX="78.0" layoutY="23.0" prefHeight="10.0" prefWidth="26.0" promptText="int" text="4">
+                           <font>
+                              <Font size="9.0" />
+                           </font>
+                        </TextField>
+                     </children>
+                  </Pane>
+                  <ListView fx:id="lowSelectedList" prefHeight="366.0" prefWidth="133.0" VBox.vgrow="ALWAYS" />
                </children>
-            </Pane>
+            </VBox>
+         </right>
+         <bottom>
+            <HBox prefHeight="67.0" prefWidth="800.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Pane prefHeight="100.0" prefWidth="300.0" HBox.hgrow="SOMETIMES">
+                     <children>
+                        <CheckBox fx:id="zeroCapacityReaderCheckbox" layoutX="104.0" layoutY="15.0" mnemonicParsing="false" selected="true" text="Show Readers with zero capacity" />
+                        <Label layoutX="-16.0" layoutY="24.0" nodeOrientation="LEFT_TO_RIGHT" rotate="270.0" text="Settings">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                        </Label>
+                        <Separator layoutX="18.0" layoutY="1.0" orientation="VERTICAL" prefHeight="67.0" prefWidth="0.0" />
+                     </children>
+                  </Pane>
+                  <Pane prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Button fx:id="printPref" layoutX="53.0" layoutY="21.0" mnemonicParsing="false" text="Print pref" />
+                     </children>
+                  </Pane>
+                  <Pane prefHeight="100.0" prefWidth="300.0" HBox.hgrow="NEVER">
+                     <children>
+                        <Button fx:id="runAlgorithmButton" layoutX="175.0" layoutY="15.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="104.0" text="Run algorithm" />
+                        <CheckBox fx:id="loadBalancedCheckbox" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" selected="true" text="Load balancing" />
+                     </children>
+                  </Pane>
+               </children>
+            </HBox>
          </bottom>
       </BorderPane>
    </children>

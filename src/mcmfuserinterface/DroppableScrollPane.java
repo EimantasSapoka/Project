@@ -63,12 +63,17 @@ public class DroppableScrollPane extends ScrollPane {
                 }
                
                 Label sourceLabel = (Label)event.getGestureSource();
+                HBox sourceHbox = (HBox) sourceLabel.getParent();
                 Project projectToMove = (Project) sourceLabel.getUserData();
-                Reader readerToRemoveFrom = (Reader) ((HBox) sourceLabel.getParent()).getUserData();
+                Reader readerToRemoveFrom = (Reader) (sourceHbox).getUserData();
                 Reader readerToAdd = (Reader) hbox.getUserData();
                 
-                controller.getModel().movePreference(readerToAdd, readerToRemoveFrom, projectToMove);
-                controller.refreshTable();
+                boolean success = controller.getModel().movePreference(readerToAdd, readerToRemoveFrom, projectToMove);
+                if (success){
+                    sourceHbox.getChildren().remove(sourceLabel);
+                    hbox.getChildren().add(sourceLabel);
+                }
+                //controller.refreshTable();
                 
                 event.setDropCompleted(true);
                 event.consume();
