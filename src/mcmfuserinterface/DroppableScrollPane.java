@@ -28,6 +28,7 @@ public class DroppableScrollPane extends ScrollPane {
         super();
         this.controller = contr;
         scrollPane = this;
+
         
         scrollPane.setOnDragOver(new EventHandler<DragEvent>() {
             @Override

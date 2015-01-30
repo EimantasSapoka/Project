@@ -175,7 +175,7 @@ public class FXMLDocumentController implements Initializable, Controller {
             System.out.println("Graph instance empty");
             return;
         }
-     
+        
         if (tableView.getColumns().isEmpty()){
             tableView.getColumns().add(createReaderColumn());
             tableView.getColumns().add(createCapacityColumn());
@@ -183,6 +183,8 @@ public class FXMLDocumentController implements Initializable, Controller {
             tableView.getColumns().add(createPreferencesColumn());
         }
         
+        
+
         ObservableList<TableObjectInterface> items = FXCollections.observableArrayList();
         if (this.showZeroCapacityReaders()){
             items.addAll(model.getReaders());
@@ -194,12 +196,11 @@ public class FXMLDocumentController implements Initializable, Controller {
             }
         }
         
+        this.refreshTable();
         tableView.setItems(items);
         tableView.setStyle(".table-row-cell {-fx-cell-size: 50px;}");
         tableView.setFixedCellSize(40);
-        
-        this.refreshTable();
-       
+
     }
     
     /**
@@ -283,14 +284,13 @@ public class FXMLDocumentController implements Initializable, Controller {
 			public TableCell<TableObjectInterface, TableObjectInterface> call(TableColumn<TableObjectInterface, TableObjectInterface> arg) {
 
 				TableCell<TableObjectInterface, TableObjectInterface> cell = new TableCell<TableObjectInterface, TableObjectInterface>(){
+					private final Label label = new Label();
 					
 					@Override
 					protected void updateItem(TableObjectInterface arg0, boolean arg1) {
 						super.updateItem(arg0, arg1);
 						if (arg0 != null){
-							Label label = new Label();
 							label.textProperty().bind(((Reader)arg0).getPreferenceStringProperty());
-							System.out.println("value: " + ((Reader)arg0).getPreferenceStringProperty().getValue());
 							setGraphic(label);
 						}
 					}
