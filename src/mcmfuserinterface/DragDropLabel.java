@@ -30,6 +30,9 @@ import model.Project;
 import model.Reader;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.dialog.Dialogs;
+import org.controlsfx.glyphfont.FontAwesome;
+import org.controlsfx.glyphfont.GlyphFont;
+import org.controlsfx.glyphfont.GlyphFontRegistry;
 
 /**
  *
@@ -40,10 +43,11 @@ public class DragDropLabel extends Label {
     final Project project;
     final Label label;
     final private Controller controller;
+    
+   
 
     DragDropLabel(Project proj, Controller contr) {
         super(proj.getId()+"");
-        
         
         this.project = proj;
         pop = new PopOver();
@@ -54,21 +58,15 @@ public class DragDropLabel extends Label {
         this.setTooltip(new Tooltip(project.getName()));
 
         label.setOnMouseClicked(new EventHandler<MouseEvent>() {
-
             @Override
             public void handle(MouseEvent event) {
                 if (event.getButton() == MouseButton.PRIMARY){
-                    VBox vbox = new VBox();
-                    Label name = new Label("Name: " + project.getName());
+                    Label name = new Label("Name: " + project.getName() +
+                                           "\nID: " + project.getId() +
+                                           "\nTimes selected: " + project.getSelectedCount());
                     name.setTextFill(Color.BLACK);
-                    Label id = new Label("ID: " + project.getId());
-                    id.setTextFill(Color.BLACK);
-                    Label timesSelected = new Label("Times selected: " + project.getSelectedCount());
-                    timesSelected.setTextFill(Color.BLACK);
-                    vbox.getChildren().addAll(name, id, timesSelected);
-                    vbox.setSpacing(3);
-                    vbox.setPadding(new Insets(10,10,10,10));
-                    pop.setContentNode(vbox);
+                    name.setPadding(new Insets(10,10,10,10));
+                    pop.setContentNode(name);
                     pop.show((Node) event.getTarget(), event.getScreenX()+10, event.getScreenY());
                 }
                 
@@ -90,11 +88,12 @@ public class DragDropLabel extends Label {
             public void handle(MouseEvent mouseEvent) {
                 Dragboard db = label.startDragAndDrop(TransferMode.MOVE);
                 ClipboardContent content = new ClipboardContent();
-
+                
+                HBox hbox = (HBox) label.getParent();
+                hbox.getChildren().get(0).setVisible(true);
+                
                 content.putString("test");
                 db.setContent(content);
-                
-                controller.scaleTrashBin(1.5);
                 mouseEvent.consume();
             }
         });
@@ -144,7 +143,7 @@ public class DragDropLabel extends Label {
                     indexToPlace = controller.getModel().movePreference(readerToAdd, readerToRemoveFrom, projectToMove, projectToPlaceBefore);
                     if (indexToPlace != -1) {
                         sourceHbox.getChildren().remove(sourceLabel);
-                        hbox.getChildren().add(indexToPlace, sourceLabel);
+                        hbox.getChildren().add(indexToPlace+1, sourceLabel);
                     } else {
                         createErrorDialog(projectToMove);
                     }
@@ -154,7 +153,7 @@ public class DragDropLabel extends Label {
                     
                     indexToPlace = controller.getModel().addProjectToReaderPreferences(readerToAdd, projectToAdd, projectToPlaceBefore);
                     if (indexToPlace != -1) {
-                        hbox.getChildren().add(indexToPlace, new DragDropLabel(projectToAdd, controller));
+                        hbox.getChildren().add(indexToPlace+1, new DragDropLabel(projectToAdd, controller));
                     } else {
                         createErrorDialog(projectToAdd);
                     }
@@ -165,32 +164,25 @@ public class DragDropLabel extends Label {
                 event.consume();
             }
 
-            private void createErrorDialog(Project projectToAdd) {
-                final Runnable runnable = (Runnable) Toolkit.getDefaultToolkit().getDesktopProperty("win.sound.exclamation");
-                if (runnable != null) {
-                    runnable.run();
-                }
-                
-                Dialogs.create()
-                        .owner(label)
-                        .title("Error")
-                        .masthead("Cannot move preference")
-                        .message("The reader already has project as preference!\nProject name: "
-                                + projectToAdd.getName() + ",\nID: " + projectToAdd.getId())
-                        .showError();
-                 
-            }
-        });
-        
-        label.setOnDragDone(new EventHandler<DragEvent>(){
-
-            @Override
-            public void handle(DragEvent event) {
-                controller.scaleTrashBin(1.0);
-            }
-            
+           
         });
 
     }
+    
+    
+    private void createErrorDialog(Project projectToAdd) {
+        final Runnable runnable = (Runnable) Toolkit.getDefaultToolkit().getDesktopProperty("win.sound.exclamation");
+        if (runnable != null) {
+            runnable.run();
+        }
 
+        Dialogs.create()
+                .owner(label)
+                .title("Error")
+                .masthead("Cannot move preference")
+                .message("The reader already has project as preference!\nProject name: "
+                        + projectToAdd.getName() + ",\nID: " + projectToAdd.getId())
+                .showError();
+
+    }
 }

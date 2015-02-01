@@ -34,6 +34,7 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.ClipboardContent;
@@ -42,6 +43,7 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -87,17 +89,16 @@ public class FXMLDocumentController implements Initializable, Controller {
     @FXML
     private Label trashBin;
     
-    
     /******************    /
      METHODS
     /*********************/
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        
         GlyphFont fontAwesome = GlyphFontRegistry.font("FontAwesome");
         trashBin.setGraphic(fontAwesome.create(FontAwesome.Glyph.TRASH_ALT));
-        setTrashBinListeners();
+        addTrashBinListeners(trashBin);
+                
         setZeroCapacityCheckboxListeners();
         setProjectLowSelectionLimitBoxListeners();
         setRunAlgorithmButtonListeners();
@@ -168,51 +169,7 @@ public class FXMLDocumentController implements Initializable, Controller {
         });
     }
 
-    private void setTrashBinListeners() {
-        trashBin.setOnDragOver(new EventHandler<DragEvent>(){
-            
-            @Override
-            public void handle(DragEvent event) {
-                if (event.getGestureSource() instanceof DragDropLabel){
-                    event.acceptTransferModes(TransferMode.MOVE);
-                    trashBin.setScaleY(2);
-                    trashBin.setScaleX(2);
-                }
-            }
-            
-        });
-        
-        trashBin.setOnDragExited(new EventHandler<DragEvent>(){
-            
-            @Override
-            public void handle(DragEvent event) {
-                if (event.getGestureSource() instanceof DragDropLabel){
-                    trashBin.setScaleX(1.5);
-                    trashBin.setScaleY(1.5);
-                }
-            }
-            
-        });
-        
-        trashBin.setOnDragDropped(new EventHandler<DragEvent>(){
-            
-            @Override
-            public void handle(DragEvent event) {
-                if (event.getGestureSource() instanceof DragDropLabel){
-                    Label sourceLabel = (Label) event.getGestureSource();
-                    HBox sourceHbox = (HBox) sourceLabel.getParent();
-                    Project projectToRemove = (Project) sourceLabel.getUserData();
-                    Reader readerToRemoveFrom = (Reader) sourceHbox.getUserData();
-                    
-                    model.removeProjectFromReaderPreferences(readerToRemoveFrom, projectToRemove);
-                    sourceHbox.getChildren().remove(sourceLabel);
-                    event.setDropCompleted(true);
-                    event.consume();
-                }
-            }
-            
-        });
-    }
+    
     
     public boolean showZeroCapacityReaders(){
         return zeroCapacityReaderCheckbox.isSelected();
@@ -275,7 +232,56 @@ public class FXMLDocumentController implements Initializable, Controller {
         tableView.setItems(items);
         tableView.setStyle(".table-row-cell {-fx-cell-size: 50px;}");
         tableView.setFixedCellSize(40);
+        tableView.setRowFactory(new Callback<TableView<TableObjectInterface>,TableRow<TableObjectInterface>>(){
 
+            @Override
+            public TableRow<TableObjectInterface> call(TableView<TableObjectInterface> param) {
+                TableRow<TableObjectInterface> row = new TableRow<TableObjectInterface>(){
+                    @Override
+                    protected void updateItem(TableObjectInterface item, boolean empty) {
+                        super.updateItem(item, empty); 
+                        setUserData(item);
+                        if (item != null){
+                            
+                            final Reader reader = (Reader) item;
+                            reader.getPreferenceStringProperty().addListener(new ChangeListener<String>(){
+                                
+                                @Override
+                                public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                                    if (getUserData()!= null){
+                                        int cap = ((Reader) getUserData()).getCapacity();
+                                        int numPref = Integer.parseInt(newValue);
+                                        if (reader.equals(getUserData())){
+                                            if (numPref < cap){
+                                                setStyle("-fx-background-color: red;");
+                                            } else if (numPref < cap*2){
+                                                setStyle("-fx-background-color: orange;");
+                                            } else {
+                                                setStyle("");
+                                            }
+                                        } 
+                                    }
+                                }
+                                
+                            });
+                            int cap = reader.getCapacity();
+                            int numPref = reader.getPreferences().size();
+
+                            if (numPref < cap){
+                                setStyle("-fx-background-color: red;");
+                            } else if (numPref < cap*2){
+                                setStyle("-fx-background-color: orange;");
+                            } else {
+                                setStyle("");
+                            }
+                        }
+                    }
+
+                };
+                return row;
+            }
+            
+        });
     }
     
     /**
@@ -314,6 +320,10 @@ public class FXMLDocumentController implements Initializable, Controller {
         return preferencesColumn;
     }
     
+    /**
+     * creates a column which shows the reader's capacity
+     * @return 
+     */
     private TableColumn<TableObjectInterface, TableObjectInterface> createCapacityColumn(){
         TableColumn<TableObjectInterface, TableObjectInterface> capacityColumn  = new TableColumn<TableObjectInterface, TableObjectInterface>("Cap");
         capacityColumn.setMinWidth(30);
@@ -330,7 +340,13 @@ public class FXMLDocumentController implements Initializable, Controller {
         return capacityColumn;
     }
     
+    /**
+     * creates the column with the preference sizes. It changes dynamically as the 
+     * preferences are added and removed. Hence the huge method. 
+     * @return 
+     */
      private TableColumn<TableObjectInterface, TableObjectInterface> createPreferenceListSizeColumn(){
+         
         TableColumn<TableObjectInterface, TableObjectInterface> preferenceCountColumn  = new TableColumn<TableObjectInterface, TableObjectInterface>("#Pref");
         preferenceCountColumn.setMinWidth(30);
         preferenceCountColumn.setPrefWidth(50);
@@ -343,40 +359,31 @@ public class FXMLDocumentController implements Initializable, Controller {
           });
         
         preferenceCountColumn.setComparator(new Comparator<TableObjectInterface>(){
-
-			@Override
-			public int compare(TableObjectInterface o1, TableObjectInterface o2) {
-				return ((Reader) o1).getPreferences().size() - ((Reader) o2).getPreferences().size();
-			}
+            @Override
+            public int compare(TableObjectInterface o1, TableObjectInterface o2) {
+                    return ((Reader) o1).getPreferences().size() - ((Reader) o2).getPreferences().size();
+            }
         	
         });
         
-        
-        
         preferenceCountColumn.setCellFactory(new Callback<TableColumn<TableObjectInterface, TableObjectInterface>, TableCell<TableObjectInterface,TableObjectInterface>>() {
+            @Override
+            public TableCell<TableObjectInterface, TableObjectInterface> call(TableColumn<TableObjectInterface, TableObjectInterface> arg) {
+                TableCell<TableObjectInterface, TableObjectInterface> cell = new TableCell<TableObjectInterface, TableObjectInterface>(){
+                    private final Label label = new Label();
 
-			@Override
-			public TableCell<TableObjectInterface, TableObjectInterface> call(TableColumn<TableObjectInterface, TableObjectInterface> arg) {
-
-				TableCell<TableObjectInterface, TableObjectInterface> cell = new TableCell<TableObjectInterface, TableObjectInterface>(){
-					private final Label label = new Label();
-					
-					@Override
-					protected void updateItem(TableObjectInterface arg0, boolean arg1) {
-						super.updateItem(arg0, arg1);
-						if (arg0 != null){
-							label.textProperty().bind(((Reader)arg0).getPreferenceStringProperty());
-							setGraphic(label);
-						}
-					}
-					
-				};
-				return cell;
-			}
-          
+                    @Override
+                    protected void updateItem(TableObjectInterface arg0, boolean arg1) {
+                        super.updateItem(arg0, arg1);
+                        if (arg0 != null){
+                                label.textProperty().bind(((Reader)arg0).getPreferenceStringProperty());
+                                setGraphic(label);
+                        }
+                    }
+                };
+                return cell;
+            }
         });
-        
-        
         
         return preferenceCountColumn;
     }
@@ -386,12 +393,11 @@ public class FXMLDocumentController implements Initializable, Controller {
         tableView.getColumns().get(2).setVisible(true);
     }
     
-    public void scaleTrashBin(Double value){
-        this.trashBin.setScaleX(value);
-        this.trashBin.setScaleY(value);
-    }
-
+    /**
+     * creates side list with lowest selected projects in ascending order
+     */
     private void createLowSelectedProjectsList() {
+        
         ObservableList<Project> lowSelectedProjectList = FXCollections.observableArrayList();
         SortedList sortedLowSelectedProjectList = new SortedList(lowSelectedProjectList, new Comparator<Project>() {
 
@@ -461,5 +467,56 @@ public class FXMLDocumentController implements Initializable, Controller {
        });
     }
 
+     /**
+     * adds the listeners for drag over and drops for the trash bin icon.
+     * @param trashBin 
+     */
+      private void addTrashBinListeners(final Label trashBin) {
+        trashBin.setOnDragOver(new EventHandler<DragEvent>() {
+
+            @Override
+            public void handle(DragEvent event) {
+                if (event.getGestureSource() instanceof DragDropLabel) {
+                    event.acceptTransferModes(TransferMode.MOVE);
+                    trashBin.setScaleY(1.5);
+                    trashBin.setScaleX(1.5);
+                }
+            }
+
+        });
+
+        trashBin.setOnDragExited(new EventHandler<DragEvent>() {
+
+            @Override
+            public void handle(DragEvent event) {
+                if (event.getGestureSource() instanceof DragDropLabel) {
+                    trashBin.setScaleX(1);
+                    trashBin.setScaleY(1);
+                }
+            }
+
+        });
+
+        trashBin.setOnDragDropped(new EventHandler<DragEvent>() {
+
+            @Override
+            public void handle(DragEvent event) {
+                if (event.getGestureSource() instanceof DragDropLabel) {
+                    Label sourceLabel = (Label) event.getGestureSource();
+                    HBox sourceHbox = (HBox) sourceLabel.getParent();
+                    Project projectToRemove = (Project) sourceLabel.getUserData();
+                    Reader readerToRemoveFrom = (Reader) sourceHbox.getUserData();
+
+                    model.removeProjectFromReaderPreferences(readerToRemoveFrom, projectToRemove);
+                    sourceHbox.getChildren().remove(sourceLabel);
+                    
+                    event.setDropCompleted(true);
+                    event.consume();
+                }
+            }
+        });
+        
+        
+    }
 
 }

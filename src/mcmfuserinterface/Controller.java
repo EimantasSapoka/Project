@@ -14,6 +14,4 @@ import model.MCMFModel;
 interface Controller {
     public void createTableViewFromGraph(MCMFModel model);
     public MCMFModel getModel();
-    public void scaleTrashBin(Double value);
-
 }

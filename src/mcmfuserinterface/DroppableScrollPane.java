@@ -18,6 +18,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableCell;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -27,6 +28,9 @@ import model.Project;
 import model.Reader;
 import org.controlsfx.dialog.Dialog;
 import org.controlsfx.dialog.Dialogs;
+import org.controlsfx.glyphfont.FontAwesome;
+import org.controlsfx.glyphfont.GlyphFont;
+import org.controlsfx.glyphfont.GlyphFontRegistry;
 
 /**
  *
@@ -36,11 +40,13 @@ public class DroppableScrollPane extends ScrollPane {
     
     final private ScrollPane scrollPane;
     final private Controller controller;
-    
+   
     public DroppableScrollPane(Controller contr){
         super();
         this.controller = contr;
         scrollPane = this;
+        
+        
         
         final ContextMenu contextMenu = new ContextMenu();
         
@@ -169,8 +175,5 @@ public class DroppableScrollPane extends ScrollPane {
                
             }
         });
-    }
-    
-    
-    
+    }    
 }
