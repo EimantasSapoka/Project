@@ -5,6 +5,7 @@
  */
 package mcmfuserinterface;
 
+import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +14,8 @@ import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.DragEvent;
@@ -112,38 +115,58 @@ public class DroppableScrollPane extends ScrollPane {
         scrollPane.setOnDragDropped(new EventHandler<DragEvent>() {
             @Override
             public void handle(DragEvent event) {
-               
+                HBox hbox = (HBox) scrollPane.getContent();
+                if (hbox.getUserData() == null){
+                       event.consume();
+                       return;
+                 }
+                boolean success;
+                
+                Reader readerToAdd = (Reader) hbox.getUserData();
+                 
                 if(event.getTransferMode() == TransferMode.MOVE){
-                    HBox hbox = (HBox) scrollPane.getContent();
-                    if (hbox.getUserData() == null){
-                        event.consume();
-                        return;
-                    }
-
                     Label sourceLabel = (Label)event.getGestureSource();
                     HBox sourceHbox = (HBox) sourceLabel.getParent();
                     Project projectToMove = (Project) sourceLabel.getUserData();
                     Reader readerToRemoveFrom = (Reader) (sourceHbox).getUserData();
-                    Reader readerToAdd = (Reader) hbox.getUserData();
 
-                    boolean success = controller.getModel().movePreference(readerToAdd, readerToRemoveFrom, projectToMove);
+                    success = controller.getModel().movePreference(readerToAdd, readerToRemoveFrom, projectToMove);
                     if (success){
                         sourceHbox.getChildren().remove(sourceLabel);
                         hbox.getChildren().add(sourceLabel);
                     } else {
-                         Dialogs.create()
-                            .owner(scrollPane)
-                            .title("Error")
-                            .masthead("Cannot move preference")
-                            .message("The reader already has project as preference!\n Project name: "
-                                    + projectToMove.getName() + ",\nID: " + projectToMove.getId())
-                            .showError();
+                         createErrorDialog();
                     }
                 } else {
-                    //TODO: list drop here
+                    ListCell listCell = (ListCell) event.getGestureSource();
+                    Project projectToAdd = (Project) listCell.getUserData();
+                   
+                    
+                   success = controller.getModel().addProjectToReaderPreferences(readerToAdd, projectToAdd);
+                    if (success) {
+                        hbox.getChildren().add(new DragDropLabel(projectToAdd, controller));
+                    } else {
+                        createErrorDialog();
+                    }
+                    
                 }
-                event.setDropCompleted(true);
+                event.setDropCompleted(success);
                 event.consume();
+            }
+
+            private void createErrorDialog() {
+                final Runnable runnable = (Runnable) Toolkit.getDefaultToolkit().getDesktopProperty("win.sound.exclamation");
+                if (runnable != null) {
+                    runnable.run();
+                }
+                
+                Dialogs.create()
+                        .owner(scrollPane)
+                        .title("Error")
+                        .masthead("Cannot move preference")
+                        .message("Either the reader already has project as preference or he has capacity of 0!")
+                        .showError();
+               
             }
         });
     }

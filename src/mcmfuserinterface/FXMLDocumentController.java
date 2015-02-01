@@ -24,6 +24,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -35,13 +36,18 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import model.Project;
+import org.controlsfx.dialog.Dialogs;
 import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.GlyphFont;
 import org.controlsfx.glyphfont.GlyphFontRegistry;
@@ -198,7 +204,7 @@ public class FXMLDocumentController implements Initializable, Controller {
                     Project projectToRemove = (Project) sourceLabel.getUserData();
                     Reader readerToRemoveFrom = (Reader) sourceHbox.getUserData();
                     
-                    model.removeProjectFromReader(readerToRemoveFrom, projectToRemove);
+                    model.removeProjectFromReaderPreferences(readerToRemoveFrom, projectToRemove);
                     sourceHbox.getChildren().remove(sourceLabel);
                     event.setDropCompleted(true);
                     event.consume();
@@ -413,15 +419,46 @@ public class FXMLDocumentController implements Initializable, Controller {
                     protected void updateItem(Project item, boolean empty) {
                         super.updateItem(item, empty); 
                         if (item != null){
+                            setUserData(item);
                             setText(item.getId() + "\t\t("+item.getSelectedCount()+")");
                         }
                     }               
                 };
+                
+                listCell.setOnDragDetected(new EventHandler<MouseEvent>(){
+
+                    @Override
+                    public void handle(MouseEvent event) {
+                        
+                        Dragboard db = listCell.startDragAndDrop(TransferMode.COPY);
+                        ClipboardContent content = new ClipboardContent();
+
+                        content.putString("test");
+                        db.setContent(content);
+                        event.consume();
+                    }            
+                });
                 return listCell;
             }
             
         });
-       
+        
+       lowSelectedList.setOnDragDone(new EventHandler<DragEvent>(){
+
+            @Override
+            public void handle(DragEvent event) {
+               
+                SortedList list = (SortedList) lowSelectedList.getItems();
+                list.setComparator(new Comparator<Project>() {
+                    @Override
+                    public int compare(Project o1, Project o2) {
+                        return o1.getSelectedCount() - o2.getSelectedCount();
+                    }
+                });
+                lowSelectedList.setItems(list.sorted());
+            }
+           
+       });
     }
 
 

@@ -7,11 +7,14 @@ package mcmfuserinterface;
 
 
 import java.awt.Panel;
+import java.awt.Toolkit;
+import java.util.Comparator;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
@@ -99,7 +102,7 @@ public class DragDropLabel extends Label {
         label.setOnDragOver(new EventHandler<DragEvent>() {
             @Override
             public void handle(DragEvent event) {
-                event.acceptTransferModes(TransferMode.MOVE);
+                event.acceptTransferModes(TransferMode.ANY);
                 event.consume();
             }
         });
@@ -127,31 +130,55 @@ public class DragDropLabel extends Label {
         label.setOnDragDropped(new EventHandler<DragEvent>() {
             @Override
             public void handle(DragEvent event) {
-
-                Label sourceLabel = (Label) event.getGestureSource();
-                HBox sourceHbox = (HBox) sourceLabel.getParent();
-                Project projectToMove = (Project) sourceLabel.getUserData();
-                Reader readerToRemoveFrom = (Reader) sourceHbox.getUserData();
-                Project projectToPlaceBefore = project;
                 HBox hbox = (HBox) label.getParent();
+                Project projectToPlaceBefore = project;
                 Reader readerToAdd = (Reader) hbox.getUserData();
+                int indexToPlace;
 
-                int indexToPlace = controller.getModel().movePreference(readerToAdd, readerToRemoveFrom, projectToMove, projectToPlaceBefore);
-                if (indexToPlace != -1) {
-                    sourceHbox.getChildren().remove(sourceLabel);
-                    hbox.getChildren().add(indexToPlace, sourceLabel);
+                if (event.getTransferMode() == TransferMode.MOVE){
+                    Label sourceLabel = (Label) event.getGestureSource();
+                    HBox sourceHbox = (HBox) sourceLabel.getParent();
+                    Project projectToMove = (Project) sourceLabel.getUserData();
+                    Reader readerToRemoveFrom = (Reader) sourceHbox.getUserData();
+
+                    indexToPlace = controller.getModel().movePreference(readerToAdd, readerToRemoveFrom, projectToMove, projectToPlaceBefore);
+                    if (indexToPlace != -1) {
+                        sourceHbox.getChildren().remove(sourceLabel);
+                        hbox.getChildren().add(indexToPlace, sourceLabel);
+                    } else {
+                        createErrorDialog(projectToMove);
+                    }
                 } else {
-                    Dialogs.create()
+                    ListCell listCell = (ListCell) event.getGestureSource();
+                    Project projectToAdd = (Project) listCell.getUserData();
+                    
+                    indexToPlace = controller.getModel().addProjectToReaderPreferences(readerToAdd, projectToAdd, projectToPlaceBefore);
+                    if (indexToPlace != -1) {
+                        hbox.getChildren().add(indexToPlace, new DragDropLabel(projectToAdd, controller));
+                    } else {
+                        createErrorDialog(projectToAdd);
+                    }
+                    
+                }
+                
+                event.setDropCompleted(indexToPlace != -1);
+                event.consume();
+            }
+
+            private void createErrorDialog(Project projectToAdd) {
+                final Runnable runnable = (Runnable) Toolkit.getDefaultToolkit().getDesktopProperty("win.sound.exclamation");
+                if (runnable != null) {
+                    runnable.run();
+                }
+                
+                Dialogs.create()
                         .owner(label)
                         .title("Error")
                         .masthead("Cannot move preference")
                         .message("The reader already has project as preference!\nProject name: "
-                                + projectToMove.getName() + ",\nID: " + projectToMove.getId())
+                                + projectToAdd.getName() + ",\nID: " + projectToAdd.getId())
                         .showError();
-                }
-
-                event.setDropCompleted(true);
-                event.consume();
+                 
             }
         });
         

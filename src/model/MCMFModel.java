@@ -318,8 +318,27 @@ public class MCMFModel {
             return false;
         }
     }
+    
+     public boolean addProjectToReaderPreferences(Reader reader, Project projectToAdd){
+        if (reader.getPreferences().contains(projectToAdd)){
+            return false;
+        } else {
+            return reader.addPreference(projectToAdd);
+        }
+    }
+    
+    
+    public int addProjectToReaderPreferences(Reader reader, Project projectToAdd, Project projectToAddBefore){
+        if (reader.getPreferences().contains(projectToAdd)){
+            return -1;
+        } else {
+            int indexToPlace = reader.getPreferences().indexOf(projectToAddBefore);
+            reader.addPreference(indexToPlace, projectToAdd);
+            return indexToPlace;
+        }
+    }
 
-    public void removeProjectFromReader(Reader readerToRemoveFrom, Project projectToRemove) {
+    public void removeProjectFromReaderPreferences(Reader readerToRemoveFrom, Project projectToRemove) {
         getReader(readerToRemoveFrom).removePreference(projectToRemove);
     }
 
