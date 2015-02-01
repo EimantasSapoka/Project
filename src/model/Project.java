@@ -31,7 +31,7 @@ public class Project implements Comparable<Project>, TableObjectInterface{
 	
         @Override
 	public String toString(){
-		return name;
+		return name +"\t ("+this.timesSelected+")";
 	}
 	
 	public void select(){
@@ -53,6 +53,10 @@ public class Project implements Comparable<Project>, TableObjectInterface{
 
     void unselect() {
         this.timesSelected--;
+    }
+
+    public String getName() {
+        return this.name;
     }
 }
 

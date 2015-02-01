@@ -136,7 +136,7 @@ public class Reader  implements TableObjectInterface{
 		return this.getCapacity() - this.getAssignedProjects().size();
 	}
 
-    void removePreference(Project project) {
+    public void removePreference(Project project) {
         project.unselect();
         this.preferences.remove(project);
 		this.preferenceCountProperty.set(preferences.size()+"");

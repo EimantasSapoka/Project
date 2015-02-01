@@ -15,7 +15,6 @@ import java.util.Comparator;
 import java.util.ResourceBundle;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -36,10 +35,16 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.TransferMode;
+import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import model.Project;
+import org.controlsfx.glyphfont.FontAwesome;
+import org.controlsfx.glyphfont.GlyphFont;
+import org.controlsfx.glyphfont.GlyphFontRegistry;
 
 /**
  *
@@ -73,6 +78,9 @@ public class FXMLDocumentController implements Initializable, Controller {
     @FXML
     private ListView<Project> lowSelectedList;
     
+    @FXML
+    private Label trashBin;
+    
     
     /******************    /
      METHODS
@@ -80,11 +88,65 @@ public class FXMLDocumentController implements Initializable, Controller {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        
+        GlyphFont fontAwesome = GlyphFontRegistry.font("FontAwesome");
+        trashBin.setGraphic(fontAwesome.create(FontAwesome.Glyph.TRASH_ALT));
+        setTrashBinListeners();
+        setZeroCapacityCheckboxListeners();
+        setProjectLowSelectionLimitBoxListeners();
+        setRunAlgorithmButtonListeners();
+        
+        printPref.setOnAction(new EventHandler<ActionEvent>(){
+            @Override
+            public void handle(ActionEvent event) {
+               for(Reader r : model.getReaders()){
+                   System.out.println("reader " + r.getID() + " : " + r.getPreferences());
+               }
+            }
+        });   
+    }
+
+    private void setRunAlgorithmButtonListeners() {
+        runAlgorithmButton.setOnAction(new EventHandler<ActionEvent>(){
+            @Override
+            public void handle(ActionEvent event) {
+                if (loadBalancedCheckbox.isSelected()){
+                    Algorithm.runLoadBalancedAlgorithm(model);
+                } else {
+                    Algorithm.runUnbalancedAlgorithm(model);
+                }
+                System.out.println(model);
+            }
+            
+        });
+    }
+
+    private void setProjectLowSelectionLimitBoxListeners() {
+        projectLowSelectionLimitBox.setOnAction(new EventHandler<ActionEvent>(){
+            
+            @Override
+            public void handle(ActionEvent event) {
+                TextField textField = (TextField) event.getSource();
+                if (!textField.getText().matches("\\d+")
+                        || Integer.parseInt(textField.getText()) < 2
+                        || Integer.parseInt(textField.getText()) > 99){
+                    textField.setText("");
+                } else {
+                    if (model != null){
+                        createLowSelectedProjectsList();
+                    }
+                }
+            }
+            
+        });
+    }
+
+    private void setZeroCapacityCheckboxListeners() {
         zeroCapacityReaderCheckbox.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                 zeroCapacityReaderCheckbox.setSelected(newValue);
-                 ObservableList<TableObjectInterface> items = FXCollections.observableArrayList();
+                ObservableList<TableObjectInterface> items = FXCollections.observableArrayList();
                 if (newValue){
                     items.addAll(model.getReaders());
                 } else {
@@ -98,46 +160,52 @@ public class FXMLDocumentController implements Initializable, Controller {
                 tableView.setItems(items);
             }
         });
-        
-        projectLowSelectionLimitBox.setOnAction(new EventHandler<ActionEvent>(){
+    }
 
+    private void setTrashBinListeners() {
+        trashBin.setOnDragOver(new EventHandler<DragEvent>(){
+            
             @Override
-            public void handle(ActionEvent event) {
-                TextField textField = (TextField) event.getSource();
-                if (!textField.getText().matches("\\d+")
-                 || Integer.parseInt(textField.getText()) < 2
-                 || Integer.parseInt(textField.getText()) > 99){
-                    textField.setText("");
-                } else {
-                    if (model != null){
-                        createLowSelectedProjectsList();
-                    }
+            public void handle(DragEvent event) {
+                if (event.getGestureSource() instanceof DragDropLabel){
+                    event.acceptTransferModes(TransferMode.MOVE);
+                    trashBin.setScaleY(2);
+                    trashBin.setScaleX(2);
                 }
             }
             
         });
         
-        runAlgorithmButton.setOnAction(new EventHandler<ActionEvent>(){
+        trashBin.setOnDragExited(new EventHandler<DragEvent>(){
+            
             @Override
-            public void handle(ActionEvent event) {
-                if (loadBalancedCheckbox.isSelected()){
-                    Algorithm.runLoadBalancedAlgorithm(model);
-                } else {
-                    Algorithm.runUnbalancedAlgorithm(model);
+            public void handle(DragEvent event) {
+                if (event.getGestureSource() instanceof DragDropLabel){
+                    trashBin.setScaleX(1.5);
+                    trashBin.setScaleY(1.5);
                 }
-                System.out.println(model);
             }
             
         });
         
-        printPref.setOnAction(new EventHandler<ActionEvent>(){
+        trashBin.setOnDragDropped(new EventHandler<DragEvent>(){
+            
             @Override
-            public void handle(ActionEvent event) {
-               for(Reader r : model.getReaders()){
-                   System.out.println("reader " + r.getID() + " : " + r.getPreferences());
-               }
+            public void handle(DragEvent event) {
+                if (event.getGestureSource() instanceof DragDropLabel){
+                    Label sourceLabel = (Label) event.getGestureSource();
+                    HBox sourceHbox = (HBox) sourceLabel.getParent();
+                    Project projectToRemove = (Project) sourceLabel.getUserData();
+                    Reader readerToRemoveFrom = (Reader) sourceHbox.getUserData();
+                    
+                    model.removeProjectFromReader(readerToRemoveFrom, projectToRemove);
+                    sourceHbox.getChildren().remove(sourceLabel);
+                    event.setDropCompleted(true);
+                    event.consume();
+                }
             }
-        });   
+            
+        });
     }
     
     public boolean showZeroCapacityReaders(){
@@ -175,6 +243,7 @@ public class FXMLDocumentController implements Initializable, Controller {
             System.out.println("Graph instance empty");
             return;
         }
+        
         
         if (tableView.getColumns().isEmpty()){
             tableView.getColumns().add(createReaderColumn());
@@ -310,6 +379,11 @@ public class FXMLDocumentController implements Initializable, Controller {
         tableView.getColumns().get(2).setVisible(false);
         tableView.getColumns().get(2).setVisible(true);
     }
+    
+    public void scaleTrashBin(Double value){
+        this.trashBin.setScaleX(value);
+        this.trashBin.setScaleY(value);
+    }
 
     private void createLowSelectedProjectsList() {
         ObservableList<Project> lowSelectedProjectList = FXCollections.observableArrayList();
@@ -327,6 +401,7 @@ public class FXMLDocumentController implements Initializable, Controller {
             }
         }
 
+        
         lowSelectedList.setItems(sortedLowSelectedProjectList.sorted());
         lowSelectedList.setCellFactory(new Callback<ListView<Project>, ListCell<Project>>(){
 

@@ -43,9 +43,7 @@ public class TableCellWithListFactory implements Callback<TableColumn<TableObjec
                     hbox.getChildren().clear();
                     
                     for (Project project : ((Reader) reader).getPreferences()) {
-                        Label label = new DragDropLabel(project.getId()+"", controller);
-                        label.setUserData(project);
-                        label.setTooltip(new Tooltip(project.toString()));
+                        Label label = new DragDropLabel(project, controller);
                         hbox.getChildren().add(label);
                     }
                     hbox.setUserData(reader);

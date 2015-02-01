@@ -13,16 +13,20 @@
    <children>
       <BorderPane layoutX="-72.0" layoutY="-27.0" prefHeight="200.0" prefWidth="320.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <top>
-            <MenuBar fx:id="menuBar" BorderPane.alignment="CENTER">
-              <menus>
-                <Menu mnemonicParsing="false" text="File">
-                  <items>
-                        <MenuItem mnemonicParsing="false" onAction="#handleButtonAction" text="Open file..." />
-                    <MenuItem mnemonicParsing="false" onAction="#exitSystem" text="Close" />
-                  </items>
-                </Menu>
-              </menus>
-            </MenuBar>
+            <HBox>
+               <children>
+                  <MenuBar fx:id="menuBar" prefHeight="25.0" prefWidth="1097.0" BorderPane.alignment="CENTER" HBox.hgrow="ALWAYS">
+                    <menus>
+                      <Menu mnemonicParsing="false" text="File">
+                        <items>
+                              <MenuItem mnemonicParsing="false" onAction="#handleButtonAction" text="Open file..." />
+                          <MenuItem mnemonicParsing="false" onAction="#exitSystem" text="Close" />
+                        </items>
+                      </Menu>
+                    </menus>
+                  </MenuBar>
+               </children>
+            </HBox>
          </top>
          <center>
             <TableView fx:id="tableView" prefHeight="407.0" prefWidth="644.0" BorderPane.alignment="CENTER">
@@ -58,12 +62,7 @@
                   <Pane prefHeight="100.0" prefWidth="300.0" HBox.hgrow="SOMETIMES">
                      <children>
                         <CheckBox fx:id="zeroCapacityReaderCheckbox" layoutX="104.0" layoutY="15.0" mnemonicParsing="false" selected="true" text="Show Readers with zero capacity" />
-                        <Label layoutX="-16.0" layoutY="24.0" nodeOrientation="LEFT_TO_RIGHT" rotate="270.0" text="Settings">
-                           <font>
-                              <Font size="15.0" />
-                           </font>
-                        </Label>
-                        <Separator layoutX="18.0" layoutY="1.0" orientation="VERTICAL" prefHeight="67.0" prefWidth="0.0" />
+                        <Label fx:id="trashBin" layoutX="35.0" layoutY="9.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="17.0" prefWidth="21.0" />
                      </children>
                   </Pane>
                   <Pane prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
@@ -74,7 +73,7 @@
                   <Pane prefHeight="100.0" prefWidth="300.0" HBox.hgrow="NEVER">
                      <children>
                         <Button fx:id="runAlgorithmButton" layoutX="175.0" layoutY="15.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="104.0" text="Run algorithm" />
-                        <CheckBox fx:id="loadBalancedCheckbox" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" selected="true" text="Load balancing" />
+                        <CheckBox fx:id="loadBalancedCheckbox" layoutX="48.0" layoutY="15.0" mnemonicParsing="false" selected="true" text="Load balancing" />
                      </children>
                   </Pane>
                </children>

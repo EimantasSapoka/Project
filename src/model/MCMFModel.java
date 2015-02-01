@@ -311,13 +311,16 @@ public class MCMFModel {
                 readerToRemoveFrom.removePreference(projectToMove);
                 return true;
             } else {
-                // TODO: show incorrect action dialog box
                 return false;
             }
             
         } else {
             return false;
         }
+    }
+
+    public void removeProjectFromReader(Reader readerToRemoveFrom, Project projectToRemove) {
+        getReader(readerToRemoveFrom).removePreference(projectToRemove);
     }
 
 }
