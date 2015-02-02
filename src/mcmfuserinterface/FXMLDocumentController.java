@@ -42,6 +42,7 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -89,12 +90,24 @@ public class FXMLDocumentController implements Initializable, Controller {
     @FXML
     private Label trashBin;
     
+    Label dragLabel;
+    
+    @FXML
+    AnchorPane anchorPane;
+    
     /******************    /
      METHODS
     /*********************/
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        
+        dragLabel = new Label("");
+        dragLabel.setMouseTransparent(true);
+        dragLabel.setVisible(false);
+        dragLabel.toFront();
+        registerRootPaneDragEvents();
+        
         GlyphFont fontAwesome = GlyphFontRegistry.font("FontAwesome");
         trashBin.setGraphic(fontAwesome.create(FontAwesome.Glyph.TRASH_ALT));
         addTrashBinListeners(trashBin);
@@ -113,24 +126,35 @@ public class FXMLDocumentController implements Initializable, Controller {
         });   
     }
 
+    /**
+     * adds the button listener to the run algorithm button
+    */
     private void setRunAlgorithmButtonListeners() {
         runAlgorithmButton.setOnAction(new EventHandler<ActionEvent>(){
             @Override
             public void handle(ActionEvent event) {
-                if (loadBalancedCheckbox.isSelected()){
-                    Algorithm.runLoadBalancedAlgorithm(model);
+                if (model == null){
+                    openFileButtonAction(event);
                 } else {
-                    Algorithm.runUnbalancedAlgorithm(model);
+                    if (loadBalancedCheckbox.isSelected()){
+                        Algorithm.runLoadBalancedAlgorithm(model);
+                    } else {
+                        Algorithm.runUnbalancedAlgorithm(model);
+                    }
+                    
+                    System.out.println(model);
                 }
-                System.out.println(model);
             }
             
         });
     }
 
+    /**
+     * sets the listeners on the input text box which changes
+     * the items in the low selected project list. 
+     */
     private void setProjectLowSelectionLimitBoxListeners() {
         projectLowSelectionLimitBox.setOnAction(new EventHandler<ActionEvent>(){
-            
             @Override
             public void handle(ActionEvent event) {
                 TextField textField = (TextField) event.getSource();
@@ -144,10 +168,12 @@ public class FXMLDocumentController implements Initializable, Controller {
                     }
                 }
             }
-            
         });
     }
 
+    /**
+     * sets the listeners to zero capacity check box.
+     */
     private void setZeroCapacityCheckboxListeners() {
         zeroCapacityReaderCheckbox.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
@@ -180,8 +206,12 @@ public class FXMLDocumentController implements Initializable, Controller {
         ((Stage) menuBar.getScene().getWindow()).close();
     }
 
+    /**
+     * 
+     * @param event 
+     */
     @FXML
-    private void handleButtonAction(ActionEvent event) {
+    private void openFileButtonAction(ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Input File");
         File file = fileChooser.showOpenDialog(menuBar.getScene().getWindow());
@@ -200,14 +230,19 @@ public class FXMLDocumentController implements Initializable, Controller {
     }
     
     
-    
-    public void createTableViewFromGraph(MCMFModel model) {
-        if (model.getGraph() == null) {
-            System.out.println("Graph instance empty");
+    /**
+     * creates a table with reader information and preferences list.
+     * @param model 
+     */
+    private void createTableViewFromGraph(MCMFModel model) {
+        if (model.getGraph() == null) { 
+            /* should not happen as this is only called locally after
+               the model is instanciated */
+            System.err.println("Graph instance empty");
             return;
         }
         
-        
+        // if the table has no columns, create them
         if (tableView.getColumns().isEmpty()){
             tableView.getColumns().add(createReaderColumn());
             tableView.getColumns().add(createCapacityColumn());
@@ -215,8 +250,6 @@ public class FXMLDocumentController implements Initializable, Controller {
             tableView.getColumns().add(createPreferencesColumn());
         }
         
-        
-
         ObservableList<TableObjectInterface> items = FXCollections.observableArrayList();
         if (this.showZeroCapacityReaders()){
             items.addAll(model.getReaders());
@@ -228,12 +261,65 @@ public class FXMLDocumentController implements Initializable, Controller {
             }
         }
         
-        this.refreshTable();
+        refreshTable();
         tableView.setItems(items);
-        tableView.setStyle(".table-row-cell {-fx-cell-size: 50px;}");
         tableView.setFixedCellSize(40);
-        tableView.setRowFactory(new Callback<TableView<TableObjectInterface>,TableRow<TableObjectInterface>>(){
+        setTableRowFactory();
+    }
 
+    /**
+     * registers drag events for the root anchorPane, which 
+ show and move the drag label across the anchorPane.
+     */
+    private void registerRootPaneDragEvents() {
+        anchorPane.getChildren().add(dragLabel);
+        anchorPane.setOnDragDetected(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent t) { 
+                System.out.println("DRAGGING");
+                
+                
+                dragLabel.relocate(
+                        (int) (t.getSceneX() - dragLabel.getBoundsInLocal().getWidth() / 2),
+                        (int) (t.getSceneY() - dragLabel.getBoundsInLocal().getHeight() / 2));
+            }
+        });
+        
+        anchorPane.setOnDragOver(new EventHandler<DragEvent>(){
+            @Override
+            public void handle(DragEvent event) {
+                if (!dragLabel.isVisible()){
+                    dragLabel.setVisible(true);
+                    dragLabel.toFront();
+                    Project project;
+                    if (event.getGestureSource() instanceof DragDropLabel){
+                        project = (Project) ((Label) event.getGestureSource()).getUserData();
+                    } else {
+                        project = (Project) ((ListCell)event.getGestureSource()).getUserData();
+                    }
+                    dragLabel.setText(project.getId() + "");
+                }
+                dragLabel.relocate(
+                        (int) (event.getSceneX() - dragLabel.getBoundsInLocal().getWidth() / 2),
+                        (int) (event.getSceneY() - dragLabel.getBoundsInLocal().getHeight() / 2));
+            }
+        });
+        
+        anchorPane.setOnDragDone(new EventHandler<DragEvent>(){
+            @Override
+            public void handle(DragEvent event) {
+                dragLabel.setVisible(false);
+            }
+            
+        });
+    }
+
+    /**
+     * creates the table row factory which adds colors to the rows
+     */
+    private void setTableRowFactory() {
+        tableView.setRowFactory(new Callback<TableView<TableObjectInterface>,TableRow<TableObjectInterface>>(){
+            
             @Override
             public TableRow<TableObjectInterface> call(TableView<TableObjectInterface> param) {
                 TableRow<TableObjectInterface> row = new TableRow<TableObjectInterface>(){
@@ -262,7 +348,6 @@ public class FXMLDocumentController implements Initializable, Controller {
                                         } 
                                     }
                                 }
-                                
                             });
                             int cap = reader.getCapacity();
                             int numPref = reader.getPreferences().size();
@@ -276,7 +361,6 @@ public class FXMLDocumentController implements Initializable, Controller {
                             }
                         }
                     }
-
                 };
                 return row;
             }
@@ -441,7 +525,6 @@ public class FXMLDocumentController implements Initializable, Controller {
 
                         content.putString("test");
                         db.setContent(content);
-                        event.consume();
                     }            
                 });
                 return listCell;
@@ -511,7 +594,7 @@ public class FXMLDocumentController implements Initializable, Controller {
                     sourceHbox.getChildren().remove(sourceLabel);
                     
                     event.setDropCompleted(true);
-                    event.consume();
+                    dragLabel.setVisible(false);
                 }
             }
         });

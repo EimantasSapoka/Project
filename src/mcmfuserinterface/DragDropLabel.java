@@ -94,7 +94,6 @@ public class DragDropLabel extends Label {
                 
                 content.putString("test");
                 db.setContent(content);
-                mouseEvent.consume();
             }
         });
 
@@ -102,7 +101,6 @@ public class DragDropLabel extends Label {
             @Override
             public void handle(DragEvent event) {
                 event.acceptTransferModes(TransferMode.ANY);
-                event.consume();
             }
         });
 
@@ -113,7 +111,6 @@ public class DragDropLabel extends Label {
                     label.setOpacity(0.5);
                     label.setText("\t" + label.getText());
                 }
-                event.consume();
             }
         });
 
@@ -122,7 +119,6 @@ public class DragDropLabel extends Label {
             public void handle(DragEvent event) {
                 label.setText(label.getText().trim());
                 label.setOpacity(1);
-                event.consume();
             }
         });
 
@@ -143,7 +139,7 @@ public class DragDropLabel extends Label {
                     indexToPlace = controller.getModel().movePreference(readerToAdd, readerToRemoveFrom, projectToMove, projectToPlaceBefore);
                     if (indexToPlace != -1) {
                         sourceHbox.getChildren().remove(sourceLabel);
-                        hbox.getChildren().add(indexToPlace+1, sourceLabel);
+                        hbox.getChildren().add(indexToPlace, sourceLabel);
                     } else {
                         createErrorDialog(projectToMove);
                     }
@@ -153,7 +149,7 @@ public class DragDropLabel extends Label {
                     
                     indexToPlace = controller.getModel().addProjectToReaderPreferences(readerToAdd, projectToAdd, projectToPlaceBefore);
                     if (indexToPlace != -1) {
-                        hbox.getChildren().add(indexToPlace+1, new DragDropLabel(projectToAdd, controller));
+                        hbox.getChildren().add(indexToPlace, new DragDropLabel(projectToAdd, controller));
                     } else {
                         createErrorDialog(projectToAdd);
                     }

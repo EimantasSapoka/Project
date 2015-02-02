@@ -12,6 +12,5 @@ import model.MCMFModel;
  * @author Eimantas
  */
 interface Controller {
-    public void createTableViewFromGraph(MCMFModel model);
     public MCMFModel getModel();
 }

@@ -113,7 +113,6 @@ public class DroppableScrollPane extends ScrollPane {
             @Override
             public void handle(DragEvent event) {
                 event.acceptTransferModes(TransferMode.ANY);
-                event.consume();
             }
         });
         
