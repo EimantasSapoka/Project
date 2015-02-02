@@ -154,7 +154,6 @@ public class DragDropLabel extends Label {
                 event.setDropCompleted(indexToPlace != -1);
                 event.consume();
             }
-
            
         });
 

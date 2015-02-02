@@ -42,6 +42,7 @@ import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
@@ -97,6 +98,9 @@ public class FXMLDocumentController implements Initializable, Controller {
     @FXML
     AnchorPane anchorPane;
     
+    @FXML
+    Button extendPrefListButton;
+    
     /******************    /
      METHODS
     /*********************/
@@ -117,6 +121,7 @@ public class FXMLDocumentController implements Initializable, Controller {
         setZeroCapacityCheckboxListeners();
         setTextBoxListeners();
         setRunAlgorithmButtonListeners();
+        setExtendPrefListButtonListener();
         
         printPref.setOnAction(new EventHandler<ActionEvent>(){
             @Override
@@ -507,6 +512,18 @@ public class FXMLDocumentController implements Initializable, Controller {
         tableView.getColumns().get(2).setVisible(true);
     }
     
+    @Override
+    public void refreshLowSelectedProjectList(){
+        SortedList list = (SortedList) lowSelectedList.getItems();
+        list.setComparator(new Comparator<Project>() {
+            @Override
+            public int compare(Project o1, Project o2) {
+                return o1.getSelectedCount() - o2.getSelectedCount();
+            }
+        });
+        lowSelectedList.setItems(null);
+        lowSelectedList.setItems(list.sorted());      
+    }
     /**
      * creates side list with lowest selected projects in ascending order
      */
@@ -540,6 +557,14 @@ public class FXMLDocumentController implements Initializable, Controller {
                         super.updateItem(item, empty); 
                         if (item != null){
                             setUserData(item);
+                            if (item.getSelectedCount() == 0){
+                                setStyle("-fx-background-color: red;");
+                            } else if (item.getSelectedCount() < 3){
+                                setStyle("-fx-background-color: orange;");
+                            } else {
+                                setStyle("");
+                            }
+                            setTooltip(new Tooltip(item.getName()));
                             setText(item.getId() + "\t\t("+item.getSelectedCount()+")");
                         }
                     }               
@@ -563,18 +588,9 @@ public class FXMLDocumentController implements Initializable, Controller {
         });
         
        lowSelectedList.setOnDragDone(new EventHandler<DragEvent>(){
-
             @Override
             public void handle(DragEvent event) {
-               
-                SortedList list = (SortedList) lowSelectedList.getItems();
-                list.setComparator(new Comparator<Project>() {
-                    @Override
-                    public int compare(Project o1, Project o2) {
-                        return o1.getSelectedCount() - o2.getSelectedCount();
-                    }
-                });
-                lowSelectedList.setItems(list.sorted());
+               refreshLowSelectedProjectList();
             }
            
        });
@@ -625,11 +641,37 @@ public class FXMLDocumentController implements Initializable, Controller {
                     
                     event.setDropCompleted(true);
                     dragLabel.setVisible(false);
+                    refreshLowSelectedProjectList();
                 }
             }
         });
         
         
+    }
+
+    private void setExtendPrefListButtonListener() {
+        extendPrefListButton.setOnAction(new EventHandler<ActionEvent>(){
+
+            @Override
+            public void handle(ActionEvent event) {
+                if (model == null){
+                    openFileButtonAction(event);
+                } else {
+                    Alert confirmation = new Alert(AlertType.CONFIRMATION);
+                    confirmation.setTitle("Confirmation");
+                    confirmation.setHeaderText("Are you sure you want to automatically extend preference lists?");
+                    confirmation.setContentText("The automatic extension is semi-random. It may result in some readers "
+                            + "being assigned unwanted projects or projects not in their field of study");
+                    Optional<ButtonType> result = confirmation.showAndWait();
+                    if (result.get() == ButtonType.OK){
+                        model.extendPreferenceLists();
+                        refreshTable();
+                        refreshLowSelectedProjectList();
+                    }
+                }
+            }
+            
+        });
     }
 
 }

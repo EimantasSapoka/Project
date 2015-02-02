@@ -13,4 +13,6 @@ import model.MCMFModel;
  */
 interface Controller {
     public MCMFModel getModel();
+    public void refreshTable();
+    public void refreshLowSelectedProjectList();
 }

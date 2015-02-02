@@ -237,7 +237,7 @@ public class MCMFModel {
 
                 if (!preferences.contains(proj)) {
                     if (!r.getSupervisorProjects().contains(proj.getId())) {
-                        System.out.println("Extended reader's " + r.getID() + " pref list with project " + proj.getId());
+//                        System.out.println("Extended reader's " + r.getID() + " pref list with project " + proj.getId());
                         r.addPreference(proj);
                     }
                 }
