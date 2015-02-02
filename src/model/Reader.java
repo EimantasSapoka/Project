@@ -15,8 +15,7 @@ public class Reader  implements TableObjectInterface{
 	private ArrayList<Integer> supervisorProjects;		// list of already assigned projects
 	private ArrayList<Project> preferences;				// list of project preferences
 	private String name;
-	private int projectUpperLimit;						// the reader's limit of how many projects he can take.
-														// Used for load balancing
+        
 	
 	private SimpleStringProperty preferenceCountProperty;
 	
@@ -26,7 +25,6 @@ public class Reader  implements TableObjectInterface{
 		this.capacity = capacity;
 		this.supervisorProjects = new ArrayList<Integer>();
 		this.preferences = new ArrayList<Project>();
-		this.projectUpperLimit = 0;
 		this.name = String.valueOf(id);
 		this.preferenceCountProperty = new SimpleStringProperty("0");  
 	}
@@ -35,10 +33,6 @@ public class Reader  implements TableObjectInterface{
             this(id,0);
             this.name = readerName;
         }
-	
-	public void incrementLimit(){
-		this.projectUpperLimit++;
-	}
         
         public String getName(){
             return this.name;
@@ -47,11 +41,7 @@ public class Reader  implements TableObjectInterface{
         public void setName(String name){
             this.name = name ;
         }
-	
-	public int getProjectUpperLimit(){
-		return this.projectUpperLimit;
-	}
-	
+        
 	public void addSupervisingProject(int id){
 		this.supervisorProjects.add(id);
 	}
@@ -110,6 +100,7 @@ public class Reader  implements TableObjectInterface{
 	 * @return
 	 */
 	public ArrayList<Project> getAssignedProjects(){
+               
 		ArrayList<Project> projects = new ArrayList<Project>();
 		for (Edge edge : this.vertex.getOutEdges()){
 			if (edge.getFlow() > 0){
@@ -146,6 +137,10 @@ public class Reader  implements TableObjectInterface{
     
     public SimpleStringProperty getPreferenceStringProperty(){
     	return this.preferenceCountProperty;
+    }
+
+    void resetVertex() {
+        this.vertex.resetVertex();
     }
     
 

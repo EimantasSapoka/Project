@@ -234,7 +234,6 @@ public class Graph {
 	 */
 	public void addProject(Project project){
             addVertex(project.getVertex());
-			
             Edge projectSinkEdge = new Edge(project.getVertex(), sink, PROJECT_READER_CAPACITY);
             addEdge(projectSinkEdge);
 	}

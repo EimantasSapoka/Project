@@ -5,6 +5,7 @@
  */
 package model;
 
+import ford_fulkerson.ReaderShortlistException;
 import ford_fulkerson.TextScanner;
 import ford_fulkerson.graph.Edge;
 import ford_fulkerson.graph.Graph;
@@ -32,7 +33,6 @@ public class MCMFModel {
     public MCMFModel(){
         this.readers = new ArrayList<Reader>();
         this.projects = new ArrayList<Project>();
-        this.graph = new Graph();
     }
 
     public void loadGraphFromFile(File file) {
@@ -161,8 +161,6 @@ public class MCMFModel {
     public void addProject(Project project) {
         if (!projects.contains(project)) {
             projects.add(project);
-            graph.addProject(project);
-
         }
     }
 
@@ -184,17 +182,20 @@ public class MCMFModel {
      * creates the vertices and edges between them according to the reader and
      * preference information.
      */
-    public void createGraph() {
+    public void createGraph() throws ReaderShortlistException {
+        String warnings = "";
+        String errors = "";
+        graph = new Graph();
 
         for (Reader reader : this.readers) {
+            reader.resetVertex();
 
             if (reader.getPreferences().size() < reader.getCapacity()) {
-                System.err.println("ERROR! READER " + reader.getID() + " HAS CAPACITY OF " + reader.getCapacity()
-                        + " AND PREFERENCE LIST SIZE " + reader.getPreferences().size());
-                System.exit(1);
+                errors += ">ERROR! READER "+reader.getName() +" (" + reader.getID() + ") HAS CAPACITY OF " + reader.getCapacity()
+                        + " AND PREFERENCE LIST SIZE " + reader.getPreferences().size()+"\n\n";
             } else if (reader.getPreferences().size() < reader.getCapacity() * 2) {
-                System.out.println("WARNING! reader " + reader.getID() + " has capacity of " + reader.getCapacity()
-                        + " and preference list size " + reader.getPreferences().size());
+                warnings += ">WARNING! reader "+reader.getName() +" (" + reader.getID() + ") has capacity of " + reader.getCapacity()
+                        + " and preference list size " + reader.getPreferences().size()+"\n\n";
             }
 
             graph.addVertex(reader.getVertex());
@@ -205,9 +206,17 @@ public class MCMFModel {
 
             int preference = 1; // the initial preference weight
             for (Project project : reader.getPreferences()) {
+                project.resetVertex();
+                graph.addProject(project);
                 graph.createReaderProjectEdge(reader, project, preference);
                 preference++;
             }
+        }
+        
+        if (!errors.isEmpty()){
+            throw new ReaderShortlistException(errors + warnings, true);
+        } else if (!warnings.isEmpty()){
+            throw new ReaderShortlistException(warnings);
         }
     }
 

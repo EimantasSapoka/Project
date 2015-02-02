@@ -21,7 +21,6 @@ import model.MCMFModel;
 public class Algorithm {
 	
 	public static void runUnbalancedAlgorithm(MCMFModel model){
-		model.createGraph();
 		solveGraph(model.getGraph());
 	}
 
@@ -34,8 +33,6 @@ public class Algorithm {
 	 * @param graph
 	 */
 	public static void runLoadBalancedAlgorithm(MCMFModel model){
-		// creates the graph
-		model.createGraph();
 		solveGraph(model.getGraph());
 		loadBalance(model);
 		//assignUnassignedProjects(graph);
@@ -74,7 +71,7 @@ public class Algorithm {
 	 * Run the algorithm again and since it is min cost, max flow, the 
 	 * reader who had the smallest preference list will most likely take the project. 
 	 */
-	public static void assignUnassignedProjects(MCMFModel model) {
+	public static void assignUnassignedProjects(MCMFModel model) throws ReaderShortlistException {
 		
 		if (!model.getGraph().isSaturatingFlow()){
 			

@@ -115,5 +115,11 @@ public class Vertex implements Comparable<Vertex>{
 			return 0;
 		}
 	}
+        
+        public void resetVertex(){
+            this.distanceFromSource=0;
+            this.outEdges.clear();
+            this.reachable = false;
+        }
 
 }

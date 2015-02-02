@@ -11,8 +11,11 @@ import org.junit.Test;
 import test.graph_creator.RandomArbitraryModel;
 import test.graph_creator.RandomReaderAllocationModel;
 import ford_fulkerson.Algorithm;
+import ford_fulkerson.ReaderShortlistException;
 import ford_fulkerson.graph.Edge;
 import ford_fulkerson.graph.Graph;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import model.MCMFModel;
 import model.Project;
 import model.Reader;
@@ -31,6 +34,11 @@ public class Constraints_Test {
 		for (int i=0; i<TEST_COUNT; i++){
 
 			readerGraph = new RandomReaderAllocationModel();
+                        try {
+                            readerGraph.createGraph();
+                        } catch (ReaderShortlistException ex) {
+                            System.out.println(ex.getMessage());
+                        }
 			Algorithm.runLoadBalancedAlgorithm(readerGraph);
 			checkReaderConstraints(readerGraph);
 		}
@@ -79,7 +87,11 @@ public class Constraints_Test {
 		for (int i = 0; i< TEST_COUNT ; i++){
 			arbitraryGraph = new RandomArbitraryModel();
                         MCMFModel model = new MCMFModel();
-                        
+                        try {
+                            arbitraryGraph.createGraph();
+                        } catch (ReaderShortlistException ex) {
+                            System.out.println(ex.getMessage());
+                        }
 			Algorithm.runLoadBalancedAlgorithm(arbitraryGraph);
 			graphConstraintsTests(arbitraryGraph.getGraph());
 		}

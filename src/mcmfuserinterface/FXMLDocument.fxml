@@ -61,7 +61,7 @@
                <children>
                   <Pane prefHeight="100.0" prefWidth="300.0" HBox.hgrow="SOMETIMES">
                      <children>
-                        <CheckBox fx:id="zeroCapacityReaderCheckbox" layoutX="104.0" layoutY="15.0" mnemonicParsing="false" selected="true" text="Show Readers with zero capacity" />
+                        <CheckBox fx:id="zeroCapacityReaderCheckbox" layoutX="106.0" layoutY="36.0" mnemonicParsing="false" selected="true" text="Show Readers with zero capacity" />
                         <Label fx:id="trashBin" layoutX="35.0" layoutY="9.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="39.0" />
                      </children>
                   </Pane>

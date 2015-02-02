@@ -6,6 +6,7 @@
 package mcmfuserinterface;
 
 import ford_fulkerson.Algorithm;
+import ford_fulkerson.ReaderShortlistException;
 import model.MCMFModel;
 import model.Reader;
 
@@ -13,6 +14,8 @@ import java.io.File;
 import java.net.URL;
 import java.util.Comparator;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ChangeListener;
@@ -25,6 +28,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -111,9 +115,9 @@ public class FXMLDocumentController implements Initializable, Controller {
         GlyphFont fontAwesome = GlyphFontRegistry.font("FontAwesome");
         trashBin.setGraphic(fontAwesome.create(FontAwesome.Glyph.TRASH_ALT));
         addTrashBinListeners(trashBin);
-                
+        
         setZeroCapacityCheckboxListeners();
-        setProjectLowSelectionLimitBoxListeners();
+        setTextBoxListeners();
         setRunAlgorithmButtonListeners();
         
         printPref.setOnAction(new EventHandler<ActionEvent>(){
@@ -136,13 +140,24 @@ public class FXMLDocumentController implements Initializable, Controller {
                 if (model == null){
                     openFileButtonAction(event);
                 } else {
-                    if (loadBalancedCheckbox.isSelected()){
-                        Algorithm.runLoadBalancedAlgorithm(model);
-                    } else {
-                        Algorithm.runUnbalancedAlgorithm(model);
+                    boolean runAlgorithm = true;
+                    try {
+                        model.createGraph();
+                    } catch (ReaderShortlistException ex) {
+                        runAlgorithm = false;
+                        System.out.println(ex.getMessage());
+                        //TODO: create error windows here
                     }
-                    
-                    System.out.println(model);
+                    if (runAlgorithm){
+                        if (loadBalancedCheckbox.isSelected()){
+                            Algorithm.runLoadBalancedAlgorithm(model);
+                        } else {
+                            Algorithm.runUnbalancedAlgorithm(model);
+                        }
+                        System.out.println(model);
+                    } else {
+                        System.out.println("algorithm not run");
+                    }
                 }
             }
             
@@ -153,7 +168,7 @@ public class FXMLDocumentController implements Initializable, Controller {
      * sets the listeners on the input text box which changes
      * the items in the low selected project list. 
      */
-    private void setProjectLowSelectionLimitBoxListeners() {
+    private void setTextBoxListeners() {
         projectLowSelectionLimitBox.setOnAction(new EventHandler<ActionEvent>(){
             @Override
             public void handle(ActionEvent event) {
@@ -235,10 +250,10 @@ public class FXMLDocumentController implements Initializable, Controller {
      * @param model 
      */
     private void createTableViewFromGraph(MCMFModel model) {
-        if (model.getGraph() == null) { 
+        if (model == null) { 
             /* should not happen as this is only called locally after
                the model is instanciated */
-            System.err.println("Graph instance empty");
+            System.err.println("model instance empty");
             return;
         }
         

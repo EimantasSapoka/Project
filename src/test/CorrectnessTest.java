@@ -10,6 +10,7 @@ import test.graph_creator.RandomReaderAllocationModel;
 import test.augustineMCMF.MinCostMaxFlowSPA;
 import test.augustineMCMF.Network;
 import ford_fulkerson.Algorithm;
+import ford_fulkerson.ReaderShortlistException;
 import model.MCMFModel;
 import model.Project;
 import model.Reader;
@@ -52,11 +53,14 @@ public class CorrectnessTest {
 		model.addReader(reader1);
 		model.addReader(reader2);
 		
-		model.createGraph();
+                try {
+                    model.createGraph();
+                } catch(ReaderShortlistException ex){
+                    System.out.println(ex.getMessage());
+                }
 		
 		Network network = alg.createReaderNetworkFromModel(model);
-		
-
+                
 		Algorithm.runLoadBalancedAlgorithm(model);
 		network = alg.solve(network);
 		
@@ -81,7 +85,11 @@ public class CorrectnessTest {
 			}
 			// create a new random reader graph
 			MCMFModel testGraph = new RandomReaderAllocationModel(i%40 + 10, 2, 7);
-			testGraph.createGraph();
+			try {
+                            testGraph.createGraph();
+                        } catch(ReaderShortlistException ex){
+                            System.out.println(ex.getMessage());
+                        }
 			Network network = alg.createReaderNetworkFromModel(testGraph);
 			
 			runTests(testGraph, network);
@@ -104,6 +112,11 @@ public class CorrectnessTest {
 				System.out.println("TEST " + i);
 			}
 			MCMFModel testGraph = new RandomArbitraryModel();
+                        try {
+                            testGraph.createGraph();
+                        } catch(ReaderShortlistException ex){
+                            System.out.println(ex.getMessage());
+                        }
 			Network network = alg.createNetworkFromGraph(testGraph.getGraph());
 			
 			runTests(testGraph, network);

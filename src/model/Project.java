@@ -58,6 +58,10 @@ public class Project implements Comparable<Project>, TableObjectInterface{
     public String getName() {
         return this.name;
     }
+
+    public void resetVertex() {
+        this.vertex.resetVertex();
+    }
 }
 
     
