@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.effect.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" fx:id="anchorPane" prefHeight="500.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mcmfuserinterface.FXMLDocumentController">
+   <children>
+      <BorderPane layoutX="-72.0" layoutY="-27.0" prefHeight="200.0" prefWidth="320.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <top>
+            <HBox>
+               <children>
+                  <MenuBar fx:id="menuBar" prefHeight="25.0" prefWidth="1097.0" BorderPane.alignment="CENTER" HBox.hgrow="ALWAYS">
+                    <menus>
+                      <Menu mnemonicParsing="false" text="File">
+                        <items>
+                              <MenuItem mnemonicParsing="false" onAction="#openFileButtonAction" text="Open file..." />
+                          <MenuItem mnemonicParsing="false" onAction="#exitSystem" text="Close" />
+                        </items>
+                      </Menu>
+                    </menus>
+                  </MenuBar>
+               </children>
+            </HBox>
+         </top>
+         <center>
+            <TableView fx:id="tableView" prefHeight="407.0" prefWidth="644.0" BorderPane.alignment="CENTER">
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
+            </TableView>
+         </center>
+         <right>
+            <VBox prefHeight="408.0" prefWidth="129.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Pane prefHeight="54.0" prefWidth="129.0" style="-fx-background-color: whitesmoke;" VBox.vgrow="NEVER">
+                     <children>
+                        <Label focusTraversable="false" layoutX="3.0" prefHeight="39.0" prefWidth="124.0" text="Least selected projects (&lt;          )" textAlignment="CENTER" textFill="#3c0505" wrapText="true">
+                           <font>
+                              <Font size="13.0" />
+                           </font>
+                        </Label>
+                        <TextField fx:id="projectLowSelectionLimitBox" layoutX="78.0" layoutY="23.0" prefHeight="10.0" prefWidth="26.0" promptText="int" text="4">
+                           <font>
+                              <Font size="9.0" />
+                           </font>
+                        </TextField>
+                     </children>
+                  </Pane>
+                  <ListView fx:id="lowSelectedList" prefHeight="366.0" prefWidth="133.0" VBox.vgrow="ALWAYS" />
+               </children>
+            </VBox>
+         </right>
+         <bottom>
+            <HBox prefHeight="67.0" prefWidth="800.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Pane prefHeight="100.0" prefWidth="300.0" HBox.hgrow="SOMETIMES">
+                     <children>
+                        <CheckBox fx:id="zeroCapacityReaderCheckbox" layoutX="106.0" layoutY="36.0" mnemonicParsing="false" selected="true" text="Show Readers with zero capacity" />
+                        <Label fx:id="trashBin" layoutX="35.0" layoutY="9.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="39.0" />
+                     </children>
+                  </Pane>
+                  <Pane prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Button fx:id="printPref" layoutX="67.0" layoutY="2.0" mnemonicParsing="false" text="Print pref" />
+                        <Button fx:id="extendPrefListButton" layoutX="40.0" layoutY="34.0" mnemonicParsing="false" text="Extend pref lists" />
+                     </children>
+                  </Pane>
+                  <Pane prefHeight="100.0" prefWidth="300.0" HBox.hgrow="NEVER">
+                     <children>
+                        <Button fx:id="runAlgorithmButton" layoutX="175.0" layoutY="15.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="104.0" text="Run algorithm" />
+                        <CheckBox fx:id="loadBalancedCheckbox" layoutX="48.0" layoutY="15.0" mnemonicParsing="false" selected="true" text="Load balancing" />
+                     </children>
+                  </Pane>
+               </children>
+            </HBox>
+         </bottom>
+      </BorderPane>
+   </children>
+</AnchorPane>

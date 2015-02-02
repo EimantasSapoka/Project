@@ -4,12 +4,13 @@ import java.util.ArrayList;
 
 import ford_fulkerson.graph.Edge;
 import ford_fulkerson.graph.Graph;
-import ford_fulkerson.graph.Project;
-import ford_fulkerson.graph.Reader;
+import model.Project;
+import model.Reader;
 import ford_fulkerson.graph.Vertex;
-import ford_fulkerson.residual_classes.ResidualEdge;
-import ford_fulkerson.residual_classes.ResidualGraph;
-import ford_fulkerson.residual_classes.ResidualVertex;
+import ford_fulkerson.graph.residual_classes.ResidualEdge;
+import ford_fulkerson.graph.residual_classes.ResidualGraph;
+import ford_fulkerson.graph.residual_classes.ResidualVertex;
+import model.MCMFModel;
 
 /**
  * class which runs the min cost max flow algorithm.
@@ -19,9 +20,8 @@ import ford_fulkerson.residual_classes.ResidualVertex;
  */
 public class Algorithm {
 	
-	public static void runUnbalancedAlgorithm(Graph graph){
-		graph.createGraph();
-		solveGraph(graph);
+	public static void runUnbalancedAlgorithm(MCMFModel model){
+		solveGraph(model.getGraph());
 	}
 
 	/**
@@ -32,11 +32,9 @@ public class Algorithm {
 	 * for all edges on path. Then updates the flows on the edges.
 	 * @param graph
 	 */
-	public static void runLoadBalancedAlgorithm(Graph graph){
-		// creates the graph
-		graph.createGraph();
-		solveGraph(graph);
-		loadBalance(graph);
+	public static void runLoadBalancedAlgorithm(MCMFModel model){
+		solveGraph(model.getGraph());
+		loadBalance(model);
 		//assignUnassignedProjects(graph);
 	}
 
@@ -51,8 +49,9 @@ public class Algorithm {
 	 * or as close to load balancing as possible. 
 	 */
 	
-	private static void loadBalance(Graph graph) {
-		while( !graph.isLoadBalanced()){
+	private static void loadBalance(MCMFModel model) {
+            Graph graph = model.getGraph();
+		while( !model.isLoadBalanced()){
 			graph.reset();
 			graph.decreaseCapacityOffset();
 			solveGraph(graph);
@@ -72,20 +71,20 @@ public class Algorithm {
 	 * Run the algorithm again and since it is min cost, max flow, the 
 	 * reader who had the smallest preference list will most likely take the project. 
 	 */
-	public static void assignUnassignedProjects(Graph graph) {
+	public static void assignUnassignedProjects(MCMFModel model) throws ReaderShortlistException {
 		
-		if (!graph.isSaturatingFlow()){
+		if (!model.getGraph().isSaturatingFlow()){
 			
-			ArrayList<Project> unassignedProjects = graph.findUnassignedProjects();
-			for (Reader reader : graph.getReaders()){
+			ArrayList<Project> unassignedProjects = model.getGraph().findUnassignedProjects();
+			for (Reader reader : model.getReaders()){
 				if (reader.getResidualCapacity() > 0){
 					for (Project p: unassignedProjects){
 						reader.addPreference(p);
 					}
 				}
 			}
-			graph.createGraph();
-			solveGraph(graph);
+			model.createGraph();
+			solveGraph(model.getGraph());
 		}
 	}
 

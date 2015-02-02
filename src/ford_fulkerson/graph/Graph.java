@@ -1,5 +1,7 @@
 package ford_fulkerson.graph;
 
+import model.Project;
+import model.Reader;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -7,8 +9,8 @@ public class Graph {
 	
 	private static final int PROJECT_READER_CAPACITY = 1;
 	private static final int READERS_TO_PROJECTS_CONSTANT = 1;
-	protected static final int SOURCE_ID = 0;
-	protected static final int SINK_ID = 1;
+	public static final int SOURCE_ID = 0;
+	public static final int SINK_ID = 1;
 
 	public int lowerCapacityOffset; 		// the offset used to calculate the lower capacity of edges. 
 	
@@ -18,15 +20,10 @@ public class Graph {
 	public ArrayList<Vertex> vertices;		// all the vertices in the graph
 	public ArrayList<Edge> edges;			// all the edges in the graph
 	
-	public ArrayList<Reader> readers;		// readers list
-	public ArrayList<Project> projects;		// projects list
-	
 	public Graph(){
 		
 		this.vertices = new ArrayList<Vertex>();
 		this.edges = new ArrayList<Edge>();
-		this.readers = new ArrayList<Reader>();
-		this.projects = new ArrayList<Project>();
 		
 		Vertex.resetVertexCounter();
 		
@@ -160,150 +157,10 @@ public class Graph {
 		return null;
 	}
 	
-	/**
-	 * method to check if the graph contains the reader
-	 * @param id
-	 * @return
-	 */
-	public boolean hasReader(int id){
-		for (Reader r : readers){
-			if (r.getID() == id){
-				return true;
-			}
-		}
-		return false;
-	}
 	
-	/**
-	 *  method to check if the graph contains the reader
-	 * @param reader
-	 * @return
-	 */
-	public boolean hasReader(Reader reader){
-		for (Reader r : readers){
-			if (r.equals(reader)){
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	/**
-	 * gets the largest project capacity amongst all the readers
-	 * @return
-	 */
-	public int getLargestCapacity(){
-		int max = 0;
-		for (Reader reader: this.getReaders()){
-			if (reader.getCapacity() > max){
-				max = reader.getCapacity();
-			}
-		}
-				
-		return max;
-	}
-	
-	public ArrayList<Reader> getReaders(){
-		return this.readers;
-	}
-	
-	/**
-	 * method to check if a graph contains the project
-	 * @param project
-	 * @return
-	 */
-	public boolean hasProject(Project project){
-		for (Project p: projects){
-			if (p.equals(project)){
-				return true;
-			}
-		}
-		return false;
-	}
 	
 	public void setVertices(ArrayList<Vertex> vertices){
 		this.vertices = vertices;
-	}
-	
-	/**
-	 * method to check if a graph contains the project
-	 * @param id
-	 * @return
-	 */
-	public boolean hasProject(int id){
-		for (Project p: projects){
-			if (p.getId() == id){
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	/**
-	 * returns a project with the id
-	 * @param id
-	 * @return
-	 */
-	public Project getProject(int id){
-		for (Project p: projects){
-			if (p.getId() == id){
-				return p;
-			}
-		}
-		return null;
-	}
-	
-	
-	/**
-	 * returns projects list
-	 * @return
-	 */
-	public ArrayList<Project> getProjects(){
-		return this.projects;
-	}
-	
-	/** 
-	 * prints out the readers and their assigned projects
-	 */
-	public String toString(){
-		String result = "";
-		
-		int numberProjects = this.getProjects().size();
-		
-		for (Reader r: readers){
-			result += "Reader " + r.getVertex().getObjectID();
-			
-			int assigned = 0;
-			String assignedProj = "";
-			for (Edge e: r.getVertex().getOutEdges()){
-				if (e.getFlow() > 0){
-					assigned++;
-					assignedProj += " " + e.getDestination().getObjectID();
-				} 
-			}
-			result +=  " (" + assigned + "/" + r.getCapacity() + ") :" + assignedProj + "\n";
-		}
-		
-		String unselectedProjID = "";
-		for (Project p : this.findUnassignedProjects()){
-			unselectedProjID += " " + p.getId();
-		}
-		result += String.format(""
-				+ "\n number of readers: %d"
-				+ "\n number of projects: %d, not assigned: [%s ]"
-				+ "\n total flow: %d"
-				+ "\n total weight: %d"
-				+ "\n load balanced? : %b"
-				+ "\n saturating flow? : %b", 
-				this.getReaders().size(),
-				numberProjects, 
-				unselectedProjID,
-				this.getFlow(),
-				this.getWeight(),
-				this.isLoadBalanced(),
-				this.isSaturatingFlow());
-		
-		return result;
 	}
 
 	
@@ -343,33 +200,7 @@ public class Graph {
 		return getCapacityIn() == getFlow() || getCapacityOut() == getFlow();
 	}
 	
-	/**
-	 * returns if the graph is load balanced. That is weather
-	 * all the reader's in the graph have no more than one less 
-	 * project assigned with respect to their capacities than any other reader.
-	 * Example: if a reader has capacity 7 and flow 4, load balanced graph would
-	 * mean that no other reader has flow higher than their capacity - 3 or lower
-	 * than their capacity - 4. 
-	 * @return
-	 */
-	public boolean isLoadBalanced() {
-		int capacityFlowGap = 0;
-		boolean capacitySet = false;
-		
-		for (Reader reader : this.readers){
-			if (!capacitySet){
-				capacityFlowGap = reader.getCapacity() + lowerCapacityOffset - reader.getAssignedProjects().size();
-				if (capacityFlowGap >= 0){
-					capacitySet = true;
-				}
-			} else {
-				if (reader.getCapacity() + lowerCapacityOffset - reader.getAssignedProjects().size() > capacityFlowGap+1){
-					return false;
-				}
-			}
-		}
-		return true;
-	}
+	
 	
 
 	/**
@@ -401,66 +232,13 @@ public class Graph {
 	 * adds a project to the graph
 	 * @param project
 	 */
-	private void addProject(Project project){
-		if (! projects.contains(project)){
-			projects.add(project);
-			addVertex(project.getVertex());
-			
-			Edge projectSinkEdge = new Edge(project.getVertex(), sink, PROJECT_READER_CAPACITY);
-			addEdge(projectSinkEdge);
-		}
+	public void addProject(Project project){
+            addVertex(project.getVertex());
+            Edge projectSinkEdge = new Edge(project.getVertex(), sink, PROJECT_READER_CAPACITY);
+            addEdge(projectSinkEdge);
 	}
 	
-	/**
-	 * adds a reader to the graph. This process includes adding all the reader's 
-	 * projects into the graph (if not yet present) and creating all the necessary
-	 * vertices and edges. 
-	 * @param reader
-	 */
-	public void addReader(Reader reader){
-		readers.add(reader);
-		for (Project p : reader.getPreferences()){
-			this.addProject(p);
-		}
-	}
 	
-	/**
-	 * creates the vertices and edges between them according to the reader
-	 * and preference information.
-	 */
-	public void createGraph(){
-
-		for (Reader reader : this.readers){
-			
-			if (reader.getPreferences().size() < reader.getCapacity()){
-				System.err.println("ERROR! READER " + reader.getID() + " HAS CAPACITY OF " + reader.getCapacity() 
-						+ " AND PREFERENCE LIST SIZE "  + reader.getPreferences().size());
-				System.exit(1);
-			} else if (reader.getPreferences().size() < reader.getCapacity()*2){
-				System.out.println("WARNING! reader " + reader.getID() + " has capacity of " + reader.getCapacity()
-						+ " and preference list size " + reader.getPreferences().size());
-			}
-			
-			
-			addVertex(reader.getVertex());
-			// if reader has any capacity, create an edge from source to the reader with the capacity
-			if (reader.getCapacity() > 0){
-				Edge sourceReaderEdge = new Edge(source,reader.getVertex(), reader.getCapacity());
-				addEdge(sourceReaderEdge);	
-			}
-			
-			int preference = 1; // the initial preference weight
-			for (Project project : reader.getPreferences()){
-				
-				// create the edge between the reader and the project.
-				Edge readerProjectEdge = new Edge(reader.getVertex(), project.getVertex(), READERS_TO_PROJECTS_CONSTANT, preference++);
-				addEdge(readerProjectEdge);
-				
-			}
-		}
-	}
-
-
 	/**
 	 * method which resets the graph - removes all flow from edges.
 	 */
@@ -472,32 +250,7 @@ public class Graph {
 			v.setDistanceFromSource(0);
 		}
 	}
-
-	/**
-	 * method which extends readers preference lists to 2x their capacities
-	 */
-	@SuppressWarnings("unchecked")
-	public void extendPreferenceLists() {
-		for (Reader r: this.readers){
-			
-			ArrayList<Project> preferences = r.getPreferences();
-			ArrayList<Project> projectList = (ArrayList<Project>) this.projects.clone();
-			
-			while (preferences.size() < 2*r.getCapacity() && !projectList.isEmpty()){
-				
-				Collections.sort(projectList);
-				Project proj = projectList.remove(0);
-				
-				if (!preferences.contains(proj)){
-					if( !r.getSupervisorProjects().contains(proj.getId())){
-						System.out.println("Extended reader's " + r.getID() + " pref list with project " + proj.getId());
-						r.addPreference(proj);
-					}
-				}
-			}
-			
-		}
-	}
+	
 
 	/**
 	 * finds the unassigned projects and returns them in a list
@@ -514,6 +267,17 @@ public class Graph {
 		}
 		return unassigned;
 	}
+
+    public void createReaderProjectEdge(Reader reader, Project project, int weight) {
+        // create the edge between the reader and the project.
+        Edge readerProjectEdge = new Edge(reader.getVertex(), project.getVertex(), READERS_TO_PROJECTS_CONSTANT, weight);
+        addEdge(readerProjectEdge);
+    }
+
+    public void createSourceReaderEdge(Reader reader) {
+        Edge sourceReaderEdge = new Edge(source,reader.getVertex(), reader.getCapacity());
+	addEdge(sourceReaderEdge);	
+    }
 
 
 }

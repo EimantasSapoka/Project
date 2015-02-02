@@ -1,4 +1,4 @@
-package augustineMCMF;
+package test.augustineMCMF;
 
 public class Edge 
 {

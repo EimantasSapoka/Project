@@ -4,15 +4,16 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import ford_fulkerson.graph.Graph;
-import ford_fulkerson.graph.Project;
-import ford_fulkerson.graph.Reader;
+import model.MCMFModel;
+import model.Project;
+import model.Reader;
 
 /**
  * class which creates a random reader allocation graph. Used for testing.
  * @author Eimantas
  *
  */
-public class RandomReaderAllocationGraph extends Graph{
+public class RandomReaderAllocationModel extends MCMFModel{
 	
 	private final int READER_CAPACITY;
 	private int readerIDcounter = 1;
@@ -27,9 +28,8 @@ public class RandomReaderAllocationGraph extends Graph{
 	 * also creates number of projects equal to the number of readers multiplied 
 	 * by the projectMultiplier. 
 	 */
-	public RandomReaderAllocationGraph(int readerLimit, int projectMultiplier, int readerCapacity){
+	public RandomReaderAllocationModel(int readerLimit, int projectMultiplier, int readerCapacity){
 		super();
-		
 		rand = new Random();
 		READER_CAPACITY = readerCapacity;
 		READER_COUNT = rand.nextInt(readerLimit -5) + 5;
@@ -42,7 +42,7 @@ public class RandomReaderAllocationGraph extends Graph{
 		}
 		
 		for (int i=0; i<READER_COUNT; i++){
-			this.addReader(generateReader());
+                    this.addReader(generateReader());
 		}
 	}
 	
@@ -52,11 +52,11 @@ public class RandomReaderAllocationGraph extends Graph{
 	 * and number of projects twice the reader count. 
 	 * @param readerLimit
 	 */
-	public RandomReaderAllocationGraph(int readerLimit){
+	public RandomReaderAllocationModel(int readerLimit){
 		this(readerLimit, 2, 8);
 	}
 	
-	public RandomReaderAllocationGraph(){
+	public RandomReaderAllocationModel(){
 		this(15);
 	}
 	

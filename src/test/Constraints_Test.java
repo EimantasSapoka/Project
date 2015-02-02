@@ -8,18 +8,22 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
-import test.graph_creator.RandomArbitraryGraph;
-import test.graph_creator.RandomReaderAllocationGraph;
+import test.graph_creator.RandomArbitraryModel;
+import test.graph_creator.RandomReaderAllocationModel;
 import ford_fulkerson.Algorithm;
+import ford_fulkerson.ReaderShortlistException;
 import ford_fulkerson.graph.Edge;
 import ford_fulkerson.graph.Graph;
-import ford_fulkerson.graph.Project;
-import ford_fulkerson.graph.Reader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import model.MCMFModel;
+import model.Project;
+import model.Reader;
 
 public class Constraints_Test {
 	
 	private static final int TEST_COUNT = 100;
-	Graph arbitraryGraph,readerGraph;;
+	MCMFModel arbitraryGraph,readerGraph;;
 	
 	/**
 	 * checks that the constraints hold after running the algorithm on the 
@@ -29,7 +33,12 @@ public class Constraints_Test {
 	public void testReaderGraph(){
 		for (int i=0; i<TEST_COUNT; i++){
 
-			readerGraph = new RandomReaderAllocationGraph();
+			readerGraph = new RandomReaderAllocationModel();
+                        try {
+                            readerGraph.createGraph();
+                        } catch (ReaderShortlistException ex) {
+                            System.out.println(ex.getMessage());
+                        }
 			Algorithm.runLoadBalancedAlgorithm(readerGraph);
 			checkReaderConstraints(readerGraph);
 		}
@@ -42,13 +51,13 @@ public class Constraints_Test {
 	 * its capacity
 	 * @param graph
 	 */
-	public static void checkReaderConstraints(Graph graph) {
+	public static void checkReaderConstraints(MCMFModel model) {
 		int capacity;
 		int assigned;
 		ArrayList<Integer> alreadyTaken = new ArrayList<Integer>();
 		
 		
-		for (Reader r: graph.getReaders()){
+		for (Reader r: model.getReaders()){
 			assigned = 0;
 			capacity = r.getCapacity();
 			for (Edge e : r.getVertex().getOutEdges()){
@@ -76,9 +85,15 @@ public class Constraints_Test {
 	@Test
 	public void testArbitraryGraph(){
 		for (int i = 0; i< TEST_COUNT ; i++){
-			arbitraryGraph = new RandomArbitraryGraph();
+			arbitraryGraph = new RandomArbitraryModel();
+                        MCMFModel model = new MCMFModel();
+                        try {
+                            arbitraryGraph.createGraph();
+                        } catch (ReaderShortlistException ex) {
+                            System.out.println(ex.getMessage());
+                        }
 			Algorithm.runLoadBalancedAlgorithm(arbitraryGraph);
-			graphConstraintsTests(arbitraryGraph);
+			graphConstraintsTests(arbitraryGraph.getGraph());
 		}
 	}
 

@@ -1,4 +1,4 @@
-package ford_fulkerson.residual_classes;
+package ford_fulkerson.graph.residual_classes;
 
 import ford_fulkerson.graph.Vertex;
 

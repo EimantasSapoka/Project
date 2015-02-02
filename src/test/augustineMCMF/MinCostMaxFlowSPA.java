@@ -1,11 +1,12 @@
-package augustineMCMF;
+package test.augustineMCMF;
 
 import java.util.ArrayList;
 
 import ford_fulkerson.graph.Graph;
-import ford_fulkerson.graph.Project;
-import ford_fulkerson.graph.Reader;
+import model.Project;
+import model.Reader;
 import ford_fulkerson.graph.Vertex;
+import model.MCMFModel;
 
 public class MinCostMaxFlowSPA 
 {
@@ -335,40 +336,40 @@ public class MinCostMaxFlowSPA
 	
 	
 	/**
-	 * creates a network from the given graph using the reader and project classes. 
+	 * creates a network from the given model using the reader and project classes. 
 	 * The created network has nodes with types which specify either LECTURER for reader vertex
 	 * or PROJECT for project vertices.
-	 * @param graph
+	 * @param model
 	 * @return
 	 */
-	public Network createReaderNetworkFromGraph(Graph graph){
+	public Network createReaderNetworkFromModel(MCMFModel model){
 		Network network = new Network();
 		
-		Vertex source = graph.source();
+		Vertex source = model.getGraph().source();
 		Node node = new Node(source.getVertexID(), (source.getVertexID())+"", null);
 		network.addNode(node);
 		network.setSource(node);
 		
-		Vertex sink = graph.sink();
+		Vertex sink = model.getGraph().sink();
 		node = new Node(sink.getVertexID(), (sink.getVertexID())+"", null);
 		network.addNode(node);
 		network.setSink(node);
 		
-		for (Reader reader: graph.getReaders()){
+		for (Reader reader: model.getReaders()){
 			Vertex v = reader.getVertex();
 			node = new Node(v.getVertexID(), (v.getVertexID())+"", NodeType.LECTURER, reader.getCapacity());
 			network.addNode(node);
 			
 		}
 		
-		for (Project project : graph.getProjects()){
+		for (Project project : model.getProjects()){
 			Vertex v = project.getVertex();
 			node = new Node(v.getVertexID(), (v.getVertexID())+"", NodeType.PROJECT);
 			network.addNode(node);
 		}
 		
 		// copy edges
-		for (ford_fulkerson.graph.Edge e : graph.getEdges()){
+		for (ford_fulkerson.graph.Edge e : model.getGraph().getEdges()){
 			Edge edge = new Edge(network.getNode((e.getParent().getVertexID())+""), network.getNode((e.getDestination().getVertexID())+""), e.getCapacity(), e.getCapacity(), e.getWeight());
 			network.addEdge(edge);
 		}
