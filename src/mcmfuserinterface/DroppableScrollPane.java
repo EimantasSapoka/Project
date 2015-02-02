@@ -12,25 +12,19 @@ import java.util.Optional;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TableCell;
 import javafx.scene.input.DragEvent;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import model.Project;
 import model.Reader;
-import org.controlsfx.dialog.Dialog;
 import org.controlsfx.dialog.Dialogs;
-import org.controlsfx.glyphfont.FontAwesome;
-import org.controlsfx.glyphfont.GlyphFont;
-import org.controlsfx.glyphfont.GlyphFontRegistry;
 
 /**
  *
@@ -164,14 +158,11 @@ public class DroppableScrollPane extends ScrollPane {
                 if (runnable != null) {
                     runnable.run();
                 }
-                
-                Dialogs.create()
-                        .owner(scrollPane)
-                        .title("Error")
-                        .masthead("Cannot move preference")
-                        .message("Either the reader already has project as preference or he has capacity of 0!")
-                        .showError();
-               
+                Alert alert = new Alert(AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Cannot move preference");
+                alert.setContentText("Either the reader already has project as preference or he has capacity of 0!");
+                alert.showAndWait();
             }
         });
     }    

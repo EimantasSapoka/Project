@@ -13,9 +13,8 @@ import model.Reader;
 import java.io.File;
 import java.net.URL;
 import java.util.Comparator;
+import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ChangeListener;
@@ -27,9 +26,11 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
-import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -48,13 +49,10 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import model.Project;
-import org.controlsfx.dialog.Dialogs;
 import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.GlyphFont;
 import org.controlsfx.glyphfont.GlyphFontRegistry;
@@ -145,8 +143,27 @@ public class FXMLDocumentController implements Initializable, Controller {
                         model.createGraph();
                     } catch (ReaderShortlistException ex) {
                         runAlgorithm = false;
-                        System.out.println(ex.getMessage());
-                        //TODO: create error windows here
+                        Alert alert = new Alert(AlertType.CONFIRMATION);
+                        ButtonType proceed = new ButtonType("Proceed anyway");
+                        ButtonType cancel = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
+
+                        alert.getButtonTypes().setAll(proceed, cancel);
+                        if (ex.isErrorMessage()){
+                            alert.setTitle("Error");
+                            alert.setHeaderText("There are errors in data.\n"
+                                    + "Continuing is NOT recommended and WILL\n"
+                                    + "lead to unbalanced or poor project assignment.");
+                        } else {
+                            alert.setTitle("Warning");
+                            alert.setHeaderText("There are warnings in data.\nResulting "
+                                    + "assignment may not be the optimal. ");
+                        }
+                        alert.setContentText(ex.getMessage());
+
+                        Optional<ButtonType> result = alert.showAndWait();
+                        if (result.get() == proceed){
+                            runAlgorithm = true;
+                        }
                     }
                     if (runAlgorithm){
                         if (loadBalancedCheckbox.isSelected()){
@@ -155,8 +172,6 @@ public class FXMLDocumentController implements Initializable, Controller {
                             Algorithm.runUnbalancedAlgorithm(model);
                         }
                         System.out.println(model);
-                    } else {
-                        System.out.println("algorithm not run");
                     }
                 }
             }

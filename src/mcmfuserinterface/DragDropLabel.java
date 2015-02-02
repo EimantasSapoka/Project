@@ -6,13 +6,12 @@
 package mcmfuserinterface;
 
 
-import java.awt.Panel;
 import java.awt.Toolkit;
-import java.util.Comparator;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.Tooltip;
@@ -23,16 +22,12 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import model.Project;
 import model.Reader;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.dialog.Dialogs;
-import org.controlsfx.glyphfont.FontAwesome;
-import org.controlsfx.glyphfont.GlyphFont;
-import org.controlsfx.glyphfont.GlyphFontRegistry;
 
 /**
  *
@@ -171,14 +166,11 @@ public class DragDropLabel extends Label {
         if (runnable != null) {
             runnable.run();
         }
-
-        Dialogs.create()
-                .owner(label)
-                .title("Error")
-                .masthead("Cannot move preference")
-                .message("The reader already has project as preference!\nProject name: "
-                        + projectToAdd.getName() + ",\nID: " + projectToAdd.getId())
-                .showError();
-
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("Cannot move preference");
+        alert.setContentText("The reader already has project as preference!\nProject name: "
+                        + projectToAdd.getName() + ",\nID: " + projectToAdd.getId());
+        alert.showAndWait();
     }
 }

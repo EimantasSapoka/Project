@@ -192,10 +192,10 @@ public class MCMFModel {
 
             if (reader.getPreferences().size() < reader.getCapacity()) {
                 errors += ">ERROR! READER "+reader.getName() +" (" + reader.getID() + ") HAS CAPACITY OF " + reader.getCapacity()
-                        + " AND PREFERENCE LIST SIZE " + reader.getPreferences().size()+"\n\n";
+                        + " AND PREFERENCE LIST SIZE " + reader.getPreferences().size()+"\n";
             } else if (reader.getPreferences().size() < reader.getCapacity() * 2) {
                 warnings += ">WARNING! reader "+reader.getName() +" (" + reader.getID() + ") has capacity of " + reader.getCapacity()
-                        + " and preference list size " + reader.getPreferences().size()+"\n\n";
+                        + " and preference list size " + reader.getPreferences().size()+"\n";
             }
 
             graph.addVertex(reader.getVertex());
