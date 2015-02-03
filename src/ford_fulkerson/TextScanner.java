@@ -18,7 +18,7 @@ import model.Reader;
 public class TextScanner {
 	
 
-	public static void parse(File textFile, MCMFModel model) throws IOException{
+	public static void parse(File textFile, MCMFModel model) throws Exception{
 		BufferedReader textReader = new BufferedReader(new FileReader(textFile));
 		String line = "";
 		while ( ( line = textReader.readLine() )  != null ){

@@ -6,7 +6,7 @@ import ford_fulkerson.graph.Vertex;
 import java.util.ArrayList;
 
 import javafx.beans.property.SimpleStringProperty;
-import mcmfuserinterface.TableObjectInterface;
+import mcmfuserinterface.drag_drop_table.TableObjectInterface;
 
 public class Reader  implements TableObjectInterface{
 	private final int id;								// reader id

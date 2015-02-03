@@ -11,7 +11,7 @@ import model.MCMFModel;
  *
  * @author Eimantas
  */
-interface Controller {
+public interface Controller {
     public MCMFModel getModel();
     public void refreshTable();
     public void refreshLowSelectedProjectList();

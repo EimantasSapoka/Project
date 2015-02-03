@@ -25,7 +25,7 @@ public class MCMFModel {
 
     private Graph graph;
 
-    public MCMFModel(File file) {
+    public MCMFModel(File file) throws Exception {
        this();
        loadGraphFromFile(file);
     }
@@ -35,12 +35,8 @@ public class MCMFModel {
         this.projects = new ArrayList<Project>();
     }
 
-    public void loadGraphFromFile(File file) {
-        try {
-            TextScanner.parse(file, this);
-        } catch (IOException ex) {
-            System.out.println("ERROR OPENING FILE");
-        }
+    public void loadGraphFromFile(File file) throws Exception {
+        TextScanner.parse(file, this);
     }
 
     public Graph getGraph() {
@@ -191,10 +187,10 @@ public class MCMFModel {
             reader.resetVertex();
 
             if (reader.getPreferences().size() < reader.getCapacity()) {
-                errors += ">ERROR! READER "+reader.getName() +" (" + reader.getID() + ") HAS CAPACITY OF " + reader.getCapacity()
+                errors += ">READER "+reader.getName() +" (" + reader.getID() + ") HAS CAPACITY OF " + reader.getCapacity()
                         + " AND PREFERENCE LIST SIZE " + reader.getPreferences().size()+"\n";
             } else if (reader.getPreferences().size() < reader.getCapacity() * 2) {
-                warnings += ">WARNING! reader "+reader.getName() +" (" + reader.getID() + ") has capacity of " + reader.getCapacity()
+                warnings += ">reader "+reader.getName() +" (" + reader.getID() + ") has capacity of " + reader.getCapacity()
                         + " and preference list size " + reader.getPreferences().size()+"\n";
             }
 
@@ -212,11 +208,15 @@ public class MCMFModel {
                 preference++;
             }
         }
-        
+        for (Project project : this.projects){
+           if (project.getSelectedCount() == 0){
+               errors += ">PROJECT " + project.getName() + "("+project.getId()+") HAS NOT BEEN SELECTED BY ANYONE\n" ;
+           } 
+        }
         if (!errors.isEmpty()){
-            throw new ReaderShortlistException(errors + warnings, true);
+            throw new ReaderShortlistException(">>>> ERRORS:\n"+errors + ">>>> WARNINGS:\n"+warnings, true);
         } else if (!warnings.isEmpty()){
-            throw new ReaderShortlistException(warnings);
+            throw new ReaderShortlistException(">>>> WARNINGS:\n"+warnings);
         }
     }
 

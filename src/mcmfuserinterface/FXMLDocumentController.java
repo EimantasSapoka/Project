@@ -5,6 +5,9 @@
  */
 package mcmfuserinterface;
 
+import mcmfuserinterface.drag_drop_table.TableObjectInterface;
+import mcmfuserinterface.drag_drop_table.DragDropLabel;
+import mcmfuserinterface.drag_drop_table.TableCellWithListFactory;
 import ford_fulkerson.Algorithm;
 import ford_fulkerson.ReaderShortlistException;
 import model.MCMFModel;
@@ -107,7 +110,6 @@ public class FXMLDocumentController implements Initializable, Controller {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        
         dragLabel = new Label("");
         dragLabel.setMouseTransparent(true);
         dragLabel.setVisible(false);
@@ -164,7 +166,7 @@ public class FXMLDocumentController implements Initializable, Controller {
                                     + "assignment may not be the optimal. ");
                         }
                         alert.setContentText(ex.getMessage());
-
+                        alert.setResizable(true);
                         Optional<ButtonType> result = alert.showAndWait();
                         if (result.get() == proceed){
                             runAlgorithm = true;
@@ -251,10 +253,14 @@ public class FXMLDocumentController implements Initializable, Controller {
         fileChooser.setTitle("Open Input File");
         File file = fileChooser.showOpenDialog(menuBar.getScene().getWindow());
         if (file != null) {
-            System.out.println(file);
-            model = new MCMFModel(file);
-            createTableViewFromGraph(model);
-            createLowSelectedProjectsList();
+            try {
+                model = new MCMFModel(file);
+                createTableViewFromGraph(model);
+                createLowSelectedProjectsList();
+            } catch (Exception ex){
+                Alert alert = new ExceptionDialog(ex);
+                alert.showAndWait();
+            }
         }
     }
 

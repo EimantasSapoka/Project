@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mcmfuserinterface;
+package mcmfuserinterface.drag_drop_table;
 
 import java.awt.Toolkit;
 import java.util.ArrayList;
@@ -22,6 +22,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
+import mcmfuserinterface.Controller;
 import model.Project;
 import model.Reader;
 import org.controlsfx.dialog.Dialogs;
