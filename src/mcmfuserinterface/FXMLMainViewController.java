@@ -7,22 +7,17 @@ package mcmfuserinterface;
 
 import mcmfuserinterface.drag_drop_table.TableObjectInterface;
 import mcmfuserinterface.drag_drop_table.DragDropLabel;
-import mcmfuserinterface.drag_drop_table.TableCellWithListFactory;
 import ford_fulkerson.Algorithm;
 import ford_fulkerson.ReaderShortlistException;
 import model.MCMFModel;
 import model.Reader;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -33,6 +28,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -44,9 +40,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -58,10 +51,13 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import mcmfuserinterface.drag_drop_table.columns.CapacityColumn;
+import mcmfuserinterface.drag_drop_table.columns.PreferenceListSizeColumn;
+import mcmfuserinterface.drag_drop_table.columns.PreferencesColumn;
+import mcmfuserinterface.drag_drop_table.columns.ReaderNameColumn;
 import model.Project;
 import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.GlyphFont;
@@ -94,9 +90,6 @@ public class FXMLMainViewController implements Initializable, Controller {
     TableView<TableObjectInterface> tableView;
     
     @FXML
-    private Button printPref;
-    
-    @FXML
     private ListView<Project> lowSelectedList;
     
     @FXML
@@ -116,79 +109,65 @@ public class FXMLMainViewController implements Initializable, Controller {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        
         dragLabel = new Label("");
         dragLabel.setMouseTransparent(true);
         dragLabel.setVisible(false);
         dragLabel.toFront();
-        registerRootPaneDragEvents();
+        
+        anchorPane.getChildren().add(dragLabel);
         
         GlyphFont fontAwesome = GlyphFontRegistry.font("FontAwesome");
         trashBin.setGraphic(fontAwesome.create(FontAwesome.Glyph.TRASH_ALT));
-        addTrashBinListeners(trashBin);
-        
-        setZeroCapacityCheckboxListeners();
-        setTextBoxListeners();
-        setRunAlgorithmButtonListeners();
-        setExtendPrefListButtonListener();
-        
-        printPref.setOnAction(new EventHandler<ActionEvent>(){
-            @Override
-            public void handle(ActionEvent event) {
-               for(Reader r : model.getReaders()){
-                   System.out.println("reader " + r.getID() + " : " + r.getPreferences());
-               }
-            }
-        });   
     }
 
     /**
-     * adds the button listener to the run algorithm button
-    */
-    private void setRunAlgorithmButtonListeners() {
-        runAlgorithmButton.setOnAction(new EventHandler<ActionEvent>(){
-            @Override
-            public void handle(ActionEvent event) {
-                if (model == null){
-                    openFileButtonAction(event);
-                } else {
-                    boolean runAlgorithm = true;
-                    try {
-                        model.createGraph();
-                    } catch (ReaderShortlistException ex) {
-                        runAlgorithm = showErrorWarningDialog(ex);
-                    }
-                    if (runAlgorithm){
-                        if (loadBalancedCheckbox.isSelected()){
-                            Algorithm.runLoadBalancedAlgorithm(model);
-                        } else {
-                            Algorithm.runUnbalancedAlgorithm(model);
-                        }
-                        System.out.println(model);
-                        showResultsView();
-                    }
-                }
+     * runs the algorithm if the model is not null
+     */
+    @FXML
+    private void runAlgorithm() {
+        if (model == null) {
+            openFileButtonAction();
+        } else {
+            boolean runAlgorithm = true;
+            try {
+                model.createGraph();
+            } catch (ReaderShortlistException ex) {
+                runAlgorithm = showErrorWarningDialog(ex);
             }
-        });
+            if (runAlgorithm) {
+                if (loadBalancedCheckbox.isSelected()) {
+                    Algorithm.runLoadBalancedAlgorithm(model);
+                } else {
+                    Algorithm.runUnbalancedAlgorithm(model);
+                }
+                //System.out.println(model);
+                showResultsView();
+            }
+        }
     }
-    
+
     /**
     * shows a new window with the resulting assignments.
     */
-   private void showResultsView() {
-       Stage stage = new Stage();
-       stage.setTitle("Assignments");
-       Pane myPane = null;
-       try {
-           myPane = FXMLLoader.load(getClass().getResource("fxml/FXMLResultsView.fxml"));
-       } catch (IOException ex) {
-           Alert alert = new ExceptionDialog(ex);
-           alert.showAndWait();
-       }
-       Scene scene = new Scene(myPane);
-       stage.setScene(scene);
+    private void showResultsView() {
+        Stage stage = new Stage();
+        stage.setTitle("Assignments");
+        Parent myPane = null;
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("fxml/FXMLResultsView.fxml"));
+            myPane = (Parent) loader.load();
+            FXMLResultsViewController controller = (FXMLResultsViewController) loader.getController();
+            controller.setModel(model);
+            Scene scene = new Scene(myPane);
+            stage.setScene(scene);
 
-       stage.show();
-   }
+            stage.show();
+        } catch (Exception ex) {
+            Alert alert = new ExceptionDialog(ex);
+            alert.showAndWait();
+        }
+    }
 
    /**
     * shows a dialog with errors and warnings and asks the user 
@@ -223,59 +202,44 @@ public class FXMLMainViewController implements Initializable, Controller {
    }
 
     /**
-     * sets the listeners on the input text box which changes
-     * the items in the low selected project list. 
+     * sets the listeners on the input text box which changes the items in the
+     * low selected project list.
      */
-    private void setTextBoxListeners() {
-        projectLowSelectionLimitBox.setOnAction(new EventHandler<ActionEvent>(){
-            @Override
-            public void handle(ActionEvent event) {
-                TextField textField = (TextField) event.getSource();
-                if (!textField.getText().matches("\\d+")
-                        || Integer.parseInt(textField.getText()) < 2
-                        || Integer.parseInt(textField.getText()) > 99){
-                    textField.setText("");
-                } else {
-                    if (model != null){
-                        createLowSelectedProjectsList();
-                    }
-                }
+    @FXML
+    private void setLowSelectedProjectsThreshold() {
+        String text = this.projectLowSelectionLimitBox.getText();
+        if (!text.matches("\\d+")
+                || Integer.parseInt(text) < 2
+                || Integer.parseInt(text) > 99) {
+            projectLowSelectionLimitBox.setText("");
+        } else {
+            if (model != null) {
+                createLowSelectedProjectsList();
             }
-        });
+        }
     }
 
     /**
-     * sets the listeners to zero capacity check box.
+     * changes between showing and hiding readers with zero capacity
      */
-    private void setZeroCapacityCheckboxListeners() {
-        zeroCapacityReaderCheckbox.selectedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                zeroCapacityReaderCheckbox.setSelected(newValue);
-                ObservableList<TableObjectInterface> items = FXCollections.observableArrayList();
-                if (newValue){
-                    items.addAll(model.getReaders());
-                } else {
-                    for (Reader r : model.getReaders()){
-                        if (!(r.getCapacity() == 0)){
-                            items.add(r);
-                        }
-                    }
+    @FXML
+    private void toggleShowZeroCapacityReaders() {
+        ObservableList<TableObjectInterface> items = FXCollections.observableArrayList();
+        if (zeroCapacityReaderCheckbox.isSelected()){
+            items.addAll(model.getReaders());
+        } else {
+            for (Reader r : model.getReaders()){
+                if (!(r.getCapacity() == 0)){
+                    items.add(r);
                 }
-                tableView.setItems(null);
-                tableView.setItems(items);
             }
-        });
+        }
+        tableView.setItems(null);
+        tableView.setItems(items);
     }
 
-    
-    
-    public boolean showZeroCapacityReaders(){
-        return zeroCapacityReaderCheckbox.isSelected();
-    }
-    
     @FXML
-    private void exitSystem(ActionEvent event) {
+    private void closeWindow(ActionEvent event) {
         ((Stage) menuBar.getScene().getWindow()).close();
     }
 
@@ -284,14 +248,14 @@ public class FXMLMainViewController implements Initializable, Controller {
      * @param event 
      */
     @FXML
-    private void openFileButtonAction(ActionEvent event) {
+    private void openFileButtonAction() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Input File");
         File file = fileChooser.showOpenDialog(menuBar.getScene().getWindow());
         if (file != null) {
             try {
                 model = new MCMFModel(file);
-                createTableViewFromGraph(model);
+                createTableViewFromGraph();
                 createLowSelectedProjectsList();
             } catch (Exception ex){
                 Alert alert = new ExceptionDialog(ex);
@@ -311,7 +275,7 @@ public class FXMLMainViewController implements Initializable, Controller {
      * creates a table with reader information and preferences list.
      * @param model 
      */
-    private void createTableViewFromGraph(MCMFModel model) {
+    private void createTableViewFromGraph() {
         if (model == null) { 
             /* should not happen as this is only called locally after
                the model is instanciated */
@@ -321,14 +285,14 @@ public class FXMLMainViewController implements Initializable, Controller {
         
         // if the table has no columns, create them
         if (tableView.getColumns().isEmpty()){
-            tableView.getColumns().add(createReaderColumn());
-            tableView.getColumns().add(createCapacityColumn());
-            tableView.getColumns().add(createPreferenceListSizeColumn());
-            tableView.getColumns().add(createPreferencesColumn());
+            tableView.getColumns().add(new ReaderNameColumn("Reader name"));
+            tableView.getColumns().add(new CapacityColumn("Cap"));
+            tableView.getColumns().add(new PreferenceListSizeColumn("#Pref"));
+            tableView.getColumns().add(new PreferencesColumn("Preferences", this));
         }
         
         ObservableList<TableObjectInterface> items = FXCollections.observableArrayList();
-        if (this.showZeroCapacityReaders()){
+        if (this.zeroCapacityReaderCheckbox.isSelected()){
             items.addAll(model.getReaders());
         } else {
             for (Reader r : model.getReaders()){
@@ -342,53 +306,6 @@ public class FXMLMainViewController implements Initializable, Controller {
         tableView.setItems(items);
         tableView.setFixedCellSize(40);
         setTableRowFactory();
-    }
-
-    /**
-     * registers drag events for the root anchorPane, which 
- show and move the drag label across the anchorPane.
-     */
-    private void registerRootPaneDragEvents() {
-        anchorPane.getChildren().add(dragLabel);
-        anchorPane.setOnDragDetected(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent t) { 
-                System.out.println("DRAGGING");
-                
-                
-                dragLabel.relocate(
-                        (int) (t.getSceneX() - dragLabel.getBoundsInLocal().getWidth() / 2),
-                        (int) (t.getSceneY() - dragLabel.getBoundsInLocal().getHeight() / 2));
-            }
-        });
-        
-        anchorPane.setOnDragOver(new EventHandler<DragEvent>(){
-            @Override
-            public void handle(DragEvent event) {
-                if (!dragLabel.isVisible()){
-                    dragLabel.setVisible(true);
-                    dragLabel.toFront();
-                    Project project;
-                    if (event.getGestureSource() instanceof DragDropLabel){
-                        project = (Project) ((Label) event.getGestureSource()).getUserData();
-                    } else {
-                        project = (Project) ((ListCell)event.getGestureSource()).getUserData();
-                    }
-                    dragLabel.setText(project.getId() + "");
-                }
-                dragLabel.relocate(
-                        (int) (event.getSceneX() - dragLabel.getBoundsInLocal().getWidth() / 2),
-                        (int) (event.getSceneY() - dragLabel.getBoundsInLocal().getHeight() / 2));
-            }
-        });
-        
-        anchorPane.setOnDragDone(new EventHandler<DragEvent>(){
-            @Override
-            public void handle(DragEvent event) {
-                dragLabel.setVisible(false);
-            }
-            
-        });
     }
 
     /**
@@ -445,110 +362,7 @@ public class FXMLMainViewController implements Initializable, Controller {
         });
     }
     
-    /**
-     * creates the reader column for the tableView.
-     * @return table column
-     */
-    private TableColumn<TableObjectInterface, TableObjectInterface> createReaderColumn(){
-        TableColumn<TableObjectInterface, TableObjectInterface> readerColumn = new TableColumn<TableObjectInterface, TableObjectInterface>("Reader name");
-        readerColumn.setMinWidth(150);
-        readerColumn.setMaxWidth(300);
-        
-        readerColumn.setCellValueFactory(new Callback<CellDataFeatures<TableObjectInterface, TableObjectInterface>, ObservableValue<TableObjectInterface>>() {
-          @Override public ObservableValue<TableObjectInterface> call(CellDataFeatures<TableObjectInterface, TableObjectInterface> features) {
-              Reader reader = (Reader) features.getValue();
-              return new ReadOnlyObjectWrapper(reader.getName());
-          }
-        });
-        return readerColumn;
-    }
-    
-    /**
-     * creates the preferences column and modifies so the cells contain lists
-     * of preferences.
-     * @return table column
-     */
-    private TableColumn<TableObjectInterface, TableObjectInterface> createPreferencesColumn(){
-        TableColumn<TableObjectInterface, TableObjectInterface> preferencesColumn  = new TableColumn<TableObjectInterface, TableObjectInterface>("Preferences");
-        preferencesColumn.setMinWidth(300);
-        preferencesColumn.setCellValueFactory(new Callback<CellDataFeatures<TableObjectInterface, TableObjectInterface>, ObservableValue<TableObjectInterface>>() {
-          @Override public ObservableValue<TableObjectInterface> call(CellDataFeatures<TableObjectInterface, TableObjectInterface> features) {
-              return new ReadOnlyObjectWrapper(features.getValue());
-          }
-        });
-        
-        preferencesColumn.setCellFactory(new TableCellWithListFactory(this));
-        return preferencesColumn;
-    }
-    
-    /**
-     * creates a column which shows the reader's capacity
-     * @return 
-     */
-    private TableColumn<TableObjectInterface, TableObjectInterface> createCapacityColumn(){
-        TableColumn<TableObjectInterface, TableObjectInterface> capacityColumn  = new TableColumn<TableObjectInterface, TableObjectInterface>("Cap");
-        capacityColumn.setMinWidth(30);
-        capacityColumn.setPrefWidth(50);
-        capacityColumn.setMaxWidth(60);
-        
-        capacityColumn.setCellValueFactory(new Callback<CellDataFeatures<TableObjectInterface, TableObjectInterface>, ObservableValue<TableObjectInterface>>() {
-          @Override public ObservableValue<TableObjectInterface> call(CellDataFeatures<TableObjectInterface, TableObjectInterface> features) {
-              Reader reader = (Reader) features.getValue();
-              return new ReadOnlyObjectWrapper(reader.getCapacity());
-          }
-        });
-        
-        return capacityColumn;
-    }
-    
-    /**
-     * creates the column with the preference sizes. It changes dynamically as the 
-     * preferences are added and removed. Hence the huge method. 
-     * @return 
-     */
-     private TableColumn<TableObjectInterface, TableObjectInterface> createPreferenceListSizeColumn(){
-         
-        TableColumn<TableObjectInterface, TableObjectInterface> preferenceCountColumn  = new TableColumn<TableObjectInterface, TableObjectInterface>("#Pref");
-        preferenceCountColumn.setMinWidth(30);
-        preferenceCountColumn.setPrefWidth(50);
-        preferenceCountColumn.setMaxWidth(60);
-        
-        preferenceCountColumn.setCellValueFactory(new Callback<CellDataFeatures<TableObjectInterface, TableObjectInterface>, ObservableValue<TableObjectInterface>>() {
-            @Override public ObservableValue<TableObjectInterface> call(CellDataFeatures<TableObjectInterface, TableObjectInterface> features) {
-                return new ReadOnlyObjectWrapper(features.getValue());
-            }
-          });
-        
-        preferenceCountColumn.setComparator(new Comparator<TableObjectInterface>(){
-            @Override
-            public int compare(TableObjectInterface o1, TableObjectInterface o2) {
-                    return ((Reader) o1).getPreferences().size() - ((Reader) o2).getPreferences().size();
-            }
-        	
-        });
-        
-        preferenceCountColumn.setCellFactory(new Callback<TableColumn<TableObjectInterface, TableObjectInterface>, TableCell<TableObjectInterface,TableObjectInterface>>() {
-            @Override
-            public TableCell<TableObjectInterface, TableObjectInterface> call(TableColumn<TableObjectInterface, TableObjectInterface> arg) {
-                TableCell<TableObjectInterface, TableObjectInterface> cell = new TableCell<TableObjectInterface, TableObjectInterface>(){
-                    private final Label label = new Label();
-
-                    @Override
-                    protected void updateItem(TableObjectInterface arg0, boolean arg1) {
-                        super.updateItem(arg0, arg1);
-                        if (arg0 != null){
-                                label.textProperty().bind(((Reader)arg0).getPreferenceStringProperty());
-                                setGraphic(label);
-                        }
-                    }
-                };
-                return cell;
-            }
-        });
-        
-        return preferenceCountColumn;
-    }
-     
+    @Override
     public void refreshTable(){
         tableView.getColumns().get(2).setVisible(false);
         tableView.getColumns().get(2).setVisible(true);
@@ -638,82 +452,96 @@ public class FXMLMainViewController implements Initializable, Controller {
        });
     }
 
-     /**
-     * adds the listeners for drag over and drops for the trash bin icon.
-     * @param trashBin 
-     */
-      private void addTrashBinListeners(final Label trashBin) {
-        trashBin.setOnDragOver(new EventHandler<DragEvent>() {
+    
 
-            @Override
-            public void handle(DragEvent event) {
-                if (event.getGestureSource() instanceof DragDropLabel) {
-                    event.acceptTransferModes(TransferMode.MOVE);
-                    trashBin.setScaleY(1.5);
-                    trashBin.setScaleX(1.5);
-                }
+      /**
+       * extends the preference lists of readers
+       */
+    @FXML
+    private void extendPreferenceLists() {
+        if (model == null){
+            openFileButtonAction();
+        } else {
+            Alert confirmation = new Alert(AlertType.CONFIRMATION);
+            confirmation.setTitle("Confirmation");
+            confirmation.setHeaderText("Are you sure you want to automatically extend preference lists?");
+            confirmation.setContentText("The automatic extension is semi-random. It may result in some readers "
+                    + "being assigned unwanted projects or projects not in their field of study");
+            Optional<ButtonType> result = confirmation.showAndWait();
+            if (result.get() == ButtonType.OK){
+                model.extendPreferenceLists();
+                refreshTable();
+                refreshLowSelectedProjectList();
             }
+        }
+    }
+    
+    /************************* TRASHBIN EVENTS ************************/
+    
+    @FXML
+    private void onTrashBinDragOver(DragEvent event) {
+        if (event.getGestureSource() instanceof DragDropLabel) {
+            event.acceptTransferModes(TransferMode.MOVE);
+            trashBin.setScaleY(1.5);
+            trashBin.setScaleX(1.5);
+        }
+    }
+    
+    @FXML
+    private void onTrashBinDragExit(DragEvent event) {
+        if (event.getGestureSource() instanceof DragDropLabel) {
+            trashBin.setScaleX(1);
+            trashBin.setScaleY(1);
+        }
+    }
+    
+    @FXML
+    private void onTrashBinDragDropped(DragEvent event) {
+        if (event.getGestureSource() instanceof DragDropLabel) {
+            Label sourceLabel = (Label) event.getGestureSource();
+            HBox sourceHbox = (HBox) sourceLabel.getParent();
+            Project projectToRemove = (Project) sourceLabel.getUserData();
+            Reader readerToRemoveFrom = (Reader) sourceHbox.getUserData();
 
-        });
+            model.removeProjectFromReaderPreferences(readerToRemoveFrom, projectToRemove);
+            sourceHbox.getChildren().remove(sourceLabel);
 
-        trashBin.setOnDragExited(new EventHandler<DragEvent>() {
-
-            @Override
-            public void handle(DragEvent event) {
-                if (event.getGestureSource() instanceof DragDropLabel) {
-                    trashBin.setScaleX(1);
-                    trashBin.setScaleY(1);
-                }
-            }
-
-        });
-
-        trashBin.setOnDragDropped(new EventHandler<DragEvent>() {
-
-            @Override
-            public void handle(DragEvent event) {
-                if (event.getGestureSource() instanceof DragDropLabel) {
-                    Label sourceLabel = (Label) event.getGestureSource();
-                    HBox sourceHbox = (HBox) sourceLabel.getParent();
-                    Project projectToRemove = (Project) sourceLabel.getUserData();
-                    Reader readerToRemoveFrom = (Reader) sourceHbox.getUserData();
-
-                    model.removeProjectFromReaderPreferences(readerToRemoveFrom, projectToRemove);
-                    sourceHbox.getChildren().remove(sourceLabel);
-                    
-                    event.setDropCompleted(true);
-                    dragLabel.setVisible(false);
-                    refreshLowSelectedProjectList();
-                }
-            }
-        });
-        
-        
+            event.setDropCompleted(true);
+            dragLabel.setVisible(false);
+            refreshLowSelectedProjectList();
+        }
+    }
+    
+    
+    /**************************** ANCHOR PANE EVENTS ********************/
+    
+    @FXML
+    private void anchorPaneDragDetected(MouseEvent t) {
+        dragLabel.relocate(
+                (int) (t.getSceneX() - dragLabel.getBoundsInLocal().getWidth() / 2),
+                (int) (t.getSceneY() - dragLabel.getBoundsInLocal().getHeight() / 2));
     }
 
-    private void setExtendPrefListButtonListener() {
-        extendPrefListButton.setOnAction(new EventHandler<ActionEvent>(){
-
-            @Override
-            public void handle(ActionEvent event) {
-                if (model == null){
-                    openFileButtonAction(event);
-                } else {
-                    Alert confirmation = new Alert(AlertType.CONFIRMATION);
-                    confirmation.setTitle("Confirmation");
-                    confirmation.setHeaderText("Are you sure you want to automatically extend preference lists?");
-                    confirmation.setContentText("The automatic extension is semi-random. It may result in some readers "
-                            + "being assigned unwanted projects or projects not in their field of study");
-                    Optional<ButtonType> result = confirmation.showAndWait();
-                    if (result.get() == ButtonType.OK){
-                        model.extendPreferenceLists();
-                        refreshTable();
-                        refreshLowSelectedProjectList();
-                    }
-                }
+    @FXML
+    private void anchorPaneDragOver(DragEvent event) {
+        if (!dragLabel.isVisible()) {
+            dragLabel.setVisible(true);
+            dragLabel.toFront();
+            Project project;
+            if (event.getGestureSource() instanceof DragDropLabel) {
+                project = (Project) ((Label) event.getGestureSource()).getUserData();
+            } else {
+                project = (Project) ((ListCell) event.getGestureSource()).getUserData();
             }
-            
-        });
+            dragLabel.setText(project.getId() + "");
+        }
+        dragLabel.relocate(
+                (int) (event.getSceneX() - dragLabel.getBoundsInLocal().getWidth() / 2),
+                (int) (event.getSceneY() - dragLabel.getBoundsInLocal().getHeight() / 2));
     }
 
+    @FXML
+    private void anchorPaneDragDone(DragEvent event) {
+        dragLabel.setVisible(false);
+    }
 }
