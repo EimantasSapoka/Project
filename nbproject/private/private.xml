@@ -5,7 +5,7 @@
             <url>src/mcmfuserinterface/FXMLDocumentController.java</url>
             <bookmark id="1">
                 <name/>
-                <line>284</line>
+                <line>327</line>
                 <key/>
             </bookmark>
         </file>
@@ -14,17 +14,19 @@
         <group>
             <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/test/CorrectnessTest.java</file>
             <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/ExceptionDialog.java</file>
-            <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/FXMLDocumentController.java</file>
+            <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/FXMLResultsViewController.java</file>
             <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/MCMFUserInterface.java</file>
+            <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/FXMLMainViewController.java</file>
             <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/ford_fulkerson/graph/Vertex.java</file>
             <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/test/Constraints_Test.java</file>
-            <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/DroppableScrollPane.java</file>
-            <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/DragDropLabel.java</file>
             <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/Controller.java</file>
             <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/model/MCMFModel.java</file>
             <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/model/Project.java</file>
             <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/model/Reader.java</file>
             <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/ford_fulkerson/TextScanner.java</file>
+            <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/drag_drop_table/DragDropLabel.java</file>
+            <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/drag_drop_table/TableCellWithListFactory.java</file>
+            <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/drag_drop_table/DroppableScrollPane.java</file>
             <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/ford_fulkerson/graph/Graph.java</file>
             <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/ford_fulkerson/Algorithm.java</file>
         </group>
