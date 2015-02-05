@@ -6,7 +6,6 @@
 package mcmfuserinterface;
 
 import mcmfuserinterface.drag_drop_table.TableObjectInterface;
-import mcmfuserinterface.drag_drop_table.PreferenceLabel;
 import ford_fulkerson.Algorithm;
 import ford_fulkerson.ReaderShortlistException;
 import model.MCMFModel;
@@ -54,9 +53,10 @@ import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import mcmfuserinterface.drag_drop_table.DragDropLabel;
 import mcmfuserinterface.drag_drop_table.columns.CapacityColumn;
 import mcmfuserinterface.drag_drop_table.columns.PreferenceListSizeColumn;
-import mcmfuserinterface.drag_drop_table.columns.PreferencesColumn;
+import mcmfuserinterface.drag_drop_table.columns.ListColumn;
 import mcmfuserinterface.drag_drop_table.columns.ReaderNameColumn;
 import model.Project;
 import org.controlsfx.glyphfont.FontAwesome;
@@ -296,7 +296,7 @@ public class FXMLMainViewController implements Initializable, Controller {
             tableView.getColumns().add(new ReaderNameColumn("Reader name"));
             tableView.getColumns().add(new CapacityColumn("Cap"));
             tableView.getColumns().add(new PreferenceListSizeColumn("#Pref"));
-            tableView.getColumns().add(new PreferencesColumn("Preferences", this));
+            tableView.getColumns().add(new ListColumn("Preferences", this));
         }
         
         ObservableList<TableObjectInterface> items = FXCollections.observableArrayList();
@@ -488,7 +488,7 @@ public class FXMLMainViewController implements Initializable, Controller {
     
     @FXML
     private void onTrashBinDragOver(DragEvent event) {
-        if (event.getGestureSource() instanceof PreferenceLabel) {
+        if (event.getGestureSource() instanceof DragDropLabel) {
             event.acceptTransferModes(TransferMode.MOVE);
             trashBin.setScaleY(1.5);
             trashBin.setScaleX(1.5);
@@ -497,7 +497,7 @@ public class FXMLMainViewController implements Initializable, Controller {
     
     @FXML
     private void onTrashBinDragExit(DragEvent event) {
-        if (event.getGestureSource() instanceof PreferenceLabel) {
+        if (event.getGestureSource() instanceof DragDropLabel) {
             trashBin.setScaleX(1);
             trashBin.setScaleY(1);
         }
@@ -505,7 +505,7 @@ public class FXMLMainViewController implements Initializable, Controller {
     
     @FXML
     private void onTrashBinDragDropped(DragEvent event) {
-        if (event.getGestureSource() instanceof PreferenceLabel) {
+        if (event.getGestureSource() instanceof DragDropLabel) {
             Label sourceLabel = (Label) event.getGestureSource();
             HBox sourceHbox = (HBox) sourceLabel.getParent();
             Project projectToRemove = (Project) sourceLabel.getUserData();
@@ -536,7 +536,7 @@ public class FXMLMainViewController implements Initializable, Controller {
             dragLabel.setVisible(true);
             dragLabel.toFront();
             Project project;
-            if (event.getGestureSource() instanceof PreferenceLabel) {
+            if (event.getGestureSource() instanceof DragDropLabel) {
                 project = (Project) ((Label) event.getGestureSource()).getUserData();
             } else {
                 project = (Project) ((ListCell) event.getGestureSource()).getUserData();
@@ -551,5 +551,25 @@ public class FXMLMainViewController implements Initializable, Controller {
     @FXML
     private void anchorPaneDragDone(DragEvent event) {
         dragLabel.setVisible(false);
+    }
+
+    @Override
+    public int moveProject(Reader reader, Reader readerToRemoveFrom, Project projectToMove, Project projectToPlaceBefore) {
+        return model.movePreference(reader, readerToRemoveFrom, projectToMove, projectToPlaceBefore);
+    }
+
+    @Override
+    public boolean moveProject(Reader readerToAdd, Reader readerToRemoveFrom, Project projectToMove) {
+        return model.movePreference(readerToAdd, readerToRemoveFrom, projectToMove);
+    }
+
+    @Override
+    public boolean addProjectToReader(Reader reader, Project projectToAdd) {
+       return model.addProjectToReaderPreferences(reader, projectToAdd);
+    }
+
+    @Override
+    public int addProjectToReader(Reader reader, Project projectToAdd, Project projectToAddBefore) {
+        return model.addProjectToReaderPreferences(reader, projectToAdd, projectToAddBefore);
     }
 }

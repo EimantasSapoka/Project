@@ -11,6 +11,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
@@ -21,7 +22,9 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
+import mcmfuserinterface.Controller;
 import model.Project;
+import model.Reader;
 import org.controlsfx.control.PopOver;
 
 /**
@@ -32,7 +35,7 @@ public class DragDropLabel extends Label {
     
     final PopOver pop;
     
-    DragDropLabel(final Project project) {
+    DragDropLabel(final Project project, final Controller controller) {
         
         super(project.getId()+"");
         pop = new PopOver();
@@ -101,6 +104,47 @@ public class DragDropLabel extends Label {
             public void handle(DragEvent event) {
                 setText(getText().trim());
             }
+        });
+        
+        
+        this.setOnDragDropped(new EventHandler<DragEvent>() {
+            @Override
+            public void handle(DragEvent event) {
+                HBox hbox = (HBox) getParent();
+                Project projectToPlaceBefore = project;
+                Reader readerToAdd = (Reader) hbox.getUserData();
+                int indexToPlace;
+
+                if (event.getTransferMode() == TransferMode.MOVE){
+                    Label sourceLabel = (Label) event.getGestureSource();
+                    HBox sourceHbox = (HBox) sourceLabel.getParent();
+                    Project projectToMove = (Project) sourceLabel.getUserData();
+                    Reader readerToRemoveFrom = (Reader) sourceHbox.getUserData();
+
+                    indexToPlace = controller.moveProject(readerToAdd, readerToRemoveFrom, projectToMove, projectToPlaceBefore);
+                    if (indexToPlace != -1) {
+                        sourceHbox.getChildren().remove(sourceLabel);
+                        hbox.getChildren().add(indexToPlace, sourceLabel);
+                    } else {
+                        createErrorDialog(projectToMove);
+                    }
+                } else {
+                    ListCell listCell = (ListCell) event.getGestureSource();
+                    Project projectToAdd = (Project) listCell.getUserData();
+                    
+                    indexToPlace = controller.addProjectToReader(readerToAdd, projectToAdd, projectToPlaceBefore);
+                    if (indexToPlace != -1) {
+                        hbox.getChildren().add(indexToPlace, new DragDropLabel(projectToAdd, controller));
+                    } else {
+                        createErrorDialog(projectToAdd);
+                    }
+                    
+                }
+                
+                event.setDropCompleted(indexToPlace != -1);
+                event.consume();
+            }
+           
         });
     }
     

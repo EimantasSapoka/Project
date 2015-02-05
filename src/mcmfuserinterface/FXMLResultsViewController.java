@@ -6,13 +6,11 @@
 package mcmfuserinterface;
 
 import java.net.URL;
-import java.util.Comparator;
 import java.util.ResourceBundle;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -32,9 +30,9 @@ import javafx.scene.input.TransferMode;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import mcmfuserinterface.drag_drop_table.TableObjectInterface;
-import mcmfuserinterface.drag_drop_table.columns.AssignedProjectsColumn;
 import mcmfuserinterface.drag_drop_table.columns.AssignedProjectsCountColumn;
 import mcmfuserinterface.drag_drop_table.columns.CapacityColumn;
+import mcmfuserinterface.drag_drop_table.columns.ListColumn;
 import mcmfuserinterface.drag_drop_table.columns.ReaderNameColumn;
 import model.MCMFModel;
 import model.Project;
@@ -85,7 +83,7 @@ public class FXMLResultsViewController implements Initializable, Controller{
             resultsTable.getColumns().add(new ReaderNameColumn("Reader name"));
             resultsTable.getColumns().add(new CapacityColumn("Cap"));
             resultsTable.getColumns().add(new AssignedProjectsCountColumn("#Assigned"));
-            resultsTable.getColumns().add(new AssignedProjectsColumn("Projects Assigned", this));
+            resultsTable.getColumns().add(new ListColumn("Projects Assigned", this));
         }
       
         ObservableList<TableObjectInterface> items = FXCollections.observableArrayList();
@@ -244,5 +242,28 @@ public class FXMLResultsViewController implements Initializable, Controller{
             }
            
        });
+    }
+
+    @Override
+    public int moveProject(Reader reader, Reader readerToRemoveFrom, Project projectToMove, Project projectToPlaceBefore) {
+        System.out.println("moving assigned project");
+        return -1;
+    }
+
+    @Override
+    public boolean moveProject(Reader readerToAdd, Reader readerToRemoveFrom, Project projectToMove) {
+        System.out.println("moving assigned project");
+        return false;    }
+
+    @Override
+    public boolean addProjectToReader(Reader reader, Project projectToAdd) {
+        System.out.println("adding assigned project");
+        return false;
+    }
+
+    @Override
+    public int addProjectToReader(Reader reader, Project projectToAdd, Project projectToAddBefore) {
+        System.out.println("adding assigned project");
+        return -1;
     }
 }

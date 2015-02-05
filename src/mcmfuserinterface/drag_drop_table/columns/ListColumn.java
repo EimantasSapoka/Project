@@ -10,16 +10,16 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TableColumn;
 import javafx.util.Callback;
 import mcmfuserinterface.Controller;
-import mcmfuserinterface.drag_drop_table.TableCellWithPreferencesFactory;
+import mcmfuserinterface.drag_drop_table.TableCellWithListFactory;
 import mcmfuserinterface.drag_drop_table.TableObjectInterface;
 
 /**
  *
  * @author Eimantas
  */
-public class PreferencesColumn  extends TableColumn<TableObjectInterface, TableObjectInterface>{
+public class ListColumn  extends TableColumn<TableObjectInterface, TableObjectInterface>{
     
-    public PreferencesColumn(String name, Controller contr){
+    public ListColumn(String name, Controller contr){
         super(name);
         setMinWidth(300);
         
@@ -29,7 +29,7 @@ public class PreferencesColumn  extends TableColumn<TableObjectInterface, TableO
           }
         });
         
-        setCellFactory(new TableCellWithPreferencesFactory(contr));
+        setCellFactory(new TableCellWithListFactory(contr));
     }
     
 }
