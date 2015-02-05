@@ -14,10 +14,11 @@ public class Reader  implements TableObjectInterface{
 	private final int capacity;							// it's project preference capacity
 	private ArrayList<Integer> supervisorProjects;		// list of already assigned projects
 	private ArrayList<Project> preferences;				// list of project preferences
+        private ArrayList<Project> assigned;                        // list of assigned projects
 	private String name;
-        
 	
 	private SimpleStringProperty preferenceCountProperty;
+        private SimpleStringProperty assignedCountProperty;
 	
 	public Reader(int id, int capacity){
 		this.id = id;
@@ -25,8 +26,10 @@ public class Reader  implements TableObjectInterface{
 		this.capacity = capacity;
 		this.supervisorProjects = new ArrayList<Integer>();
 		this.preferences = new ArrayList<Project>();
+                this.assigned = new ArrayList<Project>();
 		this.name = String.valueOf(id);
-		this.preferenceCountProperty = new SimpleStringProperty("0");  
+		this.preferenceCountProperty = new SimpleStringProperty("0"); 
+                this.assignedCountProperty = new SimpleStringProperty("0");
 	}
         
         public Reader(String readerName, int id){
@@ -95,21 +98,29 @@ public class Reader  implements TableObjectInterface{
 		return this.id;
 	}
 	
-	/**
-	 * returns all assigned projects
-	 * @return
-	 */
-	public ArrayList<Project> getAssignedProjects(){
-               
-		ArrayList<Project> projects = new ArrayList<Project>();
-		for (Edge edge : this.vertex.getOutEdges()){
-			if (edge.getFlow() > 0){
-				Project project = (Project) edge.getDestination().getObject();
-				projects.add(project);
-			}
-		}
-		return projects;
-	}
+        /**
+        * returns all assigned projects
+        *
+        * @return
+        */
+       public ArrayList<Project> getAssignedProjectsFromGraph() {
+           ArrayList<Project> temp = new ArrayList<Project>();
+           for (Edge edge : this.vertex.getOutEdges()) {
+                if (edge.getFlow() > 0) {
+                    Project project = (Project) edge.getDestination().getObject();
+                    temp.add(project);
+                }
+           }
+           return temp;
+       }
+       
+       public ArrayList<Project> getFinalisedAssignedProjectList(){
+           if (assigned.isEmpty()){
+               assigned = getAssignedProjectsFromGraph();
+           }
+           this.assignedCountProperty.set(assigned.size()+"");
+           return assigned;
+       }
 	
 	public boolean equals(Reader r){
 		return this.id == r.getID() && this.vertex.equals(r.getVertex());
@@ -124,7 +135,7 @@ public class Reader  implements TableObjectInterface{
 	 * @return
 	 */
 	public int getResidualCapacity() {
-		return this.getCapacity() - this.getAssignedProjects().size();
+		return this.getCapacity() - this.getAssignedProjectsFromGraph().size();
 	}
 
     public void removePreference(Project project) {
@@ -138,10 +149,30 @@ public class Reader  implements TableObjectInterface{
     public SimpleStringProperty getPreferenceStringProperty(){
     	return this.preferenceCountProperty;
     }
+    
+    public SimpleStringProperty getAssignedCountStringProperty(){
+        return this.assignedCountProperty;
+    }
 
     void resetVertex() {
         this.vertex.resetVertex();
     }
     
-
+    public boolean assignProject(Project p){
+        this.assigned.add(p);
+        this.assignedCountProperty.set(assigned.size()+"");
+        return true;
+    }
+    
+    public boolean removeAssignedProject(Project p){
+        boolean success = this.assigned.remove(p);
+        this.assignedCountProperty.set(assigned.size()+"");
+        return success;
+    }
+    
+    public void clearAssignedProjects(){
+        this.assigned.clear();
+        this.assignedCountProperty.set("0");
+    }
+    
 }

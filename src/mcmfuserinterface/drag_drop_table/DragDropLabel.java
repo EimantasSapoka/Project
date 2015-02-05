@@ -5,15 +5,12 @@
  */
 package mcmfuserinterface.drag_drop_table;
 
-
 import java.awt.Toolkit;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
@@ -24,36 +21,26 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
-import mcmfuserinterface.Controller;
 import model.Project;
-import model.Reader;
 import org.controlsfx.control.PopOver;
-import org.controlsfx.dialog.Dialogs;
 
 /**
  *
  * @author Eimantas
  */
 public class DragDropLabel extends Label {
-    final PopOver pop;
-    final Project project;
-    final Label label;
-    final private Controller controller;
     
-   
-
-    DragDropLabel(Project proj, Controller contr) {
-        super(proj.getId()+"");
+    final PopOver pop;
+    
+    DragDropLabel(final Project project) {
         
-        this.project = proj;
+        super(project.getId()+"");
         pop = new PopOver();
-        label = this;
-        this.controller = contr;
         
         this.setUserData(project);
         this.setTooltip(new Tooltip(project.getName()));
 
-        label.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        this.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 if (event.getButton() == MouseButton.PRIMARY){
@@ -70,7 +57,7 @@ public class DragDropLabel extends Label {
 
         });
         
-        label.setOnMouseExited(new EventHandler<MouseEvent>(){
+        this.setOnMouseExited(new EventHandler<MouseEvent>(){
 
             @Override
             public void handle(MouseEvent event) {
@@ -79,13 +66,13 @@ public class DragDropLabel extends Label {
         
         });
 
-        label.setOnDragDetected(new EventHandler<MouseEvent>() {
+        this.setOnDragDetected(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                Dragboard db = label.startDragAndDrop(TransferMode.MOVE);
+                Dragboard db = startDragAndDrop(TransferMode.MOVE);
                 ClipboardContent content = new ClipboardContent();
                 
-                HBox hbox = (HBox) label.getParent();
+                HBox hbox = (HBox) getParent();
                 hbox.getChildren().get(0).setVisible(true);
                 
                 content.putString("test");
@@ -93,84 +80,43 @@ public class DragDropLabel extends Label {
             }
         });
 
-        label.setOnDragOver(new EventHandler<DragEvent>() {
+        this.setOnDragOver(new EventHandler<DragEvent>() {
             @Override
             public void handle(DragEvent event) {
                 event.acceptTransferModes(TransferMode.ANY);
             }
         });
 
-        label.setOnDragEntered(new EventHandler<DragEvent>() {
+        this.setOnDragEntered(new EventHandler<DragEvent>() {
             @Override
             public void handle(DragEvent event) {
-                if ((event.getGestureSource() != label)) {
-                    label.setOpacity(0.5);
-                    label.setText("\t" + label.getText());
+                if ((event.getGestureSource() != this)) {
+                    setText("\t" + getText());
                 }
             }
         });
 
-        label.setOnDragExited(new EventHandler<DragEvent>() {
+        this.setOnDragExited(new EventHandler<DragEvent>() {
             @Override
             public void handle(DragEvent event) {
-                label.setText(label.getText().trim());
-                label.setOpacity(1);
+                setText(getText().trim());
             }
         });
-
-        label.setOnDragDropped(new EventHandler<DragEvent>() {
-            @Override
-            public void handle(DragEvent event) {
-                HBox hbox = (HBox) label.getParent();
-                Project projectToPlaceBefore = project;
-                Reader readerToAdd = (Reader) hbox.getUserData();
-                int indexToPlace;
-
-                if (event.getTransferMode() == TransferMode.MOVE){
-                    Label sourceLabel = (Label) event.getGestureSource();
-                    HBox sourceHbox = (HBox) sourceLabel.getParent();
-                    Project projectToMove = (Project) sourceLabel.getUserData();
-                    Reader readerToRemoveFrom = (Reader) sourceHbox.getUserData();
-
-                    indexToPlace = controller.getModel().movePreference(readerToAdd, readerToRemoveFrom, projectToMove, projectToPlaceBefore);
-                    if (indexToPlace != -1) {
-                        sourceHbox.getChildren().remove(sourceLabel);
-                        hbox.getChildren().add(indexToPlace, sourceLabel);
-                    } else {
-                        createErrorDialog(projectToMove);
-                    }
-                } else {
-                    ListCell listCell = (ListCell) event.getGestureSource();
-                    Project projectToAdd = (Project) listCell.getUserData();
-                    
-                    indexToPlace = controller.getModel().addProjectToReaderPreferences(readerToAdd, projectToAdd, projectToPlaceBefore);
-                    if (indexToPlace != -1) {
-                        hbox.getChildren().add(indexToPlace, new DragDropLabel(projectToAdd, controller));
-                    } else {
-                        createErrorDialog(projectToAdd);
-                    }
-                    
-                }
-                
-                event.setDropCompleted(indexToPlace != -1);
-                event.consume();
-            }
-           
-        });
-
     }
     
     
-    private void createErrorDialog(Project projectToAdd) {
+    protected void createErrorDialog(Project projectToAdd) {
         final Runnable runnable = (Runnable) Toolkit.getDefaultToolkit().getDesktopProperty("win.sound.exclamation");
         if (runnable != null) {
             runnable.run();
         }
-        Alert alert = new Alert(AlertType.ERROR);
+        Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
-        alert.setHeaderText("Cannot move preference");
-        alert.setContentText("The reader already has project as preference!\nProject name: "
-                        + projectToAdd.getName() + ",\nID: " + projectToAdd.getId());
+        alert.setHeaderText("Cannot move");
+        alert.setContentText("The reader already has this project!\nProject name: "
+                        + projectToAdd.getName() + ",  ID: " + projectToAdd.getId());
+        alert.setResizable(true);
         alert.showAndWait();
     }
+    
 }

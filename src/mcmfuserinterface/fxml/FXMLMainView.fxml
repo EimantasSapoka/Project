@@ -61,20 +61,19 @@
                <children>
                   <Pane prefHeight="100.0" prefWidth="300.0" HBox.hgrow="SOMETIMES">
                      <children>
-                        <CheckBox fx:id="zeroCapacityReaderCheckbox" layoutX="106.0" layoutY="36.0" mnemonicParsing="false" onAction="#toggleShowZeroCapacityReaders" selected="true" text="Show Readers with zero capacity" />
+                        <CheckBox fx:id="zeroCapacityReaderCheckbox" layoutX="106.0" layoutY="25.0" mnemonicParsing="false" onAction="#toggleShowZeroCapacityReaders" selected="true" text="Show Readers with zero capacity" />
                         <Label fx:id="trashBin" layoutX="35.0" layoutY="9.0" minHeight="-Infinity" minWidth="-Infinity" onDragDropped="#onTrashBinDragDropped" onDragExited="#onTrashBinDragExit" onDragOver="#onTrashBinDragOver" prefHeight="35.0" prefWidth="39.0" />
                      </children>
                   </Pane>
                   <Pane prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
                      <children>
-                        <Button fx:id="printPref" layoutX="67.0" layoutY="2.0" mnemonicParsing="false" text="Print pref" />
-                        <Button fx:id="extendPrefListButton" layoutX="40.0" layoutY="34.0" mnemonicParsing="false" onAction="#extendPreferenceLists" text="Extend pref lists" />
+                        <Button fx:id="extendPrefListButton" layoutX="50.0" layoutY="21.0" mnemonicParsing="false" onAction="#extendPreferenceLists" text="Extend pref lists" />
                      </children>
                   </Pane>
                   <Pane prefHeight="100.0" prefWidth="300.0" HBox.hgrow="NEVER">
                      <children>
                         <Button fx:id="runAlgorithmButton" layoutX="175.0" layoutY="15.0" mnemonicParsing="false" onAction="#runAlgorithm" prefHeight="38.0" prefWidth="104.0" text="Run algorithm" />
-                        <CheckBox fx:id="loadBalancedCheckbox" layoutX="48.0" layoutY="15.0" mnemonicParsing="false" selected="true" text="Load balancing" />
+                        <CheckBox fx:id="loadBalancedCheckbox" layoutX="41.0" layoutY="25.0" mnemonicParsing="false" selected="true" text="Load balancing" />
                      </children>
                   </Pane>
                </children>

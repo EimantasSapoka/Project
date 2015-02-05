@@ -35,7 +35,6 @@ public class Algorithm {
 	public static void runLoadBalancedAlgorithm(MCMFModel model){
 		solveGraph(model.getGraph());
 		loadBalance(model);
-		//assignUnassignedProjects(graph);
 	}
 
 	/**

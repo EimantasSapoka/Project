@@ -6,7 +6,7 @@
 package mcmfuserinterface;
 
 import mcmfuserinterface.drag_drop_table.TableObjectInterface;
-import mcmfuserinterface.drag_drop_table.DragDropLabel;
+import mcmfuserinterface.drag_drop_table.PreferenceLabel;
 import ford_fulkerson.Algorithm;
 import ford_fulkerson.ReaderShortlistException;
 import model.MCMFModel;
@@ -70,6 +70,9 @@ import org.controlsfx.glyphfont.GlyphFontRegistry;
 public class FXMLMainViewController implements Initializable, Controller {
 
     MCMFModel model;
+    FXMLResultsViewController resultsController;
+    
+    Stage resultsStage;
 
     @FXML
     private MenuBar menuBar;
@@ -109,6 +112,8 @@ public class FXMLMainViewController implements Initializable, Controller {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        resultsStage = new Stage();
+        resultsStage.setTitle("Assignments");
         
         dragLabel = new Label("");
         dragLabel.setMouseTransparent(true);
@@ -151,21 +156,24 @@ public class FXMLMainViewController implements Initializable, Controller {
     * shows a new window with the resulting assignments.
     */
     private void showResultsView() {
-        Stage stage = new Stage();
-        stage.setTitle("Assignments");
-        Parent myPane = null;
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("fxml/FXMLResultsView.fxml"));
-            myPane = (Parent) loader.load();
-            FXMLResultsViewController controller = (FXMLResultsViewController) loader.getController();
-            controller.setModel(model);
-            Scene scene = new Scene(myPane);
-            stage.setScene(scene);
-
-            stage.show();
-        } catch (Exception ex) {
-            Alert alert = new ExceptionDialog(ex);
-            alert.showAndWait();
+        if (!resultsStage.isShowing()){
+            Parent myPane = null;
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("fxml/FXMLResultsView.fxml"));
+                myPane = (Parent) loader.load();
+                resultsController = (FXMLResultsViewController) loader.getController();
+                resultsController.setModel(model);
+                Scene scene = new Scene(myPane);
+                resultsStage.setScene(scene);
+                
+                resultsStage.show();
+            } catch (Exception ex) {
+                Alert alert = new ExceptionDialog(ex);
+                alert.showAndWait();
+            }
+        } else {
+            resultsController.setModel(model);
+            resultsController.refreshTable();
         }
     }
 
@@ -480,7 +488,7 @@ public class FXMLMainViewController implements Initializable, Controller {
     
     @FXML
     private void onTrashBinDragOver(DragEvent event) {
-        if (event.getGestureSource() instanceof DragDropLabel) {
+        if (event.getGestureSource() instanceof PreferenceLabel) {
             event.acceptTransferModes(TransferMode.MOVE);
             trashBin.setScaleY(1.5);
             trashBin.setScaleX(1.5);
@@ -489,7 +497,7 @@ public class FXMLMainViewController implements Initializable, Controller {
     
     @FXML
     private void onTrashBinDragExit(DragEvent event) {
-        if (event.getGestureSource() instanceof DragDropLabel) {
+        if (event.getGestureSource() instanceof PreferenceLabel) {
             trashBin.setScaleX(1);
             trashBin.setScaleY(1);
         }
@@ -497,7 +505,7 @@ public class FXMLMainViewController implements Initializable, Controller {
     
     @FXML
     private void onTrashBinDragDropped(DragEvent event) {
-        if (event.getGestureSource() instanceof DragDropLabel) {
+        if (event.getGestureSource() instanceof PreferenceLabel) {
             Label sourceLabel = (Label) event.getGestureSource();
             HBox sourceHbox = (HBox) sourceLabel.getParent();
             Project projectToRemove = (Project) sourceLabel.getUserData();
@@ -528,7 +536,7 @@ public class FXMLMainViewController implements Initializable, Controller {
             dragLabel.setVisible(true);
             dragLabel.toFront();
             Project project;
-            if (event.getGestureSource() instanceof DragDropLabel) {
+            if (event.getGestureSource() instanceof PreferenceLabel) {
                 project = (Project) ((Label) event.getGestureSource()).getUserData();
             } else {
                 project = (Project) ((ListCell) event.getGestureSource()).getUserData();

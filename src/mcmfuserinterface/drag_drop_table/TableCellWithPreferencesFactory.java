@@ -19,10 +19,10 @@ import model.Reader;
  *
  * @author Eimantas
  */
-public class TableCellWithListFactory implements Callback<TableColumn<TableObjectInterface, TableObjectInterface>, TableCell<TableObjectInterface, TableObjectInterface>> {
+public class TableCellWithPreferencesFactory implements Callback<TableColumn<TableObjectInterface, TableObjectInterface>, TableCell<TableObjectInterface, TableObjectInterface>> {
     private final Controller controller;
     
-    public TableCellWithListFactory(Controller controller) {
+    public TableCellWithPreferencesFactory(Controller controller) {
         this.controller = controller;
         
     }
@@ -30,7 +30,7 @@ public class TableCellWithListFactory implements Callback<TableColumn<TableObjec
     @Override
     public TableCell<TableObjectInterface, TableObjectInterface> call(TableColumn<TableObjectInterface, TableObjectInterface> btnCol) {
         return new TableCell<TableObjectInterface, TableObjectInterface>() {
-            ScrollPane scrollPane = new DroppableScrollPane(controller);
+            ScrollPane scrollPane = new PreferencesScrollPane(controller);
             HBox hbox = new HBox();
             
             {
@@ -44,7 +44,7 @@ public class TableCellWithListFactory implements Callback<TableColumn<TableObjec
                     hbox.getChildren().clear();
                     
                     for (Project project : ((Reader) reader).getPreferences()) {
-                        Label label = new DragDropLabel(project, controller);
+                        Label label = new PreferenceLabel(project, controller);
                         hbox.getChildren().add(label);
                     }
                     hbox.setUserData(reader);

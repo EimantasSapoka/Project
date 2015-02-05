@@ -136,12 +136,12 @@ public class MCMFModel {
 
         for (Reader reader : this.readers) {
             if (!capacitySet) {
-                capacityFlowGap = reader.getCapacity() + graph.getLowerCapacityOffset() - reader.getAssignedProjects().size();
+                capacityFlowGap = reader.getCapacity() + graph.getLowerCapacityOffset() - reader.getAssignedProjectsFromGraph().size();
                 if (capacityFlowGap >= 0) {
                     capacitySet = true;
                 }
             } else {
-                if (reader.getCapacity() + graph.getLowerCapacityOffset() - reader.getAssignedProjects().size() > capacityFlowGap + 1) {
+                if (reader.getCapacity() + graph.getLowerCapacityOffset() - reader.getAssignedProjectsFromGraph().size() > capacityFlowGap + 1) {
                     return false;
                 }
             }
@@ -182,10 +182,23 @@ public class MCMFModel {
         String warnings = "";
         String errors = "";
         graph = new Graph();
+        
+        for (Project project : this.projects){
+            
+           project.resetVertex();
+           graph.addProject(project);
+           
+           if (project.getSelectedCount() == 0){
+               errors += ">PROJECT " + project.getName() + "("+project.getId()+") HAS NOT BEEN SELECTED BY ANYONE\n" ;
+           } 
+        }
 
         for (Reader reader : this.readers) {
             reader.resetVertex();
-
+            reader.clearAssignedProjects();
+            
+            graph.addReader(reader);
+            
             if (reader.getPreferences().size() < reader.getCapacity()) {
                 errors += ">READER "+reader.getName() +" (" + reader.getID() + ") HAS CAPACITY OF " + reader.getCapacity()
                         + " AND PREFERENCE LIST SIZE " + reader.getPreferences().size()+"\n";
@@ -193,26 +206,8 @@ public class MCMFModel {
                 warnings += ">reader "+reader.getName() +" (" + reader.getID() + ") has capacity of " + reader.getCapacity()
                         + " and preference list size " + reader.getPreferences().size()+"\n";
             }
-
-            graph.addVertex(reader.getVertex());
-            // if reader has any capacity, create an edge from source to the reader with the capacity
-            if (reader.getCapacity() > 0) {
-                graph.createSourceReaderEdge(reader);
-            }
-
-            int preference = 1; // the initial preference weight
-            for (Project project : reader.getPreferences()) {
-                project.resetVertex();
-                graph.addProject(project);
-                graph.createReaderProjectEdge(reader, project, preference);
-                preference++;
-            }
         }
-        for (Project project : this.projects){
-           if (project.getSelectedCount() == 0){
-               errors += ">PROJECT " + project.getName() + "("+project.getId()+") HAS NOT BEEN SELECTED BY ANYONE\n" ;
-           } 
-        }
+        
         if (!errors.isEmpty()){
             throw new ReaderShortlistException(">>>> ERRORS:\n"+errors + ">>>> WARNINGS:\n"+warnings, true);
         } else if (!warnings.isEmpty()){
