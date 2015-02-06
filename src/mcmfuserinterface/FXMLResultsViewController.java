@@ -5,6 +5,9 @@
  */
 package mcmfuserinterface;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,9 +22,14 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -36,6 +44,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import mcmfuserinterface.drag_drop_table.DragLabel;
@@ -71,9 +82,29 @@ public class FXMLResultsViewController implements Initializable, Controller{
     @FXML
     CheckBox zeroCapacityReaderCheckbox;
     
+    private  BarChart<String,Number> barChart;
+    
+    
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+    }
+    
+    @FXML
+    private void export(){
+         FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Save file");
+            File file = fileChooser.showSaveDialog(resultsTable.getScene().getWindow());
+            if (file != null) {
+                try {
+                    PrintWriter writer = new PrintWriter(file, "UTF-8");
+                    writer.print(model.toString());
+                    writer.close();
+                } catch (IOException ex) {
+                    Alert alert = new ExceptionDialog(ex);
+                    alert.showAndWait();
+                }
+            }
     }
     
     @FXML
@@ -116,11 +147,63 @@ public class FXMLResultsViewController implements Initializable, Controller{
     private void showInfo(){
         Alert info = new Alert(Alert.AlertType.INFORMATION);
         info.setHeaderText("Information on assignments:");
+        VBox box = new VBox();
+        box.getChildren().add(new Label("Load balanced? : " + model.isLoadBalanced() + 
+                                        "\tSaturating flow? : " + model.getGraph().isSaturatingFlow()));
         
+        HBox hbox = new HBox();
+        hbox.getChildren().add(new Label("Flow: " + model.getGraph().getFlow() +
+                                        "\nWeight: " + model.getGraph().getWeight()));
+        
+        hbox.getChildren().add(new Label(String.format("Readers: %d\nProjects: %d\nAvg. reader target: %.2f", 
+                model.getReaders().size(),model.getProjects().size(), model.getAverageReaderCapacity())));
+        hbox.setSpacing(40);
+        box.getChildren().add(hbox);
+        
+        Map<Integer, Integer> preferenceStatistics = calculatePreferenceAssignmentStatistics();
+        box.getChildren().add(createPreferenceAssignedStatisticsTable(preferenceStatistics));
+        if (barChart == null){
+            createBarChart();
+        } else {
+            barChart.getData().clear();
+        }
+        XYChart.Series series1 = new XYChart.Series();    
+        for (int preference : preferenceStatistics.keySet()){
+            series1.getData().add(new XYChart.Data(preference+"", preferenceStatistics.get(preference)));
+        }
+        
+        barChart.getData().add(series1);
+        box.getChildren().add(barChart);
+        box.setSpacing(20);
+        info.getDialogPane().setContent(box);
+        info.showAndWait();
+    }
+
+    private void createBarChart() {
+        CategoryAxis xAxis = new CategoryAxis();
+        NumberAxis yAxis = new NumberAxis();
+        barChart = new BarChart<String,Number>(xAxis,yAxis);
+        xAxis.setLabel("Preference");
+        yAxis.setLabel("Projects assigned");
+    }
+
+    public GridPane createPreferenceAssignedStatisticsTable(Map<Integer, Integer> preferenceStatistics) {
         GridPane grid = new GridPane();
         grid.setGridLinesVisible(true);
+        grid.add(new Label("Preference:"), 0, 0);
+        grid.add(new Label("# assigned"), 0, 1);
+        grid.getColumnConstraints().add(new ColumnConstraints(100));
+        int column = 1;
+        for (int pref : preferenceStatistics.keySet()){
+            grid.getColumnConstraints().add(new ColumnConstraints(30));
+            grid.add(new Label("  "+ pref+""), column, 0);
+            grid.add(new Label("  "+preferenceStatistics.get(pref)+""), column++, 1);
+        }
+        return grid;
+    }
+
+    private Map<Integer, Integer> calculatePreferenceAssignmentStatistics() {
         Map<Integer, Integer> preferenceToCount = new HashMap<Integer,Integer>();
-        
         for (Reader reader: model.getReaders()){
             for (Project assigned : reader.getAssigned()){
                 int preference = reader.getPreferences().indexOf(assigned) + 1;
@@ -131,19 +214,7 @@ public class FXMLResultsViewController implements Initializable, Controller{
                 }
             }
         }
-        grid.add(new Label("Preference:"), 0, 0);
-        grid.add(new Label("#assigned"), 0, 1);
-        grid.getColumnConstraints().add(new ColumnConstraints(100));
-        int column = 1;
-        for (int pref : preferenceToCount.keySet()){
-            grid.getColumnConstraints().add(new ColumnConstraints(30));
-            grid.add(new Label(pref+""), column, 0);
-            grid.add(new Label(preferenceToCount.get(pref)+""), column++, 1);
-        }
-        
-        info.getDialogPane().setContent(grid);
-        
-        info.showAndWait();
+        return preferenceToCount;
     }
     
     
@@ -243,7 +314,6 @@ public class FXMLResultsViewController implements Initializable, Controller{
         
         ObservableList<Project> unselectedProjectList = FXCollections.observableArrayList();
         unselectedProjectList.addAll(model.getUnselectedProjects());
-        System.out.println(model);
         unselectedList.setItems(unselectedProjectList);
         unselectedList.setCellFactory(new Callback<ListView<Project>, ListCell<Project>>(){
 
@@ -334,7 +404,9 @@ public class FXMLResultsViewController implements Initializable, Controller{
     @Override
     public Label createLabel(Project project, Controller controller) {
         DragLabel label = new DragLabel(project, controller);
-        label.setPopText( "Name: " + project.getName() +"\nID: " + project.getId());
+        label.setPopText( "Name: " + project.getName() +
+                          "\nID: " + project.getId() +
+                          "\nTimes selected: " + project.getSelectedCount());
         return label;
     }
 }

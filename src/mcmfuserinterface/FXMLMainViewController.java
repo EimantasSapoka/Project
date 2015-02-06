@@ -150,7 +150,6 @@ public class FXMLMainViewController implements Initializable, Controller {
                 } else {
                     Algorithm.runUnbalancedAlgorithm(model);
                 }
-                //System.out.println(model);
                 showResultsView();
             }
         }
@@ -204,8 +203,7 @@ public class FXMLMainViewController implements Initializable, Controller {
            alert.setHeaderText("There are warnings in data.\nResulting "
                    + "assignment may not be the optimal. ");
        }
-       alert.setContentText(ex.getMessage());
-       alert.setResizable(true);
+       alert.getDialogPane().setContent(new Label(ex.getMessage()));
        Optional<ButtonType> result = alert.showAndWait();
        if (result.get() == proceed){
            runAlgorithm = true;
@@ -263,6 +261,7 @@ public class FXMLMainViewController implements Initializable, Controller {
     private void openFileButtonAction() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Input File");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text files", "*.txt"));
         File file = fileChooser.showOpenDialog(menuBar.getScene().getWindow());
         if (file != null) {
             try {

@@ -21,7 +21,8 @@ public class TextScanner {
 	public static void parse(File textFile, MCMFModel model) throws Exception{
 		BufferedReader textReader = new BufferedReader(new FileReader(textFile));
 		String line = "";
-		while ( ( line = textReader.readLine() )  != null ){
+		try {
+                    while ( ( line = textReader.readLine() )  != null ){
 			if (line.isEmpty()){
 				continue;
 			}
@@ -44,6 +45,9 @@ public class TextScanner {
 			
 		}
 		textReader.close();
+                } catch( Exception ex){
+                    throw new InvalidInputException("Could not parse file " + textFile.getName(), ex);
+                }
 	}
 
 	/**

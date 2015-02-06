@@ -209,7 +209,11 @@ public class MCMFModel {
         }
         
         if (!errors.isEmpty()){
-            throw new ReaderShortlistException(">>>> ERRORS:\n"+errors + ">>>> WARNINGS:\n"+warnings, true);
+            if (errors.isEmpty()){
+                throw new ReaderShortlistException(">>>> ERRORS:\n"+errors,true);
+            } else {
+                throw new ReaderShortlistException(">>>> ERRORS:\n"+errors + "\n>>>> WARNINGS:\n"+warnings, true);
+            }
         } else if (!warnings.isEmpty()){
             throw new ReaderShortlistException(">>>> WARNINGS:\n"+warnings);
         }
@@ -249,41 +253,13 @@ public class MCMFModel {
     @Override
     public String toString() {
         String result = "";
-
-        int numberProjects = this.projects.size();
-
-        for (Reader r : readers) {
-            result += "Reader " + r.getVertex().getObjectID();
-
-            int assigned = 0;
-            String assignedProj = "";
-            for (Edge e : r.getVertex().getOutEdges()) {
-                if (e.getFlow() > 0) {
-                    assigned++;
-                    assignedProj += " " + e.getDestination().getObjectID();
-                }
+        for (Reader reader : readers){
+            result += reader.getID() +", ";
+            for (Project project : reader.getAssigned()){
+                result += project.getId()+" ";
             }
-            result += " (" + assigned + "/" + r.getCapacity() + ") :" + assignedProj + "\n";
+            result+="\n";
         }
-
-        String unselectedProjID = "";
-        for (Project p : graph.findUnassignedProjects()) {
-            unselectedProjID += " " + p.getId();
-        }
-        result += String.format(""
-                + "\n number of readers: %d"
-                + "\n number of projects: %d, not assigned: [%s ]"
-                + "\n total flow: %d"
-                + "\n total weight: %d"
-                + "\n load balanced? : %b"
-                + "\n saturating flow? : %b",
-                this.getReaders().size(),
-                numberProjects,
-                unselectedProjID,
-                graph.getFlow(),
-                graph.getWeight(),
-                this.isLoadBalanced(),
-                graph.isSaturatingFlow());
         return result;
     }
     
@@ -415,6 +391,17 @@ public class MCMFModel {
         }
        
         return unassigned;
+    }
+
+    public Double getAverageReaderCapacity() {
+        int totalCap = 0;
+        for (Reader r : readers){
+            if (r.getCapacity() != 0){
+                totalCap += r.getCapacity();
+            }
+        }
+        Double avg = new Double(totalCap);
+        return avg/readers.size();
     }
 
 }

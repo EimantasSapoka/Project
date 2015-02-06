@@ -85,7 +85,6 @@ public class ListContextMenu extends ContextMenu {
             @Override
             public void handle(ActionEvent e) {
                 
-                // !TODO: how to check when to throw error for both?
                 if (reader.getCapacity() == 0) {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setHeaderText("Cannot add preference!");
