@@ -95,7 +95,7 @@ public class DroppableScrollPane extends ScrollPane {
         Alert alert = new Alert(AlertType.ERROR);
         alert.setTitle("Error");
         alert.setHeaderText("Cannot move!");
-        alert.setContentText("Either the reader already has project or he has capacity of 0!");
+        alert.setContentText("Either the reader already has project or cannot take any projects!");
         alert.showAndWait();
     }
 }

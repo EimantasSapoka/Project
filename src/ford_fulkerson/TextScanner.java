@@ -64,7 +64,7 @@ public class TextScanner {
 			if( (project = model.getProject(id)) == null){
 				project = new Project(id);
 			}
-			
+			model.addProject(project);
 			reader.addPreference(project);
 			
 		}

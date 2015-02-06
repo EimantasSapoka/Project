@@ -7,6 +7,8 @@ package mcmfuserinterface;
 
 import java.net.URL;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -17,9 +19,11 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableRow;
@@ -30,8 +34,11 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import mcmfuserinterface.drag_drop_table.DragLabel;
 import mcmfuserinterface.drag_drop_table.ListContextMenu;
 import mcmfuserinterface.drag_drop_table.TableObjectInterface;
 import mcmfuserinterface.drag_drop_table.columns.AssignedProjectsCountColumn;
@@ -48,6 +55,9 @@ import model.Reader;
  */
 public class FXMLResultsViewController implements Initializable, Controller{
     private MCMFModel model;
+    
+    @FXML
+    Button infoButton;
     
     @FXML
     Button cancelButton;
@@ -102,6 +112,39 @@ public class FXMLResultsViewController implements Initializable, Controller{
         setTableRowFactory();
     }
     
+    @FXML
+    private void showInfo(){
+        Alert info = new Alert(Alert.AlertType.INFORMATION);
+        info.setHeaderText("Information on assignments:");
+        
+        GridPane grid = new GridPane();
+        grid.setGridLinesVisible(true);
+        Map<Integer, Integer> preferenceToCount = new HashMap<Integer,Integer>();
+        
+        for (Reader reader: model.getReaders()){
+            for (Project assigned : reader.getAssigned()){
+                int preference = reader.getPreferences().indexOf(assigned) + 1;
+                if (preferenceToCount.containsKey(preference)){
+                    preferenceToCount.replace(preference, preferenceToCount.get(preference) + 1);
+                } else {
+                    preferenceToCount.put(preference, 1);
+                }
+            }
+        }
+        grid.add(new Label("Preference:"), 0, 0);
+        grid.add(new Label("#assigned"), 0, 1);
+        grid.getColumnConstraints().add(new ColumnConstraints(100));
+        int column = 1;
+        for (int pref : preferenceToCount.keySet()){
+            grid.getColumnConstraints().add(new ColumnConstraints(30));
+            grid.add(new Label(pref+""), column, 0);
+            grid.add(new Label(preferenceToCount.get(pref)+""), column++, 1);
+        }
+        
+        info.getDialogPane().setContent(grid);
+        
+        info.showAndWait();
+    }
     
     
     /**
@@ -286,5 +329,12 @@ public class FXMLResultsViewController implements Initializable, Controller{
     @Override
     public void removeProjectFromReader(Reader reader, Project project) {
         reader.removeAssignedProject(project);
+    }
+
+    @Override
+    public Label createLabel(Project project, Controller controller) {
+        DragLabel label = new DragLabel(project, controller);
+        label.setPopText( "Name: " + project.getName() +"\nID: " + project.getId());
+        return label;
     }
 }

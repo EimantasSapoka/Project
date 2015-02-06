@@ -31,57 +31,10 @@ import org.controlsfx.control.PopOver;
  *
  * @author Eimantas
  */
-public class DragDropLabel extends Label {
+public class DragDropLabel extends DragLabel {
     
-    final PopOver pop;
-    
-    DragDropLabel(final Project project, final Controller controller) {
-        
-        super(project.getId()+"");
-        pop = new PopOver();
-        
-        this.setUserData(project);
-        this.setTooltip(new Tooltip(project.getName()));
-
-        this.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if (event.getButton() == MouseButton.PRIMARY){
-                    Label name = new Label("Name: " + project.getName() +
-                                           "\nID: " + project.getId() +
-                                           "\nTimes selected: " + project.getSelectedCount());
-                    name.setTextFill(Color.BLACK);
-                    name.setPadding(new Insets(10,10,10,10));
-                    pop.setContentNode(name);
-                    pop.show((Node) event.getTarget(), event.getScreenX()+10, event.getScreenY());
-                }
-                
-            }
-
-        });
-        
-        this.setOnMouseExited(new EventHandler<MouseEvent>(){
-
-            @Override
-            public void handle(MouseEvent event) {
-                pop.hide(Duration.seconds(1.5));
-            }
-        
-        });
-
-        this.setOnDragDetected(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                Dragboard db = startDragAndDrop(TransferMode.MOVE);
-                ClipboardContent content = new ClipboardContent();
-                
-                HBox hbox = (HBox) getParent();
-                hbox.getChildren().get(0).setVisible(true);
-                
-                content.putString("test");
-                db.setContent(content);
-            }
-        });
+    public DragDropLabel(final Project project, final Controller controller) {
+        super(project, controller);
 
         this.setOnDragOver(new EventHandler<DragEvent>() {
             @Override

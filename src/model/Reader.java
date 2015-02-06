@@ -51,11 +51,10 @@ public class Reader  implements TableObjectInterface{
 	
 	public boolean addPreference(Project project){
             
-            if (this.capacity > 0){
+            if (this.capacity > 0 && !this.preferences.contains(project)){
 		project.select();
 		this.preferences.add(project);
 		this.preferenceCountProperty.set(preferences.size()+"");
-
                 return true;
             } else {
                 return false;

@@ -8,6 +8,7 @@ package mcmfuserinterface;
 import java.util.Collection;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import model.Project;
 import model.Reader;
 
@@ -26,4 +27,5 @@ public interface Controller {
     public Collection<Project> getProjects();
     public Collection<Project> getReaderList(Reader reader);
     public void removeProjectFromReader(Reader reader, Project project);
+    public Label createLabel(Project project, Controller controller);
 }

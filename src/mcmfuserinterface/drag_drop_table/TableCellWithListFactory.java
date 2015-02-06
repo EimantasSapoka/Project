@@ -44,7 +44,7 @@ public class TableCellWithListFactory implements Callback<TableColumn<TableObjec
                     hbox.getChildren().clear();
                     
                     for (Project project : controller.getReaderList((Reader) reader)) {
-                        Label label = new DragDropLabel(project, controller);
+                        Label label = controller.createLabel(project, controller);
                         hbox.getChildren().add(label);
                     }
                     hbox.setUserData(reader);

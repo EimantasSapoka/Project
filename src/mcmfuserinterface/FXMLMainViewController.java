@@ -593,4 +593,14 @@ public class FXMLMainViewController implements Initializable, Controller {
     public void removeProjectFromReader(Reader reader, Project project) {
         reader.removePreference(project);
     }
+
+    @Override
+    public Label createLabel(Project project, Controller controller) {
+        DragDropLabel label =  new DragDropLabel(project,controller);
+        label.setPopText("Name: " + project.getName() +
+                         "\nID: " + project.getId() +
+                         "\nTimes selected: " + project.getSelectedCount());
+         
+        return label;
+    }
 }

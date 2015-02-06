@@ -53,6 +53,7 @@
                         <Button fx:id="cancelButton" layoutX="507.0" layoutY="21.0" mnemonicParsing="false" onAction="#closeWindow" prefHeight="25.0" prefWidth="57.0" text="Cancel" />
                         <ComboBox layoutX="201.0" layoutY="21.0" prefWidth="150.0" />
                         <Label layoutX="106.0" layoutY="25.0" prefHeight="17.0" prefWidth="70.0" text="Export as:" />
+                        <Button fx:id="infoButton" layoutX="14.0" layoutY="21.0" mnemonicParsing="false" onAction="#showInfo" text="Info" />
                      </children>
                   </Pane>
                </children>
