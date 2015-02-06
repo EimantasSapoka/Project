@@ -43,11 +43,12 @@ public class TableCellWithListFactory implements Callback<TableColumn<TableObjec
                 if (!empty && reader != null) {
                     hbox.getChildren().clear();
                     
-                    for (Project project : ((Reader) reader).getPreferences()) {
+                    for (Project project : controller.getReaderList((Reader) reader)) {
                         Label label = new DragDropLabel(project, controller);
                         hbox.getChildren().add(label);
                     }
                     hbox.setUserData(reader);
+                    scrollPane.setContextMenu(controller.createContextMenu((Reader)reader,hbox));
                     this.setGraphic(scrollPane);
                 }
             }

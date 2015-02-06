@@ -10,9 +10,9 @@ import ford_fulkerson.TextScanner;
 import ford_fulkerson.graph.Edge;
 import ford_fulkerson.graph.Graph;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 /**
  *
@@ -286,6 +286,15 @@ public class MCMFModel {
                 graph.isSaturatingFlow());
         return result;
     }
+    
+    public Reader getReader(int readerID) {
+        for (Reader reader : readers){
+            if (reader.getID() == readerID){
+                return reader;
+            }
+        }
+        return null;
+    }
 
     public int movePreference(Reader reader, Reader readerToRemoveFrom, Project projectToMove, Project projectToPlaceBefore) {
         if (!reader.getPreferences().contains(projectToMove) || reader.equals(readerToRemoveFrom)) {
@@ -299,20 +308,46 @@ public class MCMFModel {
         }
     }
     
-
-    public Reader getReader(int readerID) {
-        for (Reader reader : readers){
-            if (reader.getID() == readerID){
-                return reader;
+    public int moveAssignedProject(Reader reader, Reader readerToRemoveFrom, Project projectToMove, Project projectToPlaceBefore) {
+         if (!reader.getAssigned().contains(projectToMove) || reader.equals(readerToRemoveFrom)){
+            
+            if (reader.getAssigned().size() == reader.getCapacity()) {
+                return -1;
             }
+            int indexToPlace = reader.getAssigned().indexOf(projectToPlaceBefore);
+            readerToRemoveFrom.removeAssignedProject(projectToMove);
+            reader.assignProject(indexToPlace, projectToMove);
+            return indexToPlace;
+        } else {
+            return -1;
         }
-        return null;
     }
+    
+
 
     public boolean movePreference(Reader readerToAdd, Reader readerToRemoveFrom, Project projectToMove) {
         if (!readerToAdd.getPreferences().contains(projectToMove) || readerToAdd.equals(readerToRemoveFrom)) {
             if (readerToAdd.addPreference(projectToMove)){
                 readerToRemoveFrom.removePreference(projectToMove);
+                return true;
+            } else {
+                return false;
+            }
+            
+        } else {
+            return false;
+        }
+    }
+    
+    public boolean moveAssignedProject(Reader readerToAdd, Reader readerToRemoveFrom, Project projectToMove){
+        if (!readerToAdd.getAssigned().contains(projectToMove) || readerToAdd.equals(readerToRemoveFrom)){
+            
+            if (readerToAdd.getAssigned().size() == readerToAdd.getCapacity()) {
+                return false;
+            }
+            
+            if (readerToAdd.assignProject(projectToMove)){
+                readerToRemoveFrom.removeAssignedProject(projectToMove);
                 return true;
             } else {
                 return false;
@@ -330,6 +365,14 @@ public class MCMFModel {
             return reader.addPreference(projectToAdd);
         }
     }
+     
+     public boolean assignProjectToReader(Reader reader, Project projectToAdd) {
+         if (reader.getAssigned().contains(projectToAdd) || reader.getAssigned().size() == reader.getCapacity()){
+            return false;
+        } else {
+            return reader.assignProject(projectToAdd);
+        }
+     }
     
     
     public int addProjectToReaderPreferences(Reader reader, Project projectToAdd, Project projectToAddBefore){
@@ -342,8 +385,36 @@ public class MCMFModel {
         }
     }
 
+    public int assignProjectToReader(Reader reader, Project projectToAdd, Project projectToAddBefore){
+        if (reader.getAssigned().contains(projectToAdd) || reader.getAssigned().size() == reader.getCapacity()){
+            return -1;
+        } else {
+            int indexToPlace = reader.getAssigned().indexOf(projectToAddBefore);
+            reader.assignProject(indexToPlace, projectToAdd);
+            return indexToPlace;
+        }
+    }
+    
     public void removeProjectFromReaderPreferences(Reader readerToRemoveFrom, Project projectToRemove) {
         getReader(readerToRemoveFrom).removePreference(projectToRemove);
+    }
+
+    /**
+     * gets unselected projects
+     * @return 
+     */
+    public List<Project> getUnselectedProjects() {
+        ArrayList<Project> unassigned = (ArrayList<Project>) projects.clone();
+        
+        for (Reader reader : readers){
+            for (Project project : reader.getAssigned()){
+                if (unassigned.contains(project)){
+                    unassigned.remove(project);
+                }
+            }
+        }
+       
+        return unassigned;
     }
 
 }

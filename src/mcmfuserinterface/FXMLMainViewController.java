@@ -13,6 +13,7 @@ import model.Reader;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -27,6 +28,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -35,6 +37,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -54,6 +57,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import mcmfuserinterface.drag_drop_table.DragDropLabel;
+import mcmfuserinterface.drag_drop_table.ListContextMenu;
 import mcmfuserinterface.drag_drop_table.columns.CapacityColumn;
 import mcmfuserinterface.drag_drop_table.columns.PreferenceListSizeColumn;
 import mcmfuserinterface.drag_drop_table.columns.ListColumn;
@@ -217,7 +221,7 @@ public class FXMLMainViewController implements Initializable, Controller {
     private void setLowSelectedProjectsThreshold() {
         String text = this.projectLowSelectionLimitBox.getText();
         if (!text.matches("\\d+")
-                || Integer.parseInt(text) < 2
+                || Integer.parseInt(text) < 1
                 || Integer.parseInt(text) > 99) {
             projectLowSelectionLimitBox.setText("");
         } else {
@@ -270,12 +274,6 @@ public class FXMLMainViewController implements Initializable, Controller {
                 alert.showAndWait();
             }
         }
-    }
-
-    
-    @Override
-    public MCMFModel getModel(){
-        return model;
     }
     
     
@@ -571,5 +569,28 @@ public class FXMLMainViewController implements Initializable, Controller {
     @Override
     public int addProjectToReader(Reader reader, Project projectToAdd, Project projectToAddBefore) {
         return model.addProjectToReaderPreferences(reader, projectToAdd, projectToAddBefore);
+    }
+
+    @Override
+    public ContextMenu createContextMenu(Reader reader, Node container) {
+        ListContextMenu menu =  new ListContextMenu(reader, this, container );
+        menu.includeAddButton();
+        menu.includeRemoveButton();
+        return menu;
+    }
+
+    @Override
+    public Collection<Project> getProjects() {
+        return model.getProjects();
+    }
+
+    @Override
+    public Collection<Project> getReaderList(Reader reader) {
+        return reader.getPreferences();
+    }
+
+    @Override
+    public void removeProjectFromReader(Reader reader, Project project) {
+        reader.removePreference(project);
     }
 }

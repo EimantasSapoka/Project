@@ -6,6 +6,7 @@
 package mcmfuserinterface;
 
 import java.net.URL;
+import java.util.Collection;
 import java.util.ResourceBundle;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -15,8 +16,10 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableRow;
@@ -29,6 +32,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import mcmfuserinterface.drag_drop_table.ListContextMenu;
 import mcmfuserinterface.drag_drop_table.TableObjectInterface;
 import mcmfuserinterface.drag_drop_table.columns.AssignedProjectsCountColumn;
 import mcmfuserinterface.drag_drop_table.columns.CapacityColumn;
@@ -66,12 +70,7 @@ public class FXMLResultsViewController implements Initializable, Controller{
     private void closeWindow(ActionEvent event) {
         ((Stage) cancelButton.getScene().getWindow()).close();
     }
-
-    @Override
-    public MCMFModel getModel() {
-        return this.model;
-    }
-
+    
     void setModel(MCMFModel model) {
         this.model = model;
         createTableFromModel();
@@ -140,7 +139,7 @@ public class FXMLResultsViewController implements Initializable, Controller{
                         if (item != null){
                             
                             final Reader reader = (Reader) item;
-                            reader.getPreferenceStringProperty().addListener(new ChangeListener<String>(){
+                            reader.getAssignedCountStringProperty().addListener(new ChangeListener<String>(){
                                 
                                 @Override
                                 public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
@@ -188,6 +187,9 @@ public class FXMLResultsViewController implements Initializable, Controller{
     
     @Override
     public void refreshLowSelectedProjectList(){
+        ObservableList<Project> unselectedProjectList = FXCollections.observableArrayList();
+        unselectedProjectList.addAll(model.getUnselectedProjects());
+        unselectedList.setItems(unselectedProjectList);
         unselectedList.setVisible(false);
         unselectedList.setVisible(true);
     }
@@ -197,7 +199,7 @@ public class FXMLResultsViewController implements Initializable, Controller{
     private void createUnselectedProjectsList() {
         
         ObservableList<Project> unselectedProjectList = FXCollections.observableArrayList();
-        unselectedProjectList.addAll(model.getGraph().findUnassignedProjects());
+        unselectedProjectList.addAll(model.getUnselectedProjects());
         System.out.println(model);
         unselectedList.setItems(unselectedProjectList);
         unselectedList.setCellFactory(new Callback<ListView<Project>, ListCell<Project>>(){
@@ -246,24 +248,43 @@ public class FXMLResultsViewController implements Initializable, Controller{
 
     @Override
     public int moveProject(Reader reader, Reader readerToRemoveFrom, Project projectToMove, Project projectToPlaceBefore) {
-        System.out.println("moving assigned project");
-        return -1;
+        return model.moveAssignedProject(reader, readerToRemoveFrom, projectToMove, projectToPlaceBefore);
     }
 
     @Override
     public boolean moveProject(Reader readerToAdd, Reader readerToRemoveFrom, Project projectToMove) {
-        System.out.println("moving assigned project");
-        return false;    }
+        return model.moveAssignedProject(readerToAdd, readerToRemoveFrom, projectToMove);    
+    }
 
     @Override
     public boolean addProjectToReader(Reader reader, Project projectToAdd) {
-        System.out.println("adding assigned project");
-        return false;
+        return model.assignProjectToReader(reader, projectToAdd);
     }
 
     @Override
     public int addProjectToReader(Reader reader, Project projectToAdd, Project projectToAddBefore) {
-        System.out.println("adding assigned project");
-        return -1;
+        return model.assignProjectToReader(reader, projectToAdd, projectToAddBefore);
+    }
+
+    @Override
+    public ContextMenu createContextMenu(Reader reader, Node container) {
+        ListContextMenu menu = new ListContextMenu(reader, this, container);
+        menu.includeRemoveButton();
+        return menu;
+    }
+
+    @Override
+    public Collection<Project> getProjects() {
+        return model.getProjects();
+    }
+
+    @Override
+    public Collection<Project> getReaderList(Reader reader) {
+        return reader.getAssigned();
+    }
+
+    @Override
+    public void removeProjectFromReader(Reader reader, Project project) {
+        reader.removeAssignedProject(project);
     }
 }

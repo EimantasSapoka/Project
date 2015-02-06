@@ -114,7 +114,7 @@ public class Reader  implements TableObjectInterface{
            return temp;
        }
        
-       public ArrayList<Project> getFinalisedAssignedProjectList(){
+       public ArrayList<Project> getAssigned(){
            if (assigned.isEmpty()){
                assigned = getAssignedProjectsFromGraph();
            }
@@ -162,6 +162,11 @@ public class Reader  implements TableObjectInterface{
         this.assigned.add(p);
         this.assignedCountProperty.set(assigned.size()+"");
         return true;
+    } 
+    
+    public void assignProject(int indexToPlace, Project projectToMove) {
+        this.assigned.add(indexToPlace, projectToMove);
+        this.assignedCountProperty.set(assigned.size()+"");
     }
     
     public boolean removeAssignedProject(Project p){
@@ -174,5 +179,7 @@ public class Reader  implements TableObjectInterface{
         this.assigned.clear();
         this.assignedCountProperty.set("0");
     }
+
+   
     
 }
