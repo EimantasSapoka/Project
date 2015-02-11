@@ -18,7 +18,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.HBox;
-import mcmfuserinterface.Controller;
+import mcmfuserinterface.ControllerInterface;
 import model.Project;
 import model.Reader;
 
@@ -28,10 +28,10 @@ import model.Reader;
  */
 public class ListContextMenu extends ContextMenu {
     final private Reader reader;
-    final private Controller controller;
+    final private ControllerInterface controller;
     final private HBox hbox;
     
-    public ListContextMenu(final Reader reader, final Controller controller, final Node container){
+    public ListContextMenu(final Reader reader, final ControllerInterface controller, final Node container){
         super();
         
         this.reader = reader;

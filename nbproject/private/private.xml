@@ -15,18 +15,15 @@
             <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/test/CorrectnessTest.java</file>
             <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/MCMFUserInterface.java</file>
             <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/FXMLResultsViewController.java</file>
-            <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/drag_drop_table/columns/AssignedProjectsColumn.java</file>
-            <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/drag_drop_table/TableCellWithAssignmentsFactory.java</file>
-            <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/Controller.java</file>
+            <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/drag_drop_table/columns/ListColumn.java</file>
+            <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/drag_drop_table/DragLabel.java</file>
+            <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/ViewController.java</file>
             <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/model/MCMFModel.java</file>
-            <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/drag_drop_table/columns/PreferencesColumn.java</file>
             <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/drag_drop_table/columns/PreferenceListSizeColumn.java</file>
-            <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/drag_drop_table/AssignmentsScrollPane.java</file>
             <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/drag_drop_table/columns/AssignedProjectsCountColumn.java</file>
-            <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/drag_drop_table/AssignedLabel.java</file>
             <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/drag_drop_table/DroppableScrollPane.java</file>
+            <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/drag_drop_table/TableCellWithListFactory.java</file>
             <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/ford_fulkerson/Algorithm.java</file>
-            <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/drag_drop_table/PreferenceLabel.java</file>
             <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/ExceptionDialog.java</file>
             <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/drag_drop_table/TableObjectInterface.java</file>
             <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/FXMLMainViewController.java</file>
@@ -36,9 +33,11 @@
             <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/drag_drop_table/columns/ReaderNameColumn.java</file>
             <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/drag_drop_table/columns/CapacityColumn.java</file>
             <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/model/Reader.java</file>
-            <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/drag_drop_table/TableCellWithPreferencesFactory.java</file>
             <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/ford_fulkerson/TextScanner.java</file>
             <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/drag_drop_table/DragDropLabel.java</file>
+            <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/drag_drop_table/ListContextMenu.java</file>
+            <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/ford_fulkerson/InvalidInputException.java</file>
+            <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/mcmfuserinterface/ControllerInterface.java</file>
             <file>file:/C:/Users/Eimantas/Desktop/workspace/2014/Project/src/ford_fulkerson/graph/Graph.java</file>
         </group>
     </open-files>

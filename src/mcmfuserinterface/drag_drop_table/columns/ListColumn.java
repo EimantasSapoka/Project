@@ -9,7 +9,7 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TableColumn;
 import javafx.util.Callback;
-import mcmfuserinterface.Controller;
+import mcmfuserinterface.ControllerInterface;
 import mcmfuserinterface.drag_drop_table.TableCellWithListFactory;
 import mcmfuserinterface.drag_drop_table.TableObjectInterface;
 
@@ -19,7 +19,7 @@ import mcmfuserinterface.drag_drop_table.TableObjectInterface;
  */
 public class ListColumn  extends TableColumn<TableObjectInterface, TableObjectInterface>{
     
-    public ListColumn(String name, Controller contr){
+    public ListColumn(String name, ControllerInterface contr){
         super(name);
         setMinWidth(300);
         

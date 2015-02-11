@@ -71,9 +71,8 @@ import org.controlsfx.glyphfont.GlyphFontRegistry;
  *
  * @author Eimantas
  */
-public class FXMLMainViewController implements Initializable, Controller {
-
-    MCMFModel model;
+public class FXMLMainViewController extends ViewController {
+    
     FXMLResultsViewController resultsController;
     
     Stage resultsStage;
@@ -86,26 +85,15 @@ public class FXMLMainViewController implements Initializable, Controller {
     
     @FXML 
     private CheckBox loadBalancedCheckbox;
-            
-    @FXML
-    private CheckBox zeroCapacityReaderCheckbox;
     
     @FXML
     private TextField projectLowSelectionLimitBox;
-    
-    @FXML
-    TableView<TableObjectInterface> tableView;
     
     @FXML
     private ListView<Project> lowSelectedList;
     
     @FXML
     private Label trashBin;
-    
-    Label dragLabel;
-    
-    @FXML
-    AnchorPane anchorPane;
     
     @FXML
     Button extendPrefListButton;
@@ -119,12 +107,7 @@ public class FXMLMainViewController implements Initializable, Controller {
         resultsStage = new Stage();
         resultsStage.setTitle("Assignments");
         
-        dragLabel = new Label("");
-        dragLabel.setMouseTransparent(true);
-        dragLabel.setVisible(false);
-        dragLabel.toFront();
-        
-        anchorPane.getChildren().add(dragLabel);
+        createDragLabel();
         
         GlyphFont fontAwesome = GlyphFontRegistry.font("FontAwesome");
         trashBin.setGraphic(fontAwesome.create(FontAwesome.Glyph.TRASH_ALT));
@@ -230,30 +213,6 @@ public class FXMLMainViewController implements Initializable, Controller {
     }
 
     /**
-     * changes between showing and hiding readers with zero capacity
-     */
-    @FXML
-    private void toggleShowZeroCapacityReaders() {
-        ObservableList<TableObjectInterface> items = FXCollections.observableArrayList();
-        if (zeroCapacityReaderCheckbox.isSelected()){
-            items.addAll(model.getReaders());
-        } else {
-            for (Reader r : model.getReaders()){
-                if (!(r.getCapacity() == 0)){
-                    items.add(r);
-                }
-            }
-        }
-        tableView.setItems(null);
-        tableView.setItems(items);
-    }
-
-    @FXML
-    private void closeWindow(ActionEvent event) {
-        ((Stage) menuBar.getScene().getWindow()).close();
-    }
-
-    /**
      * 
      * @param event 
      */
@@ -266,7 +225,7 @@ public class FXMLMainViewController implements Initializable, Controller {
         if (file != null) {
             try {
                 model = new MCMFModel(file);
-                createTableViewFromGraph();
+                createTableFromModel();
                 createLowSelectedProjectsList();
             } catch (Exception ex){
                 Alert alert = new ExceptionDialog(ex);
@@ -274,50 +233,21 @@ public class FXMLMainViewController implements Initializable, Controller {
             }
         }
     }
-    
-    
-    /**
-     * creates a table with reader information and preferences list.
-     * @param model 
-     */
-    private void createTableViewFromGraph() {
-        if (model == null) { 
-            /* should not happen as this is only called locally after
-               the model is instanciated */
-            System.err.println("model instance empty");
-            return;
-        }
-        
-        // if the table has no columns, create them
-        if (tableView.getColumns().isEmpty()){
-            tableView.getColumns().add(new ReaderNameColumn("Reader name"));
-            tableView.getColumns().add(new CapacityColumn("Cap"));
-            tableView.getColumns().add(new PreferenceListSizeColumn("#Pref"));
-            tableView.getColumns().add(new ListColumn("Preferences", this));
-        }
-        
-        ObservableList<TableObjectInterface> items = FXCollections.observableArrayList();
-        if (this.zeroCapacityReaderCheckbox.isSelected()){
-            items.addAll(model.getReaders());
-        } else {
-            for (Reader r : model.getReaders()){
-                if (!(r.getCapacity() == 0)){
-                    items.add(r);
-                }
-            }
-        }
-        
-        refreshTable();
-        tableView.setItems(items);
-        tableView.setFixedCellSize(40);
-        setTableRowFactory();
+
+    @Override
+    protected void createTableColumns() {
+        table.getColumns().add(new ReaderNameColumn("Reader name"));
+        table.getColumns().add(new CapacityColumn("Cap"));
+        table.getColumns().add(new PreferenceListSizeColumn("#Pref"));
+        table.getColumns().add(new ListColumn("Preferences", this));
     }
 
     /**
      * creates the table row factory which adds colors to the rows
      */
-    private void setTableRowFactory() {
-        tableView.setRowFactory(new Callback<TableView<TableObjectInterface>,TableRow<TableObjectInterface>>(){
+    @Override
+    protected void setTableRowFactory() {
+        table.setRowFactory(new Callback<TableView<TableObjectInterface>,TableRow<TableObjectInterface>>(){
             
             @Override
             public TableRow<TableObjectInterface> call(TableView<TableObjectInterface> param) {
@@ -365,12 +295,6 @@ public class FXMLMainViewController implements Initializable, Controller {
             }
             
         });
-    }
-    
-    @Override
-    public void refreshTable(){
-        tableView.getColumns().get(2).setVisible(false);
-        tableView.getColumns().get(2).setVisible(true);
     }
     
     @Override
@@ -517,38 +441,6 @@ public class FXMLMainViewController implements Initializable, Controller {
         }
     }
     
-    
-    /**************************** ANCHOR PANE EVENTS ********************/
-    
-    @FXML
-    private void anchorPaneDragDetected(MouseEvent t) {
-        dragLabel.relocate(
-                (int) (t.getSceneX() - dragLabel.getBoundsInLocal().getWidth() / 2),
-                (int) (t.getSceneY() - dragLabel.getBoundsInLocal().getHeight() / 2));
-    }
-
-    @FXML
-    private void anchorPaneDragOver(DragEvent event) {
-        if (!dragLabel.isVisible()) {
-            dragLabel.setVisible(true);
-            dragLabel.toFront();
-            Project project;
-            if (event.getGestureSource() instanceof DragDropLabel) {
-                project = (Project) ((Label) event.getGestureSource()).getUserData();
-            } else {
-                project = (Project) ((ListCell) event.getGestureSource()).getUserData();
-            }
-            dragLabel.setText(project.getId() + "");
-        }
-        dragLabel.relocate(
-                (int) (event.getSceneX() - dragLabel.getBoundsInLocal().getWidth() / 2),
-                (int) (event.getSceneY() - dragLabel.getBoundsInLocal().getHeight() / 2));
-    }
-
-    @FXML
-    private void anchorPaneDragDone(DragEvent event) {
-        dragLabel.setVisible(false);
-    }
 
     @Override
     public int moveProject(Reader reader, Reader readerToRemoveFrom, Project projectToMove, Project projectToPlaceBefore) {
@@ -577,12 +469,7 @@ public class FXMLMainViewController implements Initializable, Controller {
         menu.includeRemoveButton();
         return menu;
     }
-
-    @Override
-    public Collection<Project> getProjects() {
-        return model.getProjects();
-    }
-
+    
     @Override
     public Collection<Project> getReaderList(Reader reader) {
         return reader.getPreferences();
@@ -594,7 +481,7 @@ public class FXMLMainViewController implements Initializable, Controller {
     }
 
     @Override
-    public Label createLabel(Project project, Controller controller) {
+    public Label createLabel(Project project, ControllerInterface controller) {
         DragDropLabel label =  new DragDropLabel(project,controller);
         label.setPopText("Name: " + project.getName() +
                          "\nID: " + project.getId() +

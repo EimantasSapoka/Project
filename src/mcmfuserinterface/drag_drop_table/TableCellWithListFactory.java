@@ -11,7 +11,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.layout.HBox;
 import javafx.util.Callback;
-import mcmfuserinterface.Controller;
+import mcmfuserinterface.ControllerInterface;
 import model.Project;
 import model.Reader;
 
@@ -20,9 +20,9 @@ import model.Reader;
  * @author Eimantas
  */
 public class TableCellWithListFactory implements Callback<TableColumn<TableObjectInterface, TableObjectInterface>, TableCell<TableObjectInterface, TableObjectInterface>> {
-    private final Controller controller;
+    private final ControllerInterface controller;
     
-    public TableCellWithListFactory(Controller controller) {
+    public TableCellWithListFactory(ControllerInterface controller) {
         this.controller = controller;
         
     }

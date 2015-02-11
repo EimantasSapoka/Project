@@ -16,7 +16,7 @@ import model.Reader;
  *
  * @author Eimantas
  */
-public interface Controller {
+public interface ControllerInterface {
     public void refreshTable();
     public void refreshLowSelectedProjectList();
     public int moveProject(Reader reader, Reader readerToRemoveFrom, Project projectToMove, Project projectToPlaceBefore);
@@ -27,5 +27,5 @@ public interface Controller {
     public Collection<Project> getProjects();
     public Collection<Project> getReaderList(Reader reader);
     public void removeProjectFromReader(Reader reader, Project project);
-    public Label createLabel(Project project, Controller controller);
+    public Label createLabel(Project project, ControllerInterface controller);
 }

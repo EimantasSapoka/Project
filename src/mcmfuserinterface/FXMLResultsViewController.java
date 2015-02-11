@@ -64,8 +64,7 @@ import model.Reader;
  *
  * @author Eimantas
  */
-public class FXMLResultsViewController implements Initializable, Controller{
-    private MCMFModel model;
+public class FXMLResultsViewController extends ViewController{
     
     @FXML
     Button infoButton;
@@ -74,13 +73,7 @@ public class FXMLResultsViewController implements Initializable, Controller{
     Button cancelButton;
     
     @FXML
-    TableView<TableObjectInterface> resultsTable;
-    
-    @FXML
-    ListView<Project> unselectedList; 
-    
-    @FXML
-    CheckBox zeroCapacityReaderCheckbox;
+    ListView<Project> unselectedList;
     
     private  BarChart<String,Number> barChart;
     
@@ -88,13 +81,14 @@ public class FXMLResultsViewController implements Initializable, Controller{
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        createDragLabel();
     }
     
     @FXML
     private void export(){
          FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Save file");
-            File file = fileChooser.showSaveDialog(resultsTable.getScene().getWindow());
+            File file = fileChooser.showSaveDialog(table.getScene().getWindow());
             if (file != null) {
                 try {
                     PrintWriter writer = new PrintWriter(file, "UTF-8");
@@ -107,40 +101,18 @@ public class FXMLResultsViewController implements Initializable, Controller{
             }
     }
     
-    @FXML
-    private void closeWindow(ActionEvent event) {
-        ((Stage) cancelButton.getScene().getWindow()).close();
-    }
-    
     void setModel(MCMFModel model) {
         this.model = model;
         createTableFromModel();
         createUnselectedProjectsList();
     }
     
-    private void createTableFromModel(){
-        if (resultsTable.getColumns().isEmpty()){
-            resultsTable.getColumns().add(new ReaderNameColumn("Reader name"));
-            resultsTable.getColumns().add(new CapacityColumn("Cap"));
-            resultsTable.getColumns().add(new AssignedProjectsCountColumn("#Assigned"));
-            resultsTable.getColumns().add(new ListColumn("Projects Assigned", this));
-        }
-      
-        ObservableList<TableObjectInterface> items = FXCollections.observableArrayList();
-        if (zeroCapacityReaderCheckbox.isSelected()){
-            items.addAll(model.getReaders());
-        } else {
-            for (Reader r : model.getReaders()){
-                if (!(r.getCapacity() == 0)){
-                    items.add(r);
-                }
-            }
-        }
-        
-        refreshTable();
-        resultsTable.setItems(items);
-        resultsTable.setFixedCellSize(40);
-        setTableRowFactory();
+    @Override
+    protected void createTableColumns() {
+        table.getColumns().add(new ReaderNameColumn("Reader name"));
+        table.getColumns().add(new CapacityColumn("Cap"));
+        table.getColumns().add(new AssignedProjectsCountColumn("#Assigned"));
+        table.getColumns().add(new ListColumn("Projects Assigned", this));
     }
     
     @FXML
@@ -218,30 +190,14 @@ public class FXMLResultsViewController implements Initializable, Controller{
     }
     
     
-    /**
-     * changes between showing and hiding readers with zero capacity
-     */
-    @FXML
-    private void toggleShowZeroCapacityReaders() {
-        ObservableList<TableObjectInterface> items = FXCollections.observableArrayList();
-        if (zeroCapacityReaderCheckbox.isSelected()){
-            items.addAll(model.getReaders());
-        } else {
-            for (Reader r : model.getReaders()){
-                if (!(r.getCapacity() == 0)){
-                    items.add(r);
-                }
-            }
-        }
-        resultsTable.setItems(null);
-        resultsTable.setItems(items);
-    }
+    
     
      /**
      * creates the table row factory which adds colors to the rows
      */
-    private void setTableRowFactory() {
-        resultsTable.setRowFactory(new Callback<TableView<TableObjectInterface>,TableRow<TableObjectInterface>>(){
+    @Override
+    protected void setTableRowFactory() {
+        table.setRowFactory(new Callback<TableView<TableObjectInterface>,TableRow<TableObjectInterface>>(){
             
             @Override
             public TableRow<TableObjectInterface> call(TableView<TableObjectInterface> param) {
@@ -291,13 +247,6 @@ public class FXMLResultsViewController implements Initializable, Controller{
             
         });
     }
-    
-    @Override
-    public void refreshTable() {
-        resultsTable.getColumns().get(0).setVisible(false);
-        resultsTable.getColumns().get(0).setVisible(true);
-    }
-
     
     @Override
     public void refreshLowSelectedProjectList(){
@@ -385,12 +334,7 @@ public class FXMLResultsViewController implements Initializable, Controller{
         menu.includeRemoveButton();
         return menu;
     }
-
-    @Override
-    public Collection<Project> getProjects() {
-        return model.getProjects();
-    }
-
+    
     @Override
     public Collection<Project> getReaderList(Reader reader) {
         return reader.getAssigned();
@@ -402,7 +346,7 @@ public class FXMLResultsViewController implements Initializable, Controller{
     }
 
     @Override
-    public Label createLabel(Project project, Controller controller) {
+    public Label createLabel(Project project, ControllerInterface controller) {
         DragLabel label = new DragLabel(project, controller);
         label.setPopText( "Name: " + project.getName() +
                           "\nID: " + project.getId() +

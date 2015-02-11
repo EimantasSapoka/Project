@@ -18,7 +18,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
-import mcmfuserinterface.Controller;
+import mcmfuserinterface.ControllerInterface;
 import model.Project;
 import org.controlsfx.control.PopOver;
 
@@ -31,7 +31,7 @@ public class DragLabel extends Label{
     final PopOver pop;
     final Label popText;
     
-    public DragLabel(final Project project, final Controller controller){
+    public DragLabel(final Project project, final ControllerInterface controller){
         super(project.getId() + "");
         
         pop = new PopOver();

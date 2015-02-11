@@ -22,7 +22,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
-import mcmfuserinterface.Controller;
+import mcmfuserinterface.ControllerInterface;
 import model.Project;
 import model.Reader;
 import org.controlsfx.control.PopOver;
@@ -33,7 +33,7 @@ import org.controlsfx.control.PopOver;
  */
 public class DragDropLabel extends DragLabel {
     
-    public DragDropLabel(final Project project, final Controller controller) {
+    public DragDropLabel(final Project project, final ControllerInterface controller) {
         super(project, controller);
 
         this.setOnDragOver(new EventHandler<DragEvent>() {
