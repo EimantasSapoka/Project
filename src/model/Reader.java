@@ -62,7 +62,6 @@ public class Reader  implements TableObjectInterface{
 	}
         
         public boolean addPreference(int indexToPlace, Project project) {
-           
             if (this.capacity > 0){
 		project.select();
 		this.preferences.add(indexToPlace, project);
@@ -102,11 +101,12 @@ public class Reader  implements TableObjectInterface{
         *
         * @return
         */
-       public ArrayList<Project> getAssignedProjectsFromGraph() {
+       protected ArrayList<Project> getAssignedProjectsFromGraph() {
            ArrayList<Project> temp = new ArrayList<Project>();
            for (Edge edge : this.vertex.getOutEdges()) {
                 if (edge.getFlow() > 0) {
                     Project project = (Project) edge.getDestination().getObject();
+                    project.assignToReader(this);
                     temp.add(project);
                 }
            }
@@ -158,12 +158,14 @@ public class Reader  implements TableObjectInterface{
     }
     
     public boolean assignProject(Project p){
+        p.assignToReader(this);
         this.assigned.add(p);
         this.assignedCountProperty.set(assigned.size()+"");
         return true;
     } 
     
     public void assignProject(int indexToPlace, Project projectToMove) {
+        projectToMove.assignToReader(this);
         this.assigned.add(indexToPlace, projectToMove);
         this.assignedCountProperty.set(assigned.size()+"");
     }
@@ -175,10 +177,11 @@ public class Reader  implements TableObjectInterface{
     }
     
     public void clearAssignedProjects(){
+        for (Project p: assigned){
+            p.assignToReader(null);
+        }
         this.assigned.clear();
         this.assignedCountProperty.set("0");
-    }
-
-   
+    }   
     
 }

@@ -52,6 +52,7 @@
                         <Button layoutX="369.0" layoutY="21.0" mnemonicParsing="false" onAction="#export" prefHeight="25.0" prefWidth="103.0" text="Export" />
                         <Button fx:id="cancelButton" layoutX="507.0" layoutY="21.0" mnemonicParsing="false" onAction="#closeWindow" prefHeight="25.0" prefWidth="57.0" text="Cancel" />
                         <Button fx:id="infoButton" layoutX="226.0" layoutY="21.0" mnemonicParsing="false" onAction="#showInfo" text="Info" />
+                        <CheckBox fx:id="preferencesCheckBox" layoutY="25.0" mnemonicParsing="false" onAction="#showPreferencesToggle" prefHeight="17.0" prefWidth="161.0" text="Show preferences" />
                      </children>
                   </Pane>
                </children>

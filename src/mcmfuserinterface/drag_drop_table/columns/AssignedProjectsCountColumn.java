@@ -38,7 +38,7 @@ public class AssignedProjectsCountColumn extends TableColumn<TableObjectInterfac
         setComparator(new Comparator<TableObjectInterface>(){
             @Override
             public int compare(TableObjectInterface o1, TableObjectInterface o2) {
-                    return ((Reader) o1).getAssignedProjectsFromGraph().size() - ((Reader) o2).getAssignedProjectsFromGraph().size();
+                    return ((Reader) o1).getAssigned().size() - ((Reader) o2).getAssigned().size();
             }
         	
         });

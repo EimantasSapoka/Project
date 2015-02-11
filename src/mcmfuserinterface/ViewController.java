@@ -179,7 +179,6 @@ public abstract class ViewController implements Initializable, ControllerInterfa
 
     @Override
     public abstract ContextMenu createContextMenu(Reader reader, Node node);
-
     
     @Override
     public abstract Collection<Project> getReaderList(Reader reader);
@@ -188,6 +187,6 @@ public abstract class ViewController implements Initializable, ControllerInterfa
     public abstract void removeProjectFromReader(Reader reader, Project project);
 
     @Override
-    public abstract Label createLabel(Project project, ControllerInterface controller);
+    public abstract Label createLabel(Reader reader, Project project, ControllerInterface controller);
     
 }

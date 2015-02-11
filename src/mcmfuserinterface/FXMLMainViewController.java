@@ -481,7 +481,7 @@ public class FXMLMainViewController extends ViewController {
     }
 
     @Override
-    public Label createLabel(Project project, ControllerInterface controller) {
+    public Label createLabel(Reader reader, Project project, ControllerInterface controller) {
         DragDropLabel label =  new DragDropLabel(project,controller);
         label.setPopText("Name: " + project.getName() +
                          "\nID: " + project.getId() +

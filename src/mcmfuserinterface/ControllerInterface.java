@@ -27,5 +27,5 @@ public interface ControllerInterface {
     public Collection<Project> getProjects();
     public Collection<Project> getReaderList(Reader reader);
     public void removeProjectFromReader(Reader reader, Project project);
-    public Label createLabel(Project project, ControllerInterface controller);
+    public Label createLabel(Reader reader, Project project, ControllerInterface controller);
 }

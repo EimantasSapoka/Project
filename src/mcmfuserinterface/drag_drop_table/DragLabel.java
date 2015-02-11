@@ -26,42 +26,13 @@ import org.controlsfx.control.PopOver;
  *
  * @author Eimantas
  */
-public class DragLabel extends Label{
-    
-    final PopOver pop;
-    final Label popText;
+public class DragLabel extends PopLabel{
     
     public DragLabel(final Project project, final ControllerInterface controller){
         super(project.getId() + "");
         
-        pop = new PopOver();
-        popText = new Label();
-        
         this.setUserData(project);
         this.setTooltip(new Tooltip(project.getName()));
-
-        this.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if (event.getButton() == MouseButton.PRIMARY){
-                    popText.setTextFill(Color.BLACK);
-                    popText.setPadding(new Insets(10,10,10,10));
-                    pop.setContentNode(popText);
-                    pop.show((Node) event.getTarget(), event.getScreenX()+10, event.getScreenY());
-                }
-                
-            }
-
-        });
-        
-        this.setOnMouseExited(new EventHandler<MouseEvent>(){
-
-            @Override
-            public void handle(MouseEvent event) {
-                pop.hide(Duration.seconds(1.5));
-            }
-        
-        });
         
         this.setOnDragDetected(new EventHandler<MouseEvent>() {
             @Override
@@ -76,9 +47,5 @@ public class DragLabel extends Label{
                 db.setContent(content);
             }
         });
-    }
-    
-    public void setPopText(String text){
-        this.popText.setText(text);
     }
 }

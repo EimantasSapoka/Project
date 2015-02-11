@@ -11,6 +11,7 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import javafx.beans.value.ChangeListener;
@@ -42,6 +43,8 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -51,6 +54,7 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import mcmfuserinterface.drag_drop_table.DragLabel;
 import mcmfuserinterface.drag_drop_table.ListContextMenu;
+import mcmfuserinterface.drag_drop_table.PopLabel;
 import mcmfuserinterface.drag_drop_table.TableObjectInterface;
 import mcmfuserinterface.drag_drop_table.columns.AssignedProjectsCountColumn;
 import mcmfuserinterface.drag_drop_table.columns.CapacityColumn;
@@ -75,6 +79,9 @@ public class FXMLResultsViewController extends ViewController{
     @FXML
     ListView<Project> unselectedList;
     
+    @FXML
+    CheckBox preferencesCheckBox;
+    
     private  BarChart<String,Number> barChart;
     
     
@@ -82,12 +89,24 @@ public class FXMLResultsViewController extends ViewController{
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         createDragLabel();
+        table.setOnDragDone(new EventHandler<DragEvent>(){
+
+            @Override
+            public void handle(DragEvent event) {
+                if (preferencesCheckBox.isSelected()){
+                    refreshTable();
+                }
+            }
+            
+        });
     }
     
     @FXML
     private void export(){
          FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Save file");
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("text files", "*.txt");
+            fileChooser.getExtensionFilters().add(extFilter);
             File file = fileChooser.showSaveDialog(table.getScene().getWindow());
             if (file != null) {
                 try {
@@ -99,6 +118,11 @@ public class FXMLResultsViewController extends ViewController{
                     alert.showAndWait();
                 }
             }
+    }
+    
+    @FXML
+    private void showPreferencesToggle(){
+        refreshTable();
     }
     
     void setModel(MCMFModel model) {
@@ -187,10 +211,7 @@ public class FXMLResultsViewController extends ViewController{
             }
         }
         return preferenceToCount;
-    }
-    
-    
-    
+    }    
     
      /**
      * creates the table row factory which adds colors to the rows
@@ -229,7 +250,7 @@ public class FXMLResultsViewController extends ViewController{
                                 }
                             });
                             int cap = ((Reader) getUserData()).getCapacity();
-                            int assignedCount = reader.getAssignedProjectsFromGraph().size();
+                            int assignedCount = reader.getAssigned().size();
                             if (reader.equals(getUserData())){
                                 if (cap - 1 > assignedCount){
                                     setStyle("-fx-background-color: red;");
@@ -331,13 +352,25 @@ public class FXMLResultsViewController extends ViewController{
     @Override
     public ContextMenu createContextMenu(Reader reader, Node container) {
         ListContextMenu menu = new ListContextMenu(reader, this, container);
-        menu.includeRemoveButton();
+        if (!preferencesCheckBox.isSelected()){
+            menu.includeRemoveButton();
+        }
         return menu;
     }
     
     @Override
     public Collection<Project> getReaderList(Reader reader) {
-        return reader.getAssigned();
+        if (preferencesCheckBox.isSelected()){
+            List<Project> list = (List<Project>) reader.getPreferences().clone();
+            for (Project project : reader.getAssigned()){
+                if (!list.contains(project)){
+                    list.add(project);
+                }
+            }
+            return list;      
+        } else {
+            return reader.getAssigned();
+        }
     }
 
     @Override
@@ -346,11 +379,24 @@ public class FXMLResultsViewController extends ViewController{
     }
 
     @Override
-    public Label createLabel(Project project, ControllerInterface controller) {
-        DragLabel label = new DragLabel(project, controller);
-        label.setPopText( "Name: " + project.getName() +
-                          "\nID: " + project.getId() +
-                          "\nTimes selected: " + project.getSelectedCount());
+    public Label createLabel(Reader reader, Project project, ControllerInterface controller) {
+        Reader assignedReader = project.getAssignedReader();
+        PopLabel label;
+        
+        if (reader.equals(assignedReader)) {
+            label = new DragLabel(project, controller);
+            if (preferencesCheckBox.isSelected()){
+                label.setStyle("-fx-border-color: black;");
+            }
+        } else {
+            label = new PopLabel(project.getId() + "");
+        }
+
+        label.setPopText("Name: " + project.getName()
+                + "\nID: " + project.getId()
+                + "\nTimes selected: " + project.getSelectedCount()
+                + "\nAssigned to: " + assignedReader.getName());
+
         return label;
     }
 }
