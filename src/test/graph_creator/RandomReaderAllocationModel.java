@@ -14,12 +14,14 @@ import model.Reader;
  *
  */
 public class RandomReaderAllocationModel extends MCMFModel{
-	
-	private final int READER_CAPACITY;
+    
 	private int readerIDcounter = 1;
 	private final int PROJECT_COUNT;
 	private final int READER_COUNT;
-	private ArrayList<Integer> projects;
+        private int projectsLeft;
+        private int readersLeft;
+	private ArrayList<Integer> projectList;
+        private ArrayList<Integer> unselectedProjects;
 	Random rand;
 	
 	/**
@@ -27,18 +29,23 @@ public class RandomReaderAllocationModel extends MCMFModel{
 	 * number of readers up to the reader limit. 
 	 * also creates number of projects equal to the number of readers multiplied 
 	 * by the projectMultiplier. 
+        * @param readerCount
+        * @param numberProjects
+        * @param readerMaxCapacity
 	 */
-	public RandomReaderAllocationModel(int readerLimit, int projectMultiplier, int readerCapacity){
+	public RandomReaderAllocationModel(int readerCount, int numberProjects){
 		super();
 		rand = new Random();
-		READER_CAPACITY = readerCapacity;
-		READER_COUNT = rand.nextInt(readerLimit -5) + 5;
-		PROJECT_COUNT = READER_COUNT * projectMultiplier;
+		READER_COUNT = readerCount;
+		PROJECT_COUNT = numberProjects;
+                projectsLeft = numberProjects;
+                readersLeft = readerCount;
 		
-		projects = new ArrayList<Integer>(PROJECT_COUNT);
+		projectList = new ArrayList<Integer>(PROJECT_COUNT);
+                unselectedProjects = (ArrayList<Integer>) projectList.clone();
 		
 		for (int i=0; i<PROJECT_COUNT; i++){
-			projects.add(i + READER_COUNT);
+			projectList.add(i + READER_COUNT);
 		}
 		
 		for (int i=0; i<READER_COUNT; i++){
@@ -53,7 +60,7 @@ public class RandomReaderAllocationModel extends MCMFModel{
 	 * @param readerLimit
 	 */
 	public RandomReaderAllocationModel(int readerLimit){
-		this(readerLimit, 2, 8);
+		this(readerLimit, readerLimit*4);
 	}
 	
 	public RandomReaderAllocationModel(){
@@ -64,32 +71,47 @@ public class RandomReaderAllocationModel extends MCMFModel{
 	 * generates and returns a single reader instance with a sequentially 
 	 * incremented ID (readerIDcounter) and random number capacity.
 	 * Also, preference list is random as well.
+     * @return 
 	 */
 	@SuppressWarnings("unchecked")
-	public Reader generateReader(){
-		ArrayList<Integer> projectPreferenceList = (ArrayList<Integer>) projects.clone();
-		int readerCapacity = rand.nextInt(READER_CAPACITY);
+	public final Reader generateReader(){
+            
+		ArrayList<Integer> projectPreferenceList;
+                if (unselectedProjects.isEmpty()){
+                    projectPreferenceList = (ArrayList<Integer>) projectList.clone();
+                } else {
+                    projectPreferenceList = unselectedProjects;
+                }
+		int readerCapacity = rand.nextInt((projectsLeft/readersLeft)*2);
 		
-		if (readerCapacity > PROJECT_COUNT){
-			readerCapacity = PROJECT_COUNT/2;
+		if (readerCapacity > projectsLeft){
+			readerCapacity = projectsLeft/2;
 		}
+                
+                projectsLeft -= readerCapacity;
+                readersLeft--;
 		
 		Reader r = new Reader(readerIDcounter++, readerCapacity);
 		
 		// preference list size is up to twice as big as the reader capacity. 
-		int prefListSize = readerCapacity == 0? 0:rand.nextInt(readerCapacity) + readerCapacity;
+		int prefListSize = readerCapacity == 0? 0:rand.nextInt(readerCapacity *3) + readerCapacity/2;
 		
 		// makes a preference list
 		for (int i=0; i<prefListSize; i++){
-			if (projectPreferenceList.size()  == 0){
-				break;
-			}
+			if (projectPreferenceList.isEmpty()){
+                            if (unselectedProjects.isEmpty()){
+                                break;
+                            } else {
+                                projectPreferenceList = (ArrayList<Integer>) projects.clone();
+                                projectPreferenceList.removeAll(r.getPreferences());
+                            }
+                        }
 			// selects a random project number from list
 			int randomProjectIndex = rand.nextInt(projectPreferenceList.size()); 
 			
 			// creates a new project with the id from the list (and removes that id) and preference of loop index
 			int id = projectPreferenceList.remove(randomProjectIndex);
-			Project project = null;
+			Project project;
 			if( (project = this.getProject(id)) == null){
 				project = new Project(id);
 			}

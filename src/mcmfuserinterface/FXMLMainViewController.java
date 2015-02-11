@@ -15,19 +15,17 @@ import java.io.File;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -38,24 +36,23 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.util.Callback;
+import javafx.util.Pair;
 import mcmfuserinterface.drag_drop_table.DragDropLabel;
 import mcmfuserinterface.drag_drop_table.ListContextMenu;
 import mcmfuserinterface.drag_drop_table.columns.CapacityColumn;
@@ -66,6 +63,7 @@ import model.Project;
 import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.GlyphFont;
 import org.controlsfx.glyphfont.GlyphFontRegistry;
+import test.graph_creator.RandomReaderAllocationModel;
 
 /**
  *
@@ -73,9 +71,9 @@ import org.controlsfx.glyphfont.GlyphFontRegistry;
  */
 public class FXMLMainViewController extends ViewController {
     
-    FXMLResultsViewController resultsController;
+    private FXMLResultsViewController resultsController;
     
-    Stage resultsStage;
+    private Stage resultsStage;
 
     @FXML
     private MenuBar menuBar;
@@ -96,7 +94,7 @@ public class FXMLMainViewController extends ViewController {
     private Label trashBin;
     
     @FXML
-    Button extendPrefListButton;
+    private Button extendPrefListButton;
     
     /******************    /
      METHODS
@@ -200,16 +198,83 @@ public class FXMLMainViewController extends ViewController {
      */
     @FXML
     private void setLowSelectedProjectsThreshold() {
-        String text = this.projectLowSelectionLimitBox.getText();
-        if (!text.matches("\\d+")
-                || Integer.parseInt(text) < 1
-                || Integer.parseInt(text) > 99) {
-            projectLowSelectionLimitBox.setText("");
-        } else {
+        if(checkIfTextFieldInputInteger(this.projectLowSelectionLimitBox)){
             if (model != null) {
                 createLowSelectedProjectsList();
             }
         }
+        
+    }
+
+    /**
+     * checks if the text field input is digits.
+     */
+    private boolean checkIfTextFieldInputInteger(TextField box){
+        String text = box.getText();
+        if (!text.matches("\\d+")
+                || Integer.parseInt(text) < 1
+                || Integer.parseInt(text) > 999) {
+            box.setText("");
+            return false;
+        } else {
+            return true;
+        }
+    }
+    
+    @FXML
+    private void createRandomInstance(){
+        Dialog<Pair<Integer, Integer>> dialog = new Dialog<>();
+        dialog.setTitle("Create random instance");
+        dialog.setHeaderText("Enter instance parameters");
+        
+        ButtonType createButtonType = new ButtonType("Create", ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(createButtonType, ButtonType.CANCEL);
+        
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField readerCount = new TextField();
+        readerCount.setPromptText("Number of readers");
+        TextField projectCount = new TextField();
+        projectCount.setPromptText("Number of projects");
+        
+        readerCount.setOnKeyTyped(event -> {
+                if (!event.getCharacter().matches("\\d")){
+                    event.consume();
+                }});
+        projectCount.setOnKeyTyped(event -> {
+                if (!event.getCharacter().matches("\\d")){
+                    event.consume();
+                }});
+       
+        grid.add(new Label("Readers:"), 0, 0);
+        grid.add(readerCount, 1, 0);
+        grid.add(new Label("Projects:"), 0, 1);
+        grid.add(projectCount, 1, 1);
+       
+        dialog.getDialogPane().setContent(grid);
+        
+        dialog.setResultConverter(dialogButton -> {
+            if ( dialogButton == createButtonType &&
+                !readerCount.getText().isEmpty() &&
+                !projectCount.getText().isEmpty() ) {
+                
+                Pair<Integer, Integer> pair =  new Pair<>(Integer.parseInt(readerCount.getText()), 
+                                                          Integer.parseInt(projectCount.getText()) );
+                return pair;
+            }
+            return null;
+        });
+
+        Optional<Pair<Integer, Integer>> result = dialog.showAndWait();
+        if (result.isPresent() && result.get() != null){
+            model = new RandomReaderAllocationModel(result.get().getKey(), result.get().getValue());
+            createTableFromModel();
+            createLowSelectedProjectsList();
+        }
+
     }
 
     /**
@@ -247,10 +312,7 @@ public class FXMLMainViewController extends ViewController {
      */
     @Override
     protected void setTableRowFactory() {
-        table.setRowFactory(new Callback<TableView<TableObjectInterface>,TableRow<TableObjectInterface>>(){
-            
-            @Override
-            public TableRow<TableObjectInterface> call(TableView<TableObjectInterface> param) {
+        table.setRowFactory(param -> {
                 TableRow<TableObjectInterface> row = new TableRow<TableObjectInterface>(){
                     @Override
                     protected void updateItem(TableObjectInterface item, boolean empty) {
@@ -259,10 +321,7 @@ public class FXMLMainViewController extends ViewController {
                         if (item != null){
                             
                             final Reader reader = (Reader) item;
-                            reader.getPreferenceStringProperty().addListener(new ChangeListener<String>(){
-                                
-                                @Override
-                                public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                            reader.getPreferenceStringProperty().addListener((observable, oldValue, newValue)-> {
                                     if (getUserData()!= null){
                                         int cap = ((Reader) getUserData()).getCapacity();
                                         int numPref = Integer.parseInt(newValue);
@@ -276,8 +335,7 @@ public class FXMLMainViewController extends ViewController {
                                             }
                                         } 
                                     }
-                                }
-                            });
+                                });
                             int cap = reader.getCapacity();
                             int numPref = reader.getPreferences().size();
 
@@ -292,9 +350,7 @@ public class FXMLMainViewController extends ViewController {
                     }
                 };
                 return row;
-            }
-            
-        });
+            });
     }
     
     @Override
@@ -331,10 +387,7 @@ public class FXMLMainViewController extends ViewController {
 
         
         lowSelectedList.setItems(sortedLowSelectedProjectList.sorted());
-        lowSelectedList.setCellFactory(new Callback<ListView<Project>, ListCell<Project>>(){
-
-            @Override
-            public ListCell<Project> call(ListView<Project> param) {
+        lowSelectedList.setCellFactory(param -> {
                 final ListCell<Project> listCell =  new ListCell<Project>(){
 
                     @Override
@@ -355,30 +408,20 @@ public class FXMLMainViewController extends ViewController {
                     }               
                 };
                 
-                listCell.setOnDragDetected(new EventHandler<MouseEvent>(){
-
-                    @Override
-                    public void handle(MouseEvent event) {
+                listCell.setOnDragDetected(event ->{
                         
                         Dragboard db = listCell.startDragAndDrop(TransferMode.COPY);
                         ClipboardContent content = new ClipboardContent();
 
                         content.putString("test");
                         db.setContent(content);
-                    }            
                 });
                 return listCell;
-            }
-            
-        });
+            });
         
-       lowSelectedList.setOnDragDone(new EventHandler<DragEvent>(){
-            @Override
-            public void handle(DragEvent event) {
+       lowSelectedList.setOnDragDone(event -> {
                refreshLowSelectedProjectList();
-            }
-           
-       });
+            });
     }
 
     

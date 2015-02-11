@@ -27,10 +27,8 @@ public class PreferenceListSizeColumn extends TableColumn<TableObjectInterface, 
         setPrefWidth(50);
         setMaxWidth(60);
         
-        setCellValueFactory(new Callback<CellDataFeatures<TableObjectInterface, TableObjectInterface>, ObservableValue<TableObjectInterface>>() {
-            @Override public ObservableValue<TableObjectInterface> call(CellDataFeatures<TableObjectInterface, TableObjectInterface> features) {
+        setCellValueFactory(features -> {
                 return new ReadOnlyObjectWrapper(features.getValue());
-            }
           });
         
         setComparator(new Comparator<TableObjectInterface>(){
@@ -41,9 +39,7 @@ public class PreferenceListSizeColumn extends TableColumn<TableObjectInterface, 
         	
         });
         
-        setCellFactory(new Callback<TableColumn<TableObjectInterface, TableObjectInterface>, TableCell<TableObjectInterface,TableObjectInterface>>() {
-            @Override
-            public TableCell<TableObjectInterface, TableObjectInterface> call(TableColumn<TableObjectInterface, TableObjectInterface> arg) {
+        setCellFactory(arg -> {
                 TableCell<TableObjectInterface, TableObjectInterface> cell = new TableCell<TableObjectInterface, TableObjectInterface>(){
                     private final Label label = new Label();
 
@@ -57,7 +53,6 @@ public class PreferenceListSizeColumn extends TableColumn<TableObjectInterface, 
                     }
                 };
                 return cell;
-            }
         });
         
     }

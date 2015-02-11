@@ -19,49 +19,43 @@ import model.Reader;
  *
  * @author Eimantas
  */
-public class AssignedProjectsCountColumn extends TableColumn<TableObjectInterface, TableObjectInterface>{
-    
-    public AssignedProjectsCountColumn(String name){
+public class AssignedProjectsCountColumn extends TableColumn<TableObjectInterface, TableObjectInterface> {
+
+    public AssignedProjectsCountColumn(String name) {
         super(name);
-        
+
         setMinWidth(30);
         setPrefWidth(50);
         setMaxWidth(60);
-        
-        
-        setCellValueFactory(new Callback<CellDataFeatures<TableObjectInterface, TableObjectInterface>, ObservableValue<TableObjectInterface>>() {
-            @Override public ObservableValue<TableObjectInterface> call(CellDataFeatures<TableObjectInterface, TableObjectInterface> features) {
-                return new ReadOnlyObjectWrapper(features.getValue());
-            }
-          });
-        
-        setComparator(new Comparator<TableObjectInterface>(){
+
+        setCellValueFactory(features -> {
+            return new ReadOnlyObjectWrapper(features.getValue());
+        });
+
+        setComparator(new Comparator<TableObjectInterface>() {
             @Override
             public int compare(TableObjectInterface o1, TableObjectInterface o2) {
-                    return ((Reader) o1).getAssigned().size() - ((Reader) o2).getAssigned().size();
+                return ((Reader) o1).getAssigned().size() - ((Reader) o2).getAssigned().size();
             }
-        	
-        });
-        
-        setCellFactory(new Callback<TableColumn<TableObjectInterface, TableObjectInterface>, TableCell<TableObjectInterface,TableObjectInterface>>() {
-            @Override
-            public TableCell<TableObjectInterface, TableObjectInterface> call(TableColumn<TableObjectInterface, TableObjectInterface> arg) {
-                TableCell<TableObjectInterface, TableObjectInterface> cell = new TableCell<TableObjectInterface, TableObjectInterface>(){
-                    private final Label label = new Label();
 
-                    @Override
-                    protected void updateItem(TableObjectInterface arg0, boolean arg1) {
-                        super.updateItem(arg0, arg1);
-                        if (arg0 != null){
-                                label.textProperty().bind(((Reader)arg0).getAssignedCountStringProperty());
-                                setGraphic(label);
-                        }
-                    }
-                };
-                return cell;
-            }
         });
-        
+
+        setCellFactory(arg -> {
+            TableCell<TableObjectInterface, TableObjectInterface> cell = new TableCell<TableObjectInterface, TableObjectInterface>() {
+                private final Label label = new Label();
+
+                @Override
+                protected void updateItem(TableObjectInterface arg0, boolean arg1) {
+                    super.updateItem(arg0, arg1);
+                    if (arg0 != null) {
+                        label.textProperty().bind(((Reader) arg0).getAssignedCountStringProperty());
+                        setGraphic(label);
+                    }
+                }
+            };
+            return cell;
+        });
+
     }
-    
+
 }

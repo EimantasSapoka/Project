@@ -89,15 +89,10 @@ public class FXMLResultsViewController extends ViewController{
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         createDragLabel();
-        table.setOnDragDone(new EventHandler<DragEvent>(){
-
-            @Override
-            public void handle(DragEvent event) {
+        table.setOnDragDone(event -> {
                 if (preferencesCheckBox.isSelected()){
                     refreshTable();
                 }
-            }
-            
         });
     }
     
@@ -218,10 +213,7 @@ public class FXMLResultsViewController extends ViewController{
      */
     @Override
     protected void setTableRowFactory() {
-        table.setRowFactory(new Callback<TableView<TableObjectInterface>,TableRow<TableObjectInterface>>(){
-            
-            @Override
-            public TableRow<TableObjectInterface> call(TableView<TableObjectInterface> param) {
+        table.setRowFactory(param -> {
                 TableRow<TableObjectInterface> row = new TableRow<TableObjectInterface>(){
                     @Override
                     protected void updateItem(TableObjectInterface item, boolean empty) {
@@ -230,10 +222,7 @@ public class FXMLResultsViewController extends ViewController{
                         if (item != null){
                             
                             final Reader reader = (Reader) item;
-                            reader.getAssignedCountStringProperty().addListener(new ChangeListener<String>(){
-                                
-                                @Override
-                                public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                            reader.getAssignedCountStringProperty().addListener( (observable, oldValue,  newValue) -> {
                                     if (getUserData()!= null){
                                         int cap = ((Reader) getUserData()).getCapacity();
                                         int assignedCount = Integer.parseInt(newValue);
@@ -247,8 +236,7 @@ public class FXMLResultsViewController extends ViewController{
                                             }
                                         } 
                                     }
-                                }
-                            });
+                                });
                             int cap = ((Reader) getUserData()).getCapacity();
                             int assignedCount = reader.getAssigned().size();
                             if (reader.equals(getUserData())){
@@ -264,9 +252,7 @@ public class FXMLResultsViewController extends ViewController{
                     }
                 };
                 return row;
-            }
-            
-        });
+            });
     }
     
     @Override
@@ -285,10 +271,7 @@ public class FXMLResultsViewController extends ViewController{
         ObservableList<Project> unselectedProjectList = FXCollections.observableArrayList();
         unselectedProjectList.addAll(model.getUnselectedProjects());
         unselectedList.setItems(unselectedProjectList);
-        unselectedList.setCellFactory(new Callback<ListView<Project>, ListCell<Project>>(){
-
-            @Override
-            public ListCell<Project> call(ListView<Project> param) {
+        unselectedList.setCellFactory(param -> {
                 final ListCell<Project> listCell =  new ListCell<Project>(){
 
                     @Override
@@ -316,17 +299,11 @@ public class FXMLResultsViewController extends ViewController{
                     }            
                 });
                 return listCell;
-            }
-            
-        });
+            });
         
-       unselectedList.setOnDragDone(new EventHandler<DragEvent>(){
-            @Override
-            public void handle(DragEvent event) {
+       unselectedList.setOnDragDone(event -> {
                refreshLowSelectedProjectList();
-            }
-           
-       });
+            });
     }
 
     @Override

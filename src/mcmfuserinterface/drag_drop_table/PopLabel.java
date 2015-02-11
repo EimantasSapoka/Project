@@ -5,12 +5,10 @@
  */
 package mcmfuserinterface.drag_drop_table;
 
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import org.controlsfx.control.PopOver;
@@ -30,27 +28,17 @@ public class PopLabel extends Label {
         pop = new PopOver();
         popText = new Label();
 
-        this.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
+        this.setOnMouseClicked(event -> {
                 if (event.getButton() == MouseButton.PRIMARY) {
                     popText.setTextFill(Color.BLACK);
                     popText.setPadding(new Insets(10, 10, 10, 10));
                     pop.setContentNode(popText);
                     pop.show((Node) event.getTarget(), event.getScreenX() + 10, event.getScreenY());
                 }
-
-            }
-
         });
 
-        this.setOnMouseExited(new EventHandler<MouseEvent>() {
-
-            @Override
-            public void handle(MouseEvent event) {
+        this.setOnMouseExited(event -> {
                 pop.hide(Duration.seconds(1.5));
-            }
-
         });
 
     }

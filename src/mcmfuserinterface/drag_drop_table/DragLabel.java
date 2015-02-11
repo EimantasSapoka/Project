@@ -26,26 +26,23 @@ import org.controlsfx.control.PopOver;
  *
  * @author Eimantas
  */
-public class DragLabel extends PopLabel{
-    
-    public DragLabel(final Project project, final ControllerInterface controller){
+public class DragLabel extends PopLabel {
+
+    public DragLabel(final Project project, final ControllerInterface controller) {
         super(project.getId() + "");
-        
+
         this.setUserData(project);
         this.setTooltip(new Tooltip(project.getName()));
-        
-        this.setOnDragDetected(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                Dragboard db = startDragAndDrop(TransferMode.MOVE);
-                ClipboardContent content = new ClipboardContent();
-                
-                HBox hbox = (HBox) getParent();
-                hbox.getChildren().get(0).setVisible(true);
-                
-                content.putString("test");
-                db.setContent(content);
-            }
+
+        this.setOnDragDetected(mouseEvent -> {
+            Dragboard db = startDragAndDrop(TransferMode.MOVE);
+            ClipboardContent content = new ClipboardContent();
+
+            HBox hbox = (HBox) getParent();
+            hbox.getChildren().get(0).setVisible(true);
+
+            content.putString("test");
+            db.setContent(content);
         });
     }
 }

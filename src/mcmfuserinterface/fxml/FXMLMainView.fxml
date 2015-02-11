@@ -20,6 +20,7 @@
                       <Menu mnemonicParsing="false" text="File">
                         <items>
                               <MenuItem mnemonicParsing="false" onAction="#openFileButtonAction" text="Open file..." />
+                              <MenuItem mnemonicParsing="false" onAction="#createRandomInstance" text="Create random instance" />
                           <MenuItem mnemonicParsing="false" onAction="#closeWindow" text="Close" />
                         </items>
                       </Menu>

@@ -23,10 +23,8 @@ public class ListColumn  extends TableColumn<TableObjectInterface, TableObjectIn
         super(name);
         setMinWidth(300);
         
-        setCellValueFactory(new Callback<CellDataFeatures<TableObjectInterface, TableObjectInterface>, ObservableValue<TableObjectInterface>>() {
-          @Override public ObservableValue<TableObjectInterface> call(CellDataFeatures<TableObjectInterface, TableObjectInterface> features) {
+        setCellValueFactory(features -> {
               return new ReadOnlyObjectWrapper(features.getValue());
-          }
         });
         
         setCellFactory(new TableCellWithListFactory(contr));

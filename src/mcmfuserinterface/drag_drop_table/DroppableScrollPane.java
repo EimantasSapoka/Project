@@ -6,19 +6,11 @@
 package mcmfuserinterface.drag_drop_table;
 
 import java.awt.Toolkit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ChoiceDialog;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
@@ -32,58 +24,51 @@ import model.Reader;
  * @author Eimantas
  */
 public class DroppableScrollPane extends ScrollPane {
-    
+
     public DroppableScrollPane(final ControllerInterface controller) {
         super();
 
-        setOnDragOver(new EventHandler<DragEvent>() {
-            @Override
-            public void handle(DragEvent event) {
-                event.acceptTransferModes(TransferMode.ANY);
-            }
+        setOnDragOver(event -> {
+            event.acceptTransferModes(TransferMode.ANY);
         });
 
-        setOnDragDropped(new EventHandler<DragEvent>() {
-            @Override
-            public void handle(DragEvent event) {
-                HBox hbox = (HBox) getContent();
-                if (hbox.getUserData() == null) {
-                    event.consume();
-                    return;
-                }
-                boolean success;
-
-                Reader readerToAdd = (Reader) hbox.getUserData();
-
-                if (event.getTransferMode() == TransferMode.MOVE) {
-                    Label sourceLabel = (Label) event.getGestureSource();
-                    HBox sourceHbox = (HBox) sourceLabel.getParent();
-                    Project projectToMove = (Project) sourceLabel.getUserData();
-                    Reader readerToRemoveFrom = (Reader) (sourceHbox).getUserData();
-
-                    success = controller.moveProject(readerToAdd, readerToRemoveFrom, projectToMove);
-                    if (success) {
-                        sourceHbox.getChildren().remove(sourceLabel);
-                        hbox.getChildren().add(sourceLabel);
-                    } else {
-                        createErrorDialog();
-                    }
-                } else {
-                    ListCell listCell = (ListCell) event.getGestureSource();
-                    Project projectToAdd = (Project) listCell.getUserData();
-
-                    success = controller.addProjectToReader(readerToAdd, projectToAdd);
-                    if (success) {
-                        hbox.getChildren().add(new DragDropLabel(projectToAdd, controller));
-                    } else {
-                        createErrorDialog();
-                    }
-
-                }
-                event.setDropCompleted(success);
+        setOnDragDropped(event -> {
+            HBox hbox = (HBox) getContent();
+            if (hbox.getUserData() == null) {
                 event.consume();
+                return;
             }
+            boolean success;
 
+            Reader readerToAdd = (Reader) hbox.getUserData();
+
+            if (event.getTransferMode() == TransferMode.MOVE) {
+                Label sourceLabel = (Label) event.getGestureSource();
+                HBox sourceHbox = (HBox) sourceLabel.getParent();
+                Project projectToMove = (Project) sourceLabel.getUserData();
+                Reader readerToRemoveFrom = (Reader) (sourceHbox).getUserData();
+
+                success = controller.moveProject(readerToAdd, readerToRemoveFrom, projectToMove);
+                if (success) {
+                    sourceHbox.getChildren().remove(sourceLabel);
+                    hbox.getChildren().add(sourceLabel);
+                } else {
+                    createErrorDialog();
+                }
+            } else {
+                ListCell listCell = (ListCell) event.getGestureSource();
+                Project projectToAdd = (Project) listCell.getUserData();
+
+                success = controller.addProjectToReader(readerToAdd, projectToAdd);
+                if (success) {
+                    hbox.getChildren().add(new DragDropLabel(projectToAdd, controller));
+                } else {
+                    createErrorDialog();
+                }
+
+            }
+            event.setDropCompleted(success);
+            event.consume();
         });
     }
 

@@ -24,11 +24,9 @@ public class CapacityColumn extends TableColumn<TableObjectInterface, TableObjec
         setPrefWidth(50);
         setMaxWidth(60);
         
-        setCellValueFactory(new Callback<CellDataFeatures<TableObjectInterface, TableObjectInterface>, ObservableValue<TableObjectInterface>>() {
-          @Override public ObservableValue<TableObjectInterface> call(CellDataFeatures<TableObjectInterface, TableObjectInterface> features) {
+        setCellValueFactory(features -> {
               Reader reader = (Reader) features.getValue();
               return new ReadOnlyObjectWrapper(reader.getCapacity());
-          }
         });
         
     }

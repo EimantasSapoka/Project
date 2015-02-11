@@ -27,13 +27,14 @@ import model.Reader;
  * @author Eimantas
  */
 public class ListContextMenu extends ContextMenu {
+
     final private Reader reader;
     final private ControllerInterface controller;
     final private HBox hbox;
-    
-    public ListContextMenu(final Reader reader, final ControllerInterface controller, final Node container){
+
+    public ListContextMenu(final Reader reader, final ControllerInterface controller, final Node container) {
         super();
-        
+
         this.reader = reader;
         this.controller = controller;
         hbox = (HBox) container;
@@ -41,75 +42,70 @@ public class ListContextMenu extends ContextMenu {
 
     /**
      * inserts the "Remove..." Option into the context menu
+     *
      * @param controller1
-     * @param reader1 
+     * @param reader1
      */
     public void includeRemoveButton() {
         MenuItem remove = new MenuItem("Remove..");
-        remove.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                if (controller.getReaderList(reader).isEmpty()) {
-                    Alert alert = new Alert(Alert.AlertType.WARNING);
-                    alert.setContentText("Reader does not have any preferences");
-                    alert.showAndWait();
-                    return;
-                }
-                List<Project> choices = new ArrayList<Project>();
-                choices.addAll(controller.getReaderList(reader));
-                ChoiceDialog<Project> dialog = new ChoiceDialog<>(choices.get(0), choices);
-                dialog.setTitle("Choose a project to remove");
-                dialog.setContentText("Choose project (Times selected):");
-                Optional<Project> result = dialog.showAndWait();
-                if (result.isPresent()) {
-                    controller.removeProjectFromReader(reader, result.get());
-                    for (Node n : hbox.getChildren()) {
-                        if (n.getUserData().equals(result.get())) {
-                            hbox.getChildren().remove(n);
-                            break;
-                        }
+        remove.setOnAction(e -> {
+            if (controller.getReaderList(reader).isEmpty()) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setContentText("Reader does not have any preferences");
+                alert.showAndWait();
+                return;
+            }
+            List<Project> choices = new ArrayList<Project>();
+            choices.addAll(controller.getReaderList(reader));
+            ChoiceDialog<Project> dialog = new ChoiceDialog<>(choices.get(0), choices);
+            dialog.setTitle("Choose a project to remove");
+            dialog.setContentText("Choose project (Times selected):");
+            Optional<Project> result = dialog.showAndWait();
+            if (result.isPresent()) {
+                controller.removeProjectFromReader(reader, result.get());
+                for (Node n : hbox.getChildren()) {
+                    if (n.getUserData().equals(result.get())) {
+                        hbox.getChildren().remove(n);
+                        break;
                     }
-                    controller.refreshLowSelectedProjectList();
                 }
+                controller.refreshLowSelectedProjectList();
             }
         });
         getItems().add(remove);
     }
-    
+
     /**
      * inserts the "Add.." option into the contextMenu
      */
-    public void includeAddButton(){
+    public void includeAddButton() {
         MenuItem add = new MenuItem("Add..");
-        add.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                
-                if (reader.getCapacity() == 0) {
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setHeaderText("Cannot add preference!");
-                    alert.setContentText("Reader has capacity of zero!");
-                    alert.showAndWait();
-                    return;
-                }
+        add.setOnAction(e -> {
 
-                List<Project> choices = new ArrayList<Project>();
-                choices.addAll(controller.getProjects());
-                choices.removeAll(controller.getReaderList(reader));
-                choices.sort(null);
+            if (reader.getCapacity() == 0) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setHeaderText("Cannot add preference!");
+                alert.setContentText("Reader has capacity of zero!");
+                alert.showAndWait();
+                return;
+            }
 
-                ChoiceDialog<Project> dialog = new ChoiceDialog<>(choices.get(0), choices);
-                dialog.setTitle("Choose a project to add");
-                dialog.setContentText("Choose project (Times selected):");
+            List<Project> choices = new ArrayList<Project>();
+            choices.addAll(controller.getProjects());
+            choices.removeAll(controller.getReaderList(reader));
+            choices.sort(null);
 
-                Optional<Project> result = dialog.showAndWait();
-                if (result.isPresent()) {
-                    controller.addProjectToReader(reader, result.get());
-                    hbox.getChildren().add(new DragDropLabel(result.get(), controller));
-                }
+            ChoiceDialog<Project> dialog = new ChoiceDialog<>(choices.get(0), choices);
+            dialog.setTitle("Choose a project to add");
+            dialog.setContentText("Choose project (Times selected):");
+
+            Optional<Project> result = dialog.showAndWait();
+            if (result.isPresent()) {
+                controller.addProjectToReader(reader, result.get());
+                hbox.getChildren().add(new DragDropLabel(result.get(), controller));
             }
         });
         getItems().add(add);
     }
-    
+
 }

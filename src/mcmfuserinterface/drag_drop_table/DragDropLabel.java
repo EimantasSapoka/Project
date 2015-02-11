@@ -22,76 +22,61 @@ import model.Reader;
  * @author Eimantas
  */
 public class DragDropLabel extends DragLabel {
-    
+
     public DragDropLabel(final Project project, final ControllerInterface controller) {
         super(project, controller);
 
-        this.setOnDragOver(new EventHandler<DragEvent>() {
-            @Override
-            public void handle(DragEvent event) {
-                event.acceptTransferModes(TransferMode.ANY);
+        this.setOnDragOver(event -> {
+            event.acceptTransferModes(TransferMode.ANY);
+        });
+
+        this.setOnDragEntered(event -> {
+            if ((event.getGestureSource() != this)) {
+                setText("\t" + getText());
             }
         });
 
-        this.setOnDragEntered(new EventHandler<DragEvent>() {
-            @Override
-            public void handle(DragEvent event) {
-                if ((event.getGestureSource() != this)) {
-                    setText("\t" + getText());
-                }
-            }
+        this.setOnDragExited(event -> {
+            setText(getText().trim());
         });
 
-        this.setOnDragExited(new EventHandler<DragEvent>() {
-            @Override
-            public void handle(DragEvent event) {
-                setText(getText().trim());
-            }
-        });
-        
-        
-        this.setOnDragDropped(new EventHandler<DragEvent>() {
-            @Override
-            public void handle(DragEvent event) {
-                HBox hbox = (HBox) getParent();
-                Project projectToPlaceBefore = project;
-                Reader readerToAdd = (Reader) hbox.getUserData();
-                int indexToPlace;
+        this.setOnDragDropped(event -> {
+            HBox hbox = (HBox) getParent();
+            Project projectToPlaceBefore = project;
+            Reader readerToAdd = (Reader) hbox.getUserData();
+            int indexToPlace;
 
-                if (event.getTransferMode() == TransferMode.MOVE){
-                    Label sourceLabel = (Label) event.getGestureSource();
-                    HBox sourceHbox = (HBox) sourceLabel.getParent();
-                    Project projectToMove = (Project) sourceLabel.getUserData();
-                    Reader readerToRemoveFrom = (Reader) sourceHbox.getUserData();
+            if (event.getTransferMode() == TransferMode.MOVE) {
+                Label sourceLabel = (Label) event.getGestureSource();
+                HBox sourceHbox = (HBox) sourceLabel.getParent();
+                Project projectToMove = (Project) sourceLabel.getUserData();
+                Reader readerToRemoveFrom = (Reader) sourceHbox.getUserData();
 
-                    indexToPlace = controller.moveProject(readerToAdd, readerToRemoveFrom, projectToMove, projectToPlaceBefore);
-                    if (indexToPlace != -1) {
-                        sourceHbox.getChildren().remove(sourceLabel);
-                        hbox.getChildren().add(indexToPlace, sourceLabel);
-                    } else {
-                        createErrorDialog(projectToMove);
-                    }
+                indexToPlace = controller.moveProject(readerToAdd, readerToRemoveFrom, projectToMove, projectToPlaceBefore);
+                if (indexToPlace != -1) {
+                    sourceHbox.getChildren().remove(sourceLabel);
+                    hbox.getChildren().add(indexToPlace, sourceLabel);
                 } else {
-                    ListCell listCell = (ListCell) event.getGestureSource();
-                    Project projectToAdd = (Project) listCell.getUserData();
-                    
-                    indexToPlace = controller.addProjectToReader(readerToAdd, projectToAdd, projectToPlaceBefore);
-                    if (indexToPlace != -1) {
-                        hbox.getChildren().add(indexToPlace, new DragDropLabel(projectToAdd, controller));
-                    } else {
-                        createErrorDialog(projectToAdd);
-                    }
-                    
+                    createErrorDialog(projectToMove);
                 }
-                
-                event.setDropCompleted(indexToPlace != -1);
-                event.consume();
+            } else {
+                ListCell listCell = (ListCell) event.getGestureSource();
+                Project projectToAdd = (Project) listCell.getUserData();
+
+                indexToPlace = controller.addProjectToReader(readerToAdd, projectToAdd, projectToPlaceBefore);
+                if (indexToPlace != -1) {
+                    hbox.getChildren().add(indexToPlace, new DragDropLabel(projectToAdd, controller));
+                } else {
+                    createErrorDialog(projectToAdd);
+                }
+
             }
-           
+
+            event.setDropCompleted(indexToPlace != -1);
+            event.consume();
         });
     }
-    
-    
+
     protected void createErrorDialog(Project projectToAdd) {
         final Runnable runnable = (Runnable) Toolkit.getDefaultToolkit().getDesktopProperty("win.sound.exclamation");
         if (runnable != null) {
@@ -101,9 +86,9 @@ public class DragDropLabel extends DragLabel {
         alert.setTitle("Error");
         alert.setHeaderText("Cannot move");
         alert.setContentText("The reader already has this project!\nProject name: "
-                        + projectToAdd.getName() + ",  ID: " + projectToAdd.getId());
+                + projectToAdd.getName() + ",  ID: " + projectToAdd.getId());
         alert.setResizable(true);
         alert.showAndWait();
     }
-    
+
 }

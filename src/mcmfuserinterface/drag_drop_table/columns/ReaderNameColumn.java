@@ -24,11 +24,9 @@ public class ReaderNameColumn extends TableColumn<TableObjectInterface, TableObj
         setMinWidth(150);
         setMaxWidth(300);
         
-       setCellValueFactory(new Callback<CellDataFeatures<TableObjectInterface, TableObjectInterface>, ObservableValue<TableObjectInterface>>() {
-          @Override public ObservableValue<TableObjectInterface> call(CellDataFeatures<TableObjectInterface, TableObjectInterface> features) {
+       setCellValueFactory(features -> {
               Reader reader = (Reader) features.getValue();
               return new ReadOnlyObjectWrapper(reader.getName());
-          }
         });
     }
     
