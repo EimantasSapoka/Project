@@ -84,7 +84,7 @@ public class CorrectnessTest {
 				System.out.println("TEST " + i);
 			}
 			// create a new random reader graph
-			MCMFModel testGraph = new RandomReaderAllocationModel(i%40 + 10, 2, 7);
+			MCMFModel testGraph = new RandomReaderAllocationModel(i%40 + 10, (i%40+10)*4);
 			try {
                             testGraph.createGraph();
                         } catch(ReaderShortlistException ex){

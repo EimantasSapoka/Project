@@ -229,7 +229,8 @@ public class Graph {
 	}
 	
 	/**
-	 * adds a project to the graph
+	 * adds a project to the graph. adds its vertex and creates
+         * project -> sink edges.
 	 * @param project
 	 */
 	public void addProject(Project project){
@@ -237,6 +238,27 @@ public class Graph {
             Edge projectSinkEdge = new Edge(project.getVertex(), sink, PROJECT_READER_CAPACITY);
             addEdge(projectSinkEdge);
 	}
+        
+        /**
+         * adds a reader to the graph. adds its vertex and creates
+         * source -> reader and reader -> preference edges..
+         * @param reader 
+         */
+        public void addReader(Reader reader) {
+             addVertex(reader.getVertex());
+            
+            // if reader has any capacity, create an edge from source to the reader with the capacity
+            if (reader.getCapacity() > 0) {
+                createSourceReaderEdge(reader);
+            }
+
+            int preference = 1; // the initial preference weight
+            for (Project project : reader.getPreferences()) {
+                
+                createReaderProjectEdge(reader, project, preference);
+                preference++;
+            } 
+        }
 	
 	
 	/**
@@ -278,6 +300,8 @@ public class Graph {
         Edge sourceReaderEdge = new Edge(source,reader.getVertex(), reader.getCapacity());
 	addEdge(sourceReaderEdge);	
     }
+
+    
 
 
 }

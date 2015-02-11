@@ -3,32 +3,26 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mcmfuserinterface;
+package mcmfuserinterface.drag_drop_table;
 
-import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.Tooltip;
-import javafx.scene.input.DragEvent;
-import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.util.Callback;
+import mcmfuserinterface.ControllerInterface;
 import model.Project;
 import model.Reader;
-import org.controlsfx.glyphfont.FontAwesome;
-import org.controlsfx.glyphfont.GlyphFont;
-import org.controlsfx.glyphfont.GlyphFontRegistry;
 
 /**
  *
  * @author Eimantas
  */
 public class TableCellWithListFactory implements Callback<TableColumn<TableObjectInterface, TableObjectInterface>, TableCell<TableObjectInterface, TableObjectInterface>> {
-    private final Controller controller;
+    private final ControllerInterface controller;
     
-    public TableCellWithListFactory(Controller controller) {
+    public TableCellWithListFactory(ControllerInterface controller) {
         this.controller = controller;
         
     }
@@ -45,15 +39,16 @@ public class TableCellWithListFactory implements Callback<TableColumn<TableObjec
             }
 
             @Override
-            public void updateItem(final TableObjectInterface reader, boolean empty) {
-                if (!empty && reader != null) {
+            public void updateItem(final TableObjectInterface object, boolean empty) {
+                if (!empty && object != null) {
                     hbox.getChildren().clear();
-                    
-                    for (Project project : ((Reader) reader).getPreferences()) {
-                        Label label = new DragDropLabel(project, controller);
+                    Reader reader = (Reader) object;
+                    for (Project project : controller.getReaderList(reader)) {
+                        Label label = controller.createLabel(reader, project, controller);
                         hbox.getChildren().add(label);
                     }
-                    hbox.setUserData(reader);
+                    hbox.setUserData(object);
+                    scrollPane.setContextMenu(controller.createContextMenu((Reader)object,hbox));
                     this.setGraphic(scrollPane);
                 }
             }

@@ -1,13 +1,15 @@
 package model;
 
 import ford_fulkerson.graph.Vertex;
-import mcmfuserinterface.TableObjectInterface;
+import mcmfuserinterface.drag_drop_table.TableObjectInterface;
 
 public class Project implements Comparable<Project>, TableObjectInterface{
 	private final int id;			// project id
 	private final Vertex vertex;	// vertex associated with the project
 	private int timesSelected;		// number of times the project had been added to a pref list. 
 	private String name;
+        private Reader assigned;
+        
         
 	public Project (int id){
 		this.id = id;
@@ -19,6 +21,10 @@ public class Project implements Comparable<Project>, TableObjectInterface{
         public Project(String projectName, int id){
             this(id);
             this.name = projectName;
+        }
+        
+        public void assignToReader(Reader reader){
+            this.assigned = reader;
         }
 
 	public Vertex getVertex() {
@@ -61,6 +67,10 @@ public class Project implements Comparable<Project>, TableObjectInterface{
 
     public void resetVertex() {
         this.vertex.resetVertex();
+    }
+
+    public Reader getAssignedReader() {
+        return assigned;
     }
 }
 
