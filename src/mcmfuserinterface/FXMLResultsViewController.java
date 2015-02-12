@@ -235,6 +235,8 @@ public class FXMLResultsViewController extends ViewController{
                                                 setStyle("");
                                             }
                                         } 
+                                    } else {
+                                        setStyle("");
                                     }
                                 });
                             int cap = ((Reader) getUserData()).getCapacity();
@@ -248,6 +250,8 @@ public class FXMLResultsViewController extends ViewController{
                                     setStyle("");
                                 }
                             } 
+                        } else {
+                            setStyle("");
                         }
                     }
                 };

@@ -3,9 +3,8 @@ package ford_fulkerson;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
-
-import ford_fulkerson.graph.Graph;
+import java.util.ArrayList;
+import java.util.List;
 import model.MCMFModel;
 import model.Project;
 import model.Reader;
@@ -16,6 +15,54 @@ import model.Reader;
  *
  */
 public class TextScanner {
+    
+        public static void parse2(File textFile, MCMFModel model) throws Exception{
+            BufferedReader textReader = new BufferedReader(new FileReader(textFile));
+            String line = "";
+            int projectCount;
+            int readerCount;
+            
+            line = textReader.readLine();
+            try {
+                projectCount = Integer.parseInt(line.split(",")[0]);
+                readerCount = Integer.parseInt(line.split(",")[1]);
+            }catch( Exception ex){
+                throw new InvalidInputException("text file does not contain two integers with project count and reader count", ex);
+            }
+            
+            try {
+                for (int i = 0; i<projectCount; i++){
+                    line = textReader.readLine();
+                    String[] projectInfo = line.split(",");
+                    int projectID = Integer.parseInt(projectInfo[0].trim());
+                    String projectName = projectInfo[1].trim();
+                    int projectSupervisor = Integer.parseInt(projectInfo[2].trim());
+                }
+            } catch(Exception ex){
+                throw new InvalidInputException("project description line malformed! >" + line, ex);
+            }
+            
+            try{
+                for (int i = 0; i<readerCount; i++){
+                    line = textReader.readLine();
+                    String[] readerInfo = line.split(",");
+                    int readerID = Integer.parseInt(readerInfo[0]);
+                    String readerName = readerInfo[1];
+                    int readerCapacity = Integer.parseInt(readerInfo[2]);
+                    List<Integer> readerPreferences = new ArrayList<Integer>();
+                    if (readerInfo.length > 3){
+                        for (String pref : readerInfo[3].split(" ")){
+                            if (!pref.trim().isEmpty()){
+                                readerPreferences.add(Integer.parseInt(pref));
+                            }
+                        }
+                    }
+                }
+            } catch (Exception ex){
+                throw new InvalidInputException("reader description line malformed! >" + line, ex);
+            }
+            
+        }
 	
 
 	public static void parse(File textFile, MCMFModel model) throws Exception{

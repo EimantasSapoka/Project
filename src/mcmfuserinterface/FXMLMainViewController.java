@@ -241,11 +241,11 @@ public class FXMLMainViewController extends ViewController {
         projectCount.setPromptText("Number of projects");
         
         readerCount.setOnKeyTyped(event -> {
-                if (!event.getCharacter().matches("\\d")){
+                if (!event.getCharacter().matches("\\d") || readerCount.getText().length() > 2){
                     event.consume();
                 }});
         projectCount.setOnKeyTyped(event -> {
-                if (!event.getCharacter().matches("\\d")){
+                if (!event.getCharacter().matches("\\d") || projectCount.getText().length() > 2){
                     event.consume();
                 }});
        
@@ -334,6 +334,8 @@ public class FXMLMainViewController extends ViewController {
                                                 setStyle("");
                                             }
                                         } 
+                                    } else {
+                                        setStyle("");
                                     }
                                 });
                             int cap = reader.getCapacity();
@@ -346,6 +348,8 @@ public class FXMLMainViewController extends ViewController {
                             } else {
                                 setStyle("");
                             }
+                        } else {
+                            setStyle("");
                         }
                     }
                 };

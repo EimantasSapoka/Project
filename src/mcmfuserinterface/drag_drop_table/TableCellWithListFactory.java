@@ -50,6 +50,8 @@ public class TableCellWithListFactory implements Callback<TableColumn<TableObjec
                     hbox.setUserData(object);
                     scrollPane.setContextMenu(controller.createContextMenu((Reader)object,hbox));
                     this.setGraphic(scrollPane);
+                } else {
+                    this.setGraphic(null);
                 }
             }
         };

@@ -82,7 +82,7 @@ public class RandomReaderAllocationModel extends MCMFModel{
                 } else {
                     projectPreferenceList = unselectedProjects;
                 }
-		int readerCapacity = rand.nextInt((projectsLeft/readersLeft)*2);
+		int readerCapacity = rand.nextInt((projectsLeft/readersLeft)*2 +1);
 		
 		if (readerCapacity > projectsLeft){
 			readerCapacity = projectsLeft/2;

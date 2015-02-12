@@ -121,10 +121,11 @@ public abstract class ViewController implements Initializable, ControllerInterfa
             }
         }
         
-        refreshTable();
+       
         table.setItems(items);
         table.setFixedCellSize(40);
         setTableRowFactory();
+        refreshTable();
     }
     
     /**************************** ANCHOR PANE EVENTS ********************/

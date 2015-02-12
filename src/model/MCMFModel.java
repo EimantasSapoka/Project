@@ -321,10 +321,17 @@ public class MCMFModel {
             if (readerToAdd.getAssigned().size() == readerToAdd.getCapacity()) {
                 return false;
             }
-            return (readerToAdd.assignProject(projectToMove) && readerToRemoveFrom.removeAssignedProject(projectToMove));
-        } else {
-            return false;
-        }
+            if (readerToAdd.assignProject(projectToMove)){
+                if(readerToRemoveFrom.removeAssignedProject(projectToMove)){
+                    return true;
+                } else {
+                    readerToAdd.removeAssignedProject(projectToMove);
+                    return false;
+                }
+            } 
+         }
+        
+        return false;
     }
     
      public boolean addProjectToReaderPreferences(Reader reader, Project projectToAdd){

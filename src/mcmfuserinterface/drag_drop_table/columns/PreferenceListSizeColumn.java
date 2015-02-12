@@ -49,6 +49,8 @@ public class PreferenceListSizeColumn extends TableColumn<TableObjectInterface, 
                         if (arg0 != null){
                                 label.textProperty().bind(((Reader)arg0).getPreferenceStringProperty());
                                 setGraphic(label);
+                        } else {
+                            setGraphic(null);
                         }
                     }
                 };
