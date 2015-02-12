@@ -7,6 +7,7 @@ public class Project implements Comparable<Project>, TableObjectInterface{
 	private final int id;			// project id
 	private final Vertex vertex;	// vertex associated with the project
 	private int timesSelected;		// number of times the project had been added to a pref list. 
+        private int supervisorID;       // id of the supervisor.
 	private String name;
         private Reader assigned;
         
@@ -16,6 +17,7 @@ public class Project implements Comparable<Project>, TableObjectInterface{
 		this.vertex = new Vertex(id, this);
 		this.timesSelected = 0;
                 this.name = id+"";
+                this.supervisorID = -1;
 	}
         
         public Project(String projectName, int id){
@@ -23,8 +25,17 @@ public class Project implements Comparable<Project>, TableObjectInterface{
             this.name = projectName;
         }
         
+        public Project(String projectName, int id, int projectSupervisorID){
+            this(projectName, id);
+            this.supervisorID = projectSupervisorID;
+        }
+        
         public void assignToReader(Reader reader){
             this.assigned = reader;
+        }
+        
+        public int getSupervisorID(){
+            return this.supervisorID;
         }
 
 	public Vertex getVertex() {

@@ -94,7 +94,12 @@ public class ListContextMenu extends ContextMenu {
             choices.addAll(controller.getProjects());
             choices.removeAll(controller.getReaderList(reader));
             choices.sort(null);
-
+            if (choices.isEmpty()){
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setContentText("Reader has no projects he can get added");
+                alert.showAndWait();
+                return;
+            }
             ChoiceDialog<Project> dialog = new ChoiceDialog<>(choices.get(0), choices);
             dialog.setTitle("Choose a project to add");
             dialog.setContentText("Choose project (Times selected):");
@@ -103,6 +108,7 @@ public class ListContextMenu extends ContextMenu {
             if (result.isPresent()) {
                 controller.addProjectToReader(reader, result.get());
                 hbox.getChildren().add(new DragDropLabel(result.get(), controller));
+                controller.refreshLowSelectedProjectList();
             }
         });
         getItems().add(add);

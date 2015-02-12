@@ -40,7 +40,7 @@ public class TableCellWithListFactory implements Callback<TableColumn<TableObjec
 
             @Override
             public void updateItem(final TableObjectInterface object, boolean empty) {
-                if (!empty && object != null) {
+                if(!empty && object != null){
                     hbox.getChildren().clear();
                     Reader reader = (Reader) object;
                     for (Project project : controller.getReaderList(reader)) {
@@ -51,7 +51,7 @@ public class TableCellWithListFactory implements Callback<TableColumn<TableObjec
                     scrollPane.setContextMenu(controller.createContextMenu((Reader)object,hbox));
                     this.setGraphic(scrollPane);
                 } else {
-                    this.setGraphic(null);
+                    setGraphic(null);
                 }
             }
         };

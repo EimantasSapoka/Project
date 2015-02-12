@@ -23,12 +23,12 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import mcmfuserinterface.drag_drop_table.DragDropLabel;
 import mcmfuserinterface.drag_drop_table.DragLabel;
 import mcmfuserinterface.drag_drop_table.TableObjectInterface;
 import model.MCMFModel;
 import model.Project;
 import model.Reader;
+import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 /**
  *

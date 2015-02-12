@@ -286,25 +286,29 @@ public class FXMLResultsViewController extends ViewController{
                             setStyle("-fx-background-color: red;");
                             setTooltip(new Tooltip(item.getName()));
                             setText(item.getId()+"");
+                        } else {
+                            setText("");
+                            setVisible(false);
+                            setStyle("");
+                            setUserData(null);
+                            setGraphic(null);
                         }
                     }               
                 };
                 
-                listCell.setOnDragDetected(new EventHandler<MouseEvent>(){
+                listCell.setOnDragDetected(event -> {
+                    if (listCell.getUserData() == null){
+                        return;
+                    }
+                    Dragboard db = listCell.startDragAndDrop(TransferMode.COPY);
+                    ClipboardContent content = new ClipboardContent();
 
-                    @Override
-                    public void handle(MouseEvent event) {
-                        
-                        Dragboard db = listCell.startDragAndDrop(TransferMode.COPY);
-                        ClipboardContent content = new ClipboardContent();
-
-                        content.putString("test");
-                        db.setContent(content);
-                    }            
+                    content.putString("test");
+                    db.setContent(content);
                 });
-                return listCell;
-            });
-        
+            return listCell;
+        });
+
        unselectedList.setOnDragDone(event -> {
                refreshLowSelectedProjectList();
             });
@@ -364,7 +368,7 @@ public class FXMLResultsViewController extends ViewController{
         Reader assignedReader = project.getAssignedReader();
         PopLabel label;
         
-        if (reader.equals(assignedReader)) {
+        if (assignedReader != null && reader.equals(assignedReader)) {
             label = new DragLabel(project, controller);
             if (preferencesCheckBox.isSelected()){
                 label.setStyle("-fx-border-color: black;");
@@ -376,7 +380,7 @@ public class FXMLResultsViewController extends ViewController{
         label.setPopText("Name: " + project.getName()
                 + "\nID: " + project.getId()
                 + "\nTimes selected: " + project.getSelectedCount()
-                + "\nAssigned to: " + assignedReader.getName());
+                + "\nAssigned to: " + ((assignedReader == null)? "nobody":assignedReader.getName()));
 
         return label;
     }

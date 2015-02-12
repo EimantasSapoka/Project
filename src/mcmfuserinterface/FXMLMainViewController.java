@@ -408,12 +408,17 @@ public class FXMLMainViewController extends ViewController {
                             }
                             setTooltip(new Tooltip(item.getName()));
                             setText(item.getId() + "\t\t("+item.getSelectedCount()+")");
+                        }else {
+                            setUserData(null);
+                            setVisible(false);
                         }
                     }               
                 };
                 
                 listCell.setOnDragDetected(event ->{
-                        
+                        if (listCell.getUserData() == null){
+                            return;
+                        }
                         Dragboard db = listCell.startDragAndDrop(TransferMode.COPY);
                         ClipboardContent content = new ClipboardContent();
 

@@ -36,7 +36,7 @@ public class MCMFModel {
     }
 
     public void loadGraphFromFile(File file) throws Exception {
-        TextScanner.parse(file, this);
+        TextScanner.parseCommaSeparatedInput(file, this);
     }
 
     public Graph getGraph() {
@@ -189,7 +189,7 @@ public class MCMFModel {
            graph.addProject(project);
            
            if (project.getSelectedCount() == 0){
-               errors += ">PROJECT " + project.getName() + "("+project.getId()+") HAS NOT BEEN SELECTED BY ANYONE\n" ;
+               errors += ">PROJECT " + project.getName() + " ("+project.getId()+") HAS NOT BEEN SELECTED BY ANYONE\n" ;
            } 
         }
 
@@ -209,7 +209,7 @@ public class MCMFModel {
         }
         
         if (!errors.isEmpty()){
-            if (errors.isEmpty()){
+            if (warnings.isEmpty()){
                 throw new ReaderShortlistException(">>>> ERRORS:\n"+errors,true);
             } else {
                 throw new ReaderShortlistException(">>>> ERRORS:\n"+errors + "\n>>>> WARNINGS:\n"+warnings, true);
@@ -236,7 +236,6 @@ public class MCMFModel {
 
                 if (!preferences.contains(proj)) {
                     if (!r.getSupervisorProjects().contains(proj.getId())) {
-//                        System.out.println("Extended reader's " + r.getID() + " pref list with project " + proj.getId());
                         r.addPreference(proj);
                     }
                 }

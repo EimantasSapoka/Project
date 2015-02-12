@@ -31,8 +31,8 @@ public class Reader  implements TableObjectInterface{
                 this.assignedCountProperty = new SimpleStringProperty("0");
 	}
         
-        public Reader(String readerName, int id){
-            this(id,0);
+        public Reader(String readerName, int id, int capacity){
+            this(id,capacity);
             this.name = readerName;
         }
         
@@ -49,7 +49,6 @@ public class Reader  implements TableObjectInterface{
 	}
 	
 	public boolean addPreference(Project project){
-            
             if (this.capacity > 0 && !this.preferences.contains(project)){
 		project.select();
 		this.preferences.add(project);
