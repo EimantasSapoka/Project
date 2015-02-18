@@ -79,18 +79,20 @@ public abstract class ViewController implements Initializable, ControllerInterfa
      */
     @FXML
     protected void toggleShowZeroCapacityReaders() {
-        ObservableList<TableObjectInterface> items = FXCollections.observableArrayList();
-        if (zeroCapacityReaderCheckbox.isSelected()){
-            items.addAll(model.getReaders());
-        } else {
-            for (Reader r : model.getReaders()){
-                if (!(r.getCapacity() == 0)){
-                    items.add(r);
+        if (model != null){
+            ObservableList<TableObjectInterface> items = FXCollections.observableArrayList();
+            if (zeroCapacityReaderCheckbox.isSelected()){
+                items.addAll(model.getReaders());
+            } else {
+                for (Reader r : model.getReaders()){
+                    if (!(r.getCapacity() == 0)){
+                        items.add(r);
+                    }
                 }
             }
+            table.setItems(null);
+            table.setItems(items);
         }
-        table.setItems(null);
-        table.setItems(items);
     }
     
     

@@ -170,6 +170,7 @@ public class Reader  implements TableObjectInterface{
     
     public boolean removeAssignedProject(Project p){
         boolean success = this.assigned.remove(p);
+        p.assignToReader(null);
         this.assignedCountProperty.set(assigned.size()+"");
         return success;
     }

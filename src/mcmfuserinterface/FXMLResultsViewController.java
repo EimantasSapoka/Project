@@ -9,10 +9,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -22,6 +24,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
@@ -29,14 +32,18 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
@@ -52,6 +59,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import javafx.util.Pair;
 import mcmfuserinterface.drag_drop_table.DragLabel;
 import mcmfuserinterface.drag_drop_table.ListContextMenu;
 import mcmfuserinterface.drag_drop_table.PopLabel;
@@ -63,6 +71,7 @@ import mcmfuserinterface.drag_drop_table.columns.ReaderNameColumn;
 import model.MCMFModel;
 import model.Project;
 import model.Reader;
+import test.graph_creator.RandomReaderAllocationModel;
 
 /**
  *
@@ -98,7 +107,9 @@ public class FXMLResultsViewController extends ViewController{
     
     @FXML
     private void export(){
-         FileChooser fileChooser = new FileChooser();
+        String output = createOutput();
+        if (output != null){
+             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Save file");
             FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("text files", "*.txt");
             fileChooser.getExtensionFilters().add(extFilter);
@@ -106,13 +117,91 @@ public class FXMLResultsViewController extends ViewController{
             if (file != null) {
                 try {
                     PrintWriter writer = new PrintWriter(file, "UTF-8");
-                    writer.print(model.toString());
+                    writer.print(output);
                     writer.close();
                 } catch (IOException ex) {
                     Alert alert = new ExceptionDialog(ex);
                     alert.showAndWait();
                 }
             }
+        }
+        
+    }
+    
+    private String createOutput() {
+        Optional<List<String>> result =  createParameterDialogWindow();
+        if (result.isPresent() && result.get() != null){
+            List<String> parameters = result.get();
+            return createOutputText(parameters);
+        }
+        return null;
+    }
+
+    private String createOutputText(List<String> parameters) {
+        String resultString = "";
+        for (Reader reader : model.getReaders()){
+            if (parameters.contains("ids")){
+                resultString += reader.getID() + ", ";
+            }
+            if(parameters.contains("names")){
+                resultString += reader.getName() +", ";
+            }
+            if(parameters.contains("cap")){
+                resultString += reader.getAssigned().size()+"/"+reader.getCapacity()+", ";
+            }
+            if (parameters.contains("supervised")){
+                for (Integer project: reader.getSupervisorProjects()){
+                    resultString+= project + " ";
+                }
+                resultString += ", ";
+            }
+            for (Project project : reader.getAssigned()){
+                resultString += project.getId()+" ";
+            }
+            resultString+="\n";
+        }
+        return resultString;
+    }
+
+    private Optional<List<String>> createParameterDialogWindow() {
+        Dialog<List<String>> dialog = new Dialog<>();
+        dialog.setTitle("Choose export format");
+        dialog.setHeaderText("Select parameters ");
+        ButtonType exportButton = new ButtonType("Export", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(exportButton, ButtonType.CANCEL);
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+        CheckBox readerNames = new CheckBox("reader names");
+        CheckBox readerID = new CheckBox("reader IDs");
+        CheckBox readerSupervisedProjects = new CheckBox("reader supervised projects");
+        CheckBox capacityAssigned = new CheckBox("assigned/Capacity");
+        grid.add(readerNames, 1, 0);
+        grid.add(readerID, 1, 1);
+        grid.add(readerSupervisedProjects, 1, 2);
+        grid.add(capacityAssigned, 1, 3);
+        dialog.getDialogPane().setContent(grid);
+        dialog.setResultConverter(dialogButton -> {
+            if ( dialogButton == exportButton) {
+                List<String> parameters = new ArrayList<String>();
+                if (readerNames.isSelected()){
+                    parameters.add("names");
+                }
+                if (readerID.isSelected()){
+                    parameters.add("ids");
+                }
+                if(readerSupervisedProjects.isSelected()){
+                    parameters.add("supervised");
+                }
+                if(capacityAssigned.isSelected()){
+                    parameters.add("cap");
+                }
+                return parameters;
+            }
+            return null;
+        });
+        return dialog.showAndWait();
     }
     
     @FXML
@@ -311,7 +400,33 @@ public class FXMLResultsViewController extends ViewController{
 
        unselectedList.setOnDragDone(event -> {
                refreshLowSelectedProjectList();
+               if (preferencesCheckBox.isSelected()){
+                   refreshTable();
+               }
             });
+       unselectedList.setOnDragOver(event ->{
+           event.acceptTransferModes(TransferMode.MOVE);
+       });
+       unselectedList.setOnDragDropped(event -> {
+                if (event.getAcceptedTransferMode().equals(TransferMode.MOVE)){
+                    Label sourceLabel = (Label) event.getGestureSource();
+                    HBox sourceHbox = (HBox) sourceLabel.getParent();
+                    Project projectToMove = (Project) sourceLabel.getUserData();
+                    Reader readerToRemoveFrom = (Reader) (sourceHbox).getUserData();
+                    
+                    removeProjectFromReader(readerToRemoveFrom, projectToMove);
+                    if (!preferencesCheckBox.isSelected()){
+                        for (Node n : sourceHbox.getChildren()) {
+                            if (n.getUserData().equals(projectToMove)) {
+                                sourceHbox.getChildren().remove(n);
+                                break;
+                            }
+                        }
+                    } 
+                    dragLabel.setVisible(false);
+                    refreshLowSelectedProjectList();
+                }
+       });
     }
 
     @Override
