@@ -408,6 +408,7 @@ public class FXMLResultsViewController extends ViewController{
            event.acceptTransferModes(TransferMode.MOVE);
        });
        unselectedList.setOnDragDropped(event -> {
+           System.out.println("dropping");
                 if (event.getAcceptedTransferMode().equals(TransferMode.MOVE)){
                     Label sourceLabel = (Label) event.getGestureSource();
                     HBox sourceHbox = (HBox) sourceLabel.getParent();

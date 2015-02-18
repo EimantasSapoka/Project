@@ -95,6 +95,7 @@ public class FXMLMainViewController extends ViewController {
     
     @FXML
     private Button extendPrefListButton;
+    private Project highlightedProject;
     
     /******************    /
      METHODS
@@ -535,10 +536,22 @@ public class FXMLMainViewController extends ViewController {
     @Override
     public Label createLabel(Reader reader, Project project, ControllerInterface controller) {
         DragDropLabel label =  new DragDropLabel(project,controller);
+        
+        if (project.equals(highlightedProject)){
+            label.setStyle("-fx-border-color: black;");
+        } else {
+            label.setStyle("");
+        }
         label.setPopText("Name: " + project.getName() +
                          "\nID: " + project.getId() +
                          "\nTimes selected: " + project.getSelectedCount());
          
         return label;
     }
+
+    public void setHighlightedProject(Project project) {
+        System.out.println("setting highlight project");
+        this.highlightedProject = project;
+    }
+
 }

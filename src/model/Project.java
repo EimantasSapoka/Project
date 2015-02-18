@@ -65,6 +65,9 @@ public class Project implements Comparable<Project>, TableObjectInterface{
 	}
         
         public boolean equals(Project project){
+            if (project == null) {
+                return false;
+            }
             return this.id == project.getId() && this.vertex.equals(project.getVertex());
         }
 
