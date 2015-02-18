@@ -415,7 +415,10 @@ public class FXMLMainViewController extends ViewController {
                         }
                     }               
                 };
-                
+                listCell.setOnMouseClicked(event -> {
+                    this.setHighlightedProject((Project)((Node)event.getSource()).getUserData());
+                    this.refreshTable();
+                });
                 listCell.setOnDragDetected(event ->{
                         if (listCell.getUserData() == null){
                             return;
@@ -538,7 +541,7 @@ public class FXMLMainViewController extends ViewController {
         DragDropLabel label =  new DragDropLabel(project,controller);
         
         if (project.equals(highlightedProject)){
-            label.setStyle("-fx-border-color: black;");
+            label.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: red;");
         } else {
             label.setStyle("");
         }
@@ -550,7 +553,6 @@ public class FXMLMainViewController extends ViewController {
     }
 
     public void setHighlightedProject(Project project) {
-        System.out.println("setting highlight project");
         this.highlightedProject = project;
     }
 

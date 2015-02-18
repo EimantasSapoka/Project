@@ -23,7 +23,7 @@ public class PreferenceListSizeColumn extends TableColumn<TableObjectInterface, 
     
     public PreferenceListSizeColumn(String name){
         super(name);
-        setMinWidth(30);
+        setMinWidth(40);
         setPrefWidth(50);
         setMaxWidth(60);
         
