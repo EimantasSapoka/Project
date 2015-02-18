@@ -34,6 +34,7 @@ public class PopLabel extends Label {
                     popText.setPadding(new Insets(10, 10, 10, 10));
                     pop.setContentNode(popText);
                     pop.show((Node) event.getTarget(), event.getScreenX() + 10, event.getScreenY());
+                    event.consume();
                 }
         });
 

@@ -26,14 +26,13 @@ public class Reader  implements TableObjectInterface{
 		this.capacity = capacity;
 		this.supervisorProjects = new ArrayList<Integer>();
 		this.preferences = new ArrayList<Project>();
-                this.assigned = new ArrayList<Project>();
 		this.name = String.valueOf(id);
 		this.preferenceCountProperty = new SimpleStringProperty("0"); 
                 this.assignedCountProperty = new SimpleStringProperty("0");
 	}
         
-        public Reader(String readerName, int id){
-            this(id,0);
+        public Reader(String readerName, int id, int capacity){
+            this(id,capacity);
             this.name = readerName;
         }
         
@@ -50,7 +49,6 @@ public class Reader  implements TableObjectInterface{
 	}
 	
 	public boolean addPreference(Project project){
-            
             if (this.capacity > 0 && !this.preferences.contains(project)){
 		project.select();
 		this.preferences.add(project);
@@ -101,7 +99,7 @@ public class Reader  implements TableObjectInterface{
         *
         * @return
         */
-       protected ArrayList<Project> getAssignedProjectsFromGraph() {
+       public ArrayList<Project> getAssignedProjectsFromGraph() {
            ArrayList<Project> temp = new ArrayList<Project>();
            for (Edge edge : this.vertex.getOutEdges()) {
                 if (edge.getFlow() > 0) {
@@ -114,7 +112,7 @@ public class Reader  implements TableObjectInterface{
        }
        
        public ArrayList<Project> getAssigned(){
-           if (assigned.isEmpty()){
+           if (assigned == null){
                assigned = getAssignedProjectsFromGraph();
            }
            this.assignedCountProperty.set(assigned.size()+"");
@@ -172,16 +170,19 @@ public class Reader  implements TableObjectInterface{
     
     public boolean removeAssignedProject(Project p){
         boolean success = this.assigned.remove(p);
+        p.assignToReader(null);
         this.assignedCountProperty.set(assigned.size()+"");
         return success;
     }
     
     public void clearAssignedProjects(){
-        for (Project p: assigned){
-            p.assignToReader(null);
+        if (assigned != null){
+            for (Project p: assigned){
+                p.assignToReader(null);
+            }
+            this.assigned = null;
+            this.assignedCountProperty.set("0");
         }
-        this.assigned.clear();
-        this.assignedCountProperty.set("0");
     }   
     
 }

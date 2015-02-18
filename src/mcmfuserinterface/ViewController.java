@@ -23,12 +23,12 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import mcmfuserinterface.drag_drop_table.DragDropLabel;
 import mcmfuserinterface.drag_drop_table.DragLabel;
 import mcmfuserinterface.drag_drop_table.TableObjectInterface;
 import model.MCMFModel;
 import model.Project;
 import model.Reader;
+import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 /**
  *
@@ -79,18 +79,20 @@ public abstract class ViewController implements Initializable, ControllerInterfa
      */
     @FXML
     protected void toggleShowZeroCapacityReaders() {
-        ObservableList<TableObjectInterface> items = FXCollections.observableArrayList();
-        if (zeroCapacityReaderCheckbox.isSelected()){
-            items.addAll(model.getReaders());
-        } else {
-            for (Reader r : model.getReaders()){
-                if (!(r.getCapacity() == 0)){
-                    items.add(r);
+        if (model != null){
+            ObservableList<TableObjectInterface> items = FXCollections.observableArrayList();
+            if (zeroCapacityReaderCheckbox.isSelected()){
+                items.addAll(model.getReaders());
+            } else {
+                for (Reader r : model.getReaders()){
+                    if (!(r.getCapacity() == 0)){
+                        items.add(r);
+                    }
                 }
             }
+            table.setItems(null);
+            table.setItems(items);
         }
-        table.setItems(null);
-        table.setItems(items);
     }
     
     
@@ -121,10 +123,11 @@ public abstract class ViewController implements Initializable, ControllerInterfa
             }
         }
         
-        refreshTable();
+       
         table.setItems(items);
         table.setFixedCellSize(40);
         setTableRowFactory();
+        refreshTable();
     }
     
     /**************************** ANCHOR PANE EVENTS ********************/

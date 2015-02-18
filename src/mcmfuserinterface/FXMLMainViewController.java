@@ -95,6 +95,7 @@ public class FXMLMainViewController extends ViewController {
     
     @FXML
     private Button extendPrefListButton;
+    private Project highlightedProject;
     
     /******************    /
      METHODS
@@ -241,11 +242,11 @@ public class FXMLMainViewController extends ViewController {
         projectCount.setPromptText("Number of projects");
         
         readerCount.setOnKeyTyped(event -> {
-                if (!event.getCharacter().matches("\\d")){
+                if (!event.getCharacter().matches("\\d") || readerCount.getText().length() > 2){
                     event.consume();
                 }});
         projectCount.setOnKeyTyped(event -> {
-                if (!event.getCharacter().matches("\\d")){
+                if (!event.getCharacter().matches("\\d") || projectCount.getText().length() > 2){
                     event.consume();
                 }});
        
@@ -334,6 +335,8 @@ public class FXMLMainViewController extends ViewController {
                                                 setStyle("");
                                             }
                                         } 
+                                    } else {
+                                        setStyle("");
                                     }
                                 });
                             int cap = reader.getCapacity();
@@ -346,6 +349,8 @@ public class FXMLMainViewController extends ViewController {
                             } else {
                                 setStyle("");
                             }
+                        } else {
+                            setStyle("");
                         }
                     }
                 };
@@ -404,12 +409,17 @@ public class FXMLMainViewController extends ViewController {
                             }
                             setTooltip(new Tooltip(item.getName()));
                             setText(item.getId() + "\t\t("+item.getSelectedCount()+")");
+                        }else {
+                            setUserData(null);
+                            setVisible(false);
                         }
                     }               
                 };
                 
                 listCell.setOnDragDetected(event ->{
-                        
+                        if (listCell.getUserData() == null){
+                            return;
+                        }
                         Dragboard db = listCell.startDragAndDrop(TransferMode.COPY);
                         ClipboardContent content = new ClipboardContent();
 
@@ -526,10 +536,22 @@ public class FXMLMainViewController extends ViewController {
     @Override
     public Label createLabel(Reader reader, Project project, ControllerInterface controller) {
         DragDropLabel label =  new DragDropLabel(project,controller);
+        
+        if (project.equals(highlightedProject)){
+            label.setStyle("-fx-border-color: black;");
+        } else {
+            label.setStyle("");
+        }
         label.setPopText("Name: " + project.getName() +
                          "\nID: " + project.getId() +
                          "\nTimes selected: " + project.getSelectedCount());
          
         return label;
     }
+
+    public void setHighlightedProject(Project project) {
+        System.out.println("setting highlight project");
+        this.highlightedProject = project;
+    }
+
 }

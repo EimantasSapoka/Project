@@ -50,6 +50,8 @@ public class AssignedProjectsCountColumn extends TableColumn<TableObjectInterfac
                     if (arg0 != null) {
                         label.textProperty().bind(((Reader) arg0).getAssignedCountStringProperty());
                         setGraphic(label);
+                    } else {
+                        setGraphic(null);
                     }
                 }
             };

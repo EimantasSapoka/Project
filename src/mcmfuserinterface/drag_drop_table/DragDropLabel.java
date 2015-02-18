@@ -7,13 +7,20 @@ package mcmfuserinterface.drag_drop_table;
 
 import java.awt.Toolkit;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.input.DragEvent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 import mcmfuserinterface.ControllerInterface;
+import mcmfuserinterface.FXMLMainViewController;
+import mcmfuserinterface.FXMLResultsViewController;
 import model.Project;
 import model.Reader;
 
@@ -25,7 +32,22 @@ public class DragDropLabel extends DragLabel {
 
     public DragDropLabel(final Project project, final ControllerInterface controller) {
         super(project, controller);
-
+        
+        this.setOnMouseClicked(event -> {
+                if (event.getButton() == MouseButton.PRIMARY) {
+                    popText.setTextFill(Color.BLACK);
+                    popText.setPadding(new Insets(10, 10, 10, 10));
+                    pop.setContentNode(popText);
+                    pop.show((Node) event.getTarget(), event.getScreenX() + 10, event.getScreenY());
+                    event.consume();
+                } else if ( event.getButton() == MouseButton.SECONDARY){
+                    if (controller instanceof FXMLMainViewController){
+                        ((FXMLMainViewController) controller).setHighlightedProject((Project)this.getUserData());
+                        controller.refreshTable();
+                        event.consume();
+                    }
+                }
+        });
         this.setOnDragOver(event -> {
             event.acceptTransferModes(TransferMode.ANY);
         });

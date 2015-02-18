@@ -20,8 +20,8 @@ public class RandomReaderAllocationModel extends MCMFModel{
 	private final int READER_COUNT;
         private int projectsLeft;
         private int readersLeft;
-	private ArrayList<Integer> projectList;
-        private ArrayList<Integer> unselectedProjects;
+	private ArrayList<Project> projectList;
+        private ArrayList<Project> unselectedProjects;
 	Random rand;
 	
 	/**
@@ -41,11 +41,14 @@ public class RandomReaderAllocationModel extends MCMFModel{
                 projectsLeft = numberProjects;
                 readersLeft = readerCount;
 		
-		projectList = new ArrayList<Integer>(PROJECT_COUNT);
-                unselectedProjects = (ArrayList<Integer>) projectList.clone();
+		projectList = new ArrayList<Project>(PROJECT_COUNT);
+                unselectedProjects = new ArrayList<Project>(PROJECT_COUNT);
 		
 		for (int i=0; i<PROJECT_COUNT; i++){
-			projectList.add(i + READER_COUNT);
+                    Project project = new Project(i + READER_COUNT);
+                    projectList.add(project);
+                    unselectedProjects.add(project);
+                    this.addProject(project);
 		}
 		
 		for (int i=0; i<READER_COUNT; i++){
@@ -76,13 +79,13 @@ public class RandomReaderAllocationModel extends MCMFModel{
 	@SuppressWarnings("unchecked")
 	public final Reader generateReader(){
             
-		ArrayList<Integer> projectPreferenceList;
+		ArrayList<Project> projectPreferenceList;
                 if (unselectedProjects.isEmpty()){
-                    projectPreferenceList = (ArrayList<Integer>) projectList.clone();
+                    projectPreferenceList = (ArrayList<Project>) projectList.clone();
                 } else {
                     projectPreferenceList = unselectedProjects;
                 }
-		int readerCapacity = rand.nextInt((projectsLeft/readersLeft)*2);
+		int readerCapacity = rand.nextInt((projectsLeft/readersLeft)*2 +2);
 		
 		if (readerCapacity > projectsLeft){
 			readerCapacity = projectsLeft/2;
@@ -102,7 +105,7 @@ public class RandomReaderAllocationModel extends MCMFModel{
                             if (unselectedProjects.isEmpty()){
                                 break;
                             } else {
-                                projectPreferenceList = (ArrayList<Integer>) projects.clone();
+                                projectPreferenceList = (ArrayList<Project>) projects.clone();
                                 projectPreferenceList.removeAll(r.getPreferences());
                             }
                         }
@@ -110,13 +113,8 @@ public class RandomReaderAllocationModel extends MCMFModel{
 			int randomProjectIndex = rand.nextInt(projectPreferenceList.size()); 
 			
 			// creates a new project with the id from the list (and removes that id) and preference of loop index
-			int id = projectPreferenceList.remove(randomProjectIndex);
-			Project project;
-			if( (project = this.getProject(id)) == null){
-				project = new Project(id);
-			}
-			r.addPreference(project); 
-			
+			Project project = projectPreferenceList.remove(randomProjectIndex);
+			r.addPreference(project);
 		}
 		
 		return r;

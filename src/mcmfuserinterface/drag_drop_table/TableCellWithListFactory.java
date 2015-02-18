@@ -24,24 +24,23 @@ public class TableCellWithListFactory implements Callback<TableColumn<TableObjec
     
     public TableCellWithListFactory(ControllerInterface controller) {
         this.controller = controller;
-        
     }
 
     @Override
     public TableCell<TableObjectInterface, TableObjectInterface> call(TableColumn<TableObjectInterface, TableObjectInterface> btnCol) {
         return new TableCell<TableObjectInterface, TableObjectInterface>() {
-            ScrollPane scrollPane = new DroppableScrollPane(controller);
-            HBox hbox = new HBox();
-            
-            {
-                hbox.setSpacing(10);
-                scrollPane.setContent(hbox);
-            }
-
+            ScrollPane scrollPane;
+            HBox hbox;
+    
             @Override
             public void updateItem(final TableObjectInterface object, boolean empty) {
-                if (!empty && object != null) {
-                    hbox.getChildren().clear();
+                if(!empty && object != null){
+                    scrollPane = new DroppableScrollPane(controller);
+                    hbox = new HBox();
+                    
+                    hbox.setSpacing(10);
+                    scrollPane.setContent(hbox);
+                    
                     Reader reader = (Reader) object;
                     for (Project project : controller.getReaderList(reader)) {
                         Label label = controller.createLabel(reader, project, controller);
@@ -50,6 +49,8 @@ public class TableCellWithListFactory implements Callback<TableColumn<TableObjec
                     hbox.setUserData(object);
                     scrollPane.setContextMenu(controller.createContextMenu((Reader)object,hbox));
                     this.setGraphic(scrollPane);
+                } else {
+                    setGraphic(null);
                 }
             }
         };
