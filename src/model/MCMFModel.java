@@ -302,13 +302,9 @@ public class MCMFModel {
 
     public boolean movePreference(Reader readerToAdd, Reader readerToRemoveFrom, Project projectToMove) {
         if (!readerToAdd.getPreferences().contains(projectToMove)) {
-            if (readerToAdd.addPreference(projectToMove)){
-               
-                return true;
-            } else {
-                return false;
-            }
-            
+            readerToRemoveFrom.removePreference(projectToMove);
+        	readerToAdd.addPreference(projectToMove);
+        	return true;
         } else if (readerToAdd.equals(readerToRemoveFrom)){
              readerToRemoveFrom.removePreference(projectToMove);
              readerToAdd.addPreference(projectToMove);
@@ -324,14 +320,10 @@ public class MCMFModel {
             if (readerToAdd.getAssigned().size() == readerToAdd.getCapacity()) {
                 return false;
             }
-            if (readerToAdd.assignProject(projectToMove)){
-                if(readerToRemoveFrom.removeAssignedProject(projectToMove)){
-                    return true;
-                } else {
-                    readerToAdd.removeAssignedProject(projectToMove);
-                    return false;
-                }
-            } 
+            readerToRemoveFrom.removeAssignedProject(projectToMove);
+            readerToAdd.assignProject(projectToMove);
+            
+            return true;
          }
         
         return false;

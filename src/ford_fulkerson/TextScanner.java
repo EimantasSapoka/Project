@@ -60,9 +60,9 @@ public class TextScanner {
                 line = textReader.readLine();
                 
                 String[] readerInfo = line.split(",");
-                int readerID = Integer.parseInt(readerInfo[0]);
-                String readerName = readerInfo[1];
-                int readerCapacity = Integer.parseInt(readerInfo[2]);
+                int readerID = Integer.parseInt(readerInfo[0].trim());
+                String readerName = readerInfo[1].trim();
+                int readerCapacity = Integer.parseInt(readerInfo[2].trim());
                 
                 createReader(model, readerName, readerID, readerCapacity, readerInfo);
             }
