@@ -59,7 +59,7 @@ public class ListContextMenu extends ContextMenu {
             choices.addAll(controller.getReaderList(reader));
             ChoiceDialog<Project> dialog = new ChoiceDialog<>(choices.get(0), choices);
             dialog.setTitle("Choose a project to remove");
-            dialog.setContentText("Choose project (Times selected):");
+            dialog.setContentText("Choose project (ID):");
             Optional<Project> result = dialog.showAndWait();
             if (result.isPresent()) {
                 controller.removeProjectFromReader(reader, result.get());
@@ -102,7 +102,7 @@ public class ListContextMenu extends ContextMenu {
             }
             ChoiceDialog<Project> dialog = new ChoiceDialog<>(choices.get(0), choices);
             dialog.setTitle("Choose a project to add");
-            dialog.setContentText("Choose project (Times selected):");
+            dialog.setContentText("Choose project (ID):");
 
             Optional<Project> result = dialog.showAndWait();
             if (result.isPresent()) {

@@ -49,18 +49,11 @@ public class Reader  implements TableObjectInterface{
 	}
 	
 	public boolean addPreference(Project project){
-            if (this.capacity > 0 && !this.preferences.contains(project)){
-		project.select();
-		this.preferences.add(project);
-		this.preferenceCountProperty.set(preferences.size()+"");
-                return true;
-            } else {
-                return false;
-            }
+            return addPreference(preferences.size(), project);
 	}
         
         public boolean addPreference(int indexToPlace, Project project) {
-            if (this.capacity > 0){
+            if (this.capacity > 0 && !preferences.contains(project)){
 		project.select();
 		this.preferences.add(indexToPlace, project);
 		this.preferenceCountProperty.set(preferences.size()+"");
@@ -138,8 +131,7 @@ public class Reader  implements TableObjectInterface{
     public void removePreference(Project project) {
         project.unselect();
         this.preferences.remove(project);
-		this.preferenceCountProperty.set(preferences.size()+"");
-
+        this.preferenceCountProperty.set(preferences.size()+"");
     }
 
     
@@ -156,16 +148,18 @@ public class Reader  implements TableObjectInterface{
     }
     
     public boolean assignProject(Project p){
-        p.assignToReader(this);
-        this.assigned.add(p);
-        this.assignedCountProperty.set(assigned.size()+"");
-        return true;
+        return assignProject(assigned.size(), p);
     } 
     
-    public void assignProject(int indexToPlace, Project projectToMove) {
-        projectToMove.assignToReader(this);
-        this.assigned.add(indexToPlace, projectToMove);
-        this.assignedCountProperty.set(assigned.size()+"");
+    public boolean assignProject(int indexToPlace, Project projectToMove) {
+        if (this.capacity == assigned.size() || assigned.contains(projectToMove)){
+            return false;
+        } else {
+            projectToMove.assignToReader(this);
+            this.assigned.add(indexToPlace, projectToMove);
+            this.assignedCountProperty.set(assigned.size()+"");
+            return true;
+        }
     }
     
     public boolean removeAssignedProject(Project p){

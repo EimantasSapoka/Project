@@ -24,22 +24,25 @@ public class PopLabel extends Label {
 
     public PopLabel(String msg) {
         super(msg);
-
+        
+        this.getStyleClass().add("myLabel");
+        
         pop = new PopOver();
         popText = new Label();
 
-        this.setOnMouseClicked(event -> {
-                if (event.getButton() == MouseButton.PRIMARY) {
+        this.setOnContextMenuRequested(event -> {
                     popText.setTextFill(Color.BLACK);
                     popText.setPadding(new Insets(10, 10, 10, 10));
                     pop.setContentNode(popText);
                     pop.show((Node) event.getTarget(), event.getScreenX() + 10, event.getScreenY());
                     event.consume();
-                }
         });
+        
 
         this.setOnMouseExited(event -> {
-                pop.hide(Duration.seconds(1.5));
+            if (pop.isShowing()){
+                pop.hide();
+            }
         });
 
     }

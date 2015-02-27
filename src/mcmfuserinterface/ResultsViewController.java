@@ -16,14 +16,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.chart.BarChart;
@@ -35,31 +30,21 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-import javafx.util.Callback;
-import javafx.util.Pair;
 import mcmfuserinterface.drag_drop_table.DragLabel;
 import mcmfuserinterface.drag_drop_table.ListContextMenu;
 import mcmfuserinterface.drag_drop_table.PopLabel;
@@ -71,13 +56,12 @@ import mcmfuserinterface.drag_drop_table.columns.ReaderNameColumn;
 import model.MCMFModel;
 import model.Project;
 import model.Reader;
-import test.graph_creator.RandomReaderAllocationModel;
 
 /**
  *
  * @author Eimantas
  */
-public class FXMLResultsViewController extends ViewController{
+public class ResultsViewController extends ViewController{
     
     @FXML
     Button infoButton;
@@ -100,7 +84,7 @@ public class FXMLResultsViewController extends ViewController{
         createDragLabel();
         table.setOnDragDone(event -> {
                 if (preferencesCheckBox.isSelected()){
-                    refreshTable();
+                    refresh();
                 }
         });
     }
@@ -263,8 +247,11 @@ public class FXMLResultsViewController extends ViewController{
         CategoryAxis xAxis = new CategoryAxis();
         NumberAxis yAxis = new NumberAxis();
         barChart = new BarChart<String,Number>(xAxis,yAxis);
-        xAxis.setLabel("Preference");
-        yAxis.setLabel("Projects assigned");
+        barChart.setTitle("How many readers got which preference");
+        xAxis.setLabel("Reader preference");
+        yAxis.setLabel("How many readers got it");
+        yAxis.setTickUnit(1.0);
+        yAxis.setMinorTickVisible(false);
     }
 
     public GridPane createPreferenceAssignedStatisticsTable(Map<Integer, Integer> preferenceStatistics) {
@@ -348,7 +335,6 @@ public class FXMLResultsViewController extends ViewController{
             });
     }
     
-    @Override
     public void refreshLowSelectedProjectList(){
         ObservableList<Project> unselectedProjectList = FXCollections.observableArrayList();
         unselectedProjectList.addAll(model.getUnselectedProjects());
@@ -401,7 +387,7 @@ public class FXMLResultsViewController extends ViewController{
        unselectedList.setOnDragDone(event -> {
                refreshLowSelectedProjectList();
                if (preferencesCheckBox.isSelected()){
-                   refreshTable();
+                   refresh();
                }
             });
        unselectedList.setOnDragOver(event ->{
@@ -432,7 +418,7 @@ public class FXMLResultsViewController extends ViewController{
 
     @Override
     public int moveProject(Reader reader, Reader readerToRemoveFrom, Project projectToMove, Project projectToPlaceBefore) {
-        return model.moveAssignedProject(reader, readerToRemoveFrom, projectToMove, projectToPlaceBefore);
+        return -1; // method should not be used in the results table as reordering is not really necessary.
     }
 
     @Override
@@ -487,7 +473,7 @@ public class FXMLResultsViewController extends ViewController{
         if (assignedReader != null && reader.equals(assignedReader)) {
             label = new DragLabel(project, controller);
             if (preferencesCheckBox.isSelected()){
-                label.setStyle("-fx-border-color: black;");
+                label.getStyleClass().add("bordered");
             }
         } else {
             label = new PopLabel(project.getId() + "");

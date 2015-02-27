@@ -1,0 +1,18 @@
+.bordered {
+   -fx-border-color: black;
+}
+.myLabel{
+    -fx-font-size: 15px;
+    -fx-label-padding: 3;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.highlighted {
+    -fx-font-size: 20px;
+    -fx-text-fill: red;
+}
+
+.HBox {
+    -fx-halignment: center
+}

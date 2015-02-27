@@ -15,12 +15,14 @@ import javafx.stage.Stage;
  *
  * @author Eimantas
  */
-public class MCMFUserInterface extends Application {
+public class UserInterface extends Application {
     
     @Override
     public void start(Stage stage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("fxml/FXMLMainView.fxml"));
         Scene scene = new Scene(root);
+        String css = UserInterface.class.getResource("css/stylesheet.css").toExternalForm();
+        scene.getStylesheets().add(css);
         stage.setScene(scene);
         stage.show();
     }

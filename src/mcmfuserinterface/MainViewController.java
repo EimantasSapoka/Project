@@ -69,9 +69,9 @@ import test.graph_creator.RandomReaderAllocationModel;
  *
  * @author Eimantas
  */
-public class FXMLMainViewController extends ViewController {
+public class MainViewController extends ViewController {
     
-    private FXMLResultsViewController resultsController;
+    private ResultsViewController resultsController;
     
     private Stage resultsStage;
 
@@ -146,9 +146,11 @@ public class FXMLMainViewController extends ViewController {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("fxml/FXMLResultsView.fxml"));
                 myPane = (Parent) loader.load();
-                resultsController = (FXMLResultsViewController) loader.getController();
+                resultsController = (ResultsViewController) loader.getController();
                 resultsController.setModel(model);
                 Scene scene = new Scene(myPane);
+                String css = UserInterface.class.getResource("css/stylesheet.css").toExternalForm();
+                scene.getStylesheets().add(css);
                 resultsStage.setScene(scene);
                 
                 resultsStage.show();
@@ -158,7 +160,7 @@ public class FXMLMainViewController extends ViewController {
             }
         } else {
             resultsController.setModel(model);
-            resultsController.refreshTable();
+            resultsController.refresh();
         }
     }
 
@@ -358,7 +360,6 @@ public class FXMLMainViewController extends ViewController {
             });
     }
     
-    @Override
     public void refreshLowSelectedProjectList(){
         SortedList list = (SortedList) lowSelectedList.getItems();
         list.setComparator(new Comparator<Project>() {
@@ -417,7 +418,7 @@ public class FXMLMainViewController extends ViewController {
                 };
                 listCell.setOnMouseClicked(event -> {
                     this.setHighlightedProject((Project)((Node)event.getSource()).getUserData());
-                    this.refreshTable();
+                    refresh();
                 });
                 listCell.setOnDragDetected(event ->{
                         if (listCell.getUserData() == null){
@@ -455,7 +456,7 @@ public class FXMLMainViewController extends ViewController {
             Optional<ButtonType> result = confirmation.showAndWait();
             if (result.get() == ButtonType.OK){
                 model.extendPreferenceLists();
-                refreshTable();
+                refresh();
                 refreshLowSelectedProjectList();
             }
         }
@@ -489,10 +490,8 @@ public class FXMLMainViewController extends ViewController {
             Reader readerToRemoveFrom = (Reader) sourceHbox.getUserData();
 
             model.removeProjectFromReaderPreferences(readerToRemoveFrom, projectToRemove);
-            sourceHbox.getChildren().remove(sourceLabel);
 
-            event.setDropCompleted(true);
-            dragLabel.setVisible(false);
+            refresh();
             refreshLowSelectedProjectList();
         }
     }
@@ -541,9 +540,9 @@ public class FXMLMainViewController extends ViewController {
         DragDropLabel label =  new DragDropLabel(project,controller);
         
         if (project.equals(highlightedProject)){
-            label.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: red;");
+            label.getStyleClass().add("highlighted");
         } else {
-            label.setStyle("");
+            label.getStyleClass().remove("highlighted");
         }
         label.setPopText("Name: " + project.getName() +
                          "\nID: " + project.getId() +

@@ -45,14 +45,18 @@ public abstract class ViewController implements Initializable, ControllerInterfa
     @FXML
     protected CheckBox zeroCapacityReaderCheckbox;
     
-    
     @Override
-    public abstract void initialize(URL location, ResourceBundle resources);
-
+    public void refresh(){
+        refreshTable();
+        refreshLowSelectedProjectList();
+    }
+    
+   
     @Override
     public void refreshTable() {
         table.getColumns().get(0).setVisible(false);
         table.getColumns().get(0).setVisible(true);
+        this.dragLabel.setVisible(false);
     }
     
      protected void createDragLabel() {
@@ -125,7 +129,7 @@ public abstract class ViewController implements Initializable, ControllerInterfa
         
        
         table.setItems(items);
-        table.setFixedCellSize(40);
+        table.setFixedCellSize(50);
         setTableRowFactory();
         refreshTable();
     }
@@ -162,34 +166,8 @@ public abstract class ViewController implements Initializable, ControllerInterfa
         dragLabel.setVisible(false);
     }
     
+    
+    
     protected abstract void setTableRowFactory();
     protected abstract void createTableColumns();
-
-    @Override
-    public abstract void refreshLowSelectedProjectList();
-
-    @Override
-    public abstract int moveProject(Reader reader, Reader readerToRemoveFrom, Project projectToMove, Project projectToPlaceBefore);
-
-    @Override
-    public abstract boolean moveProject(Reader readerToAdd, Reader readerToRemoveFrom, Project projectToMove);
-
-    @Override
-    public abstract boolean addProjectToReader(Reader reader, Project projectToAdd);
-
-    @Override
-    public abstract int addProjectToReader(Reader reader, Project projectToAdd, Project projectToAddBefore);
-
-    @Override
-    public abstract ContextMenu createContextMenu(Reader reader, Node node);
-    
-    @Override
-    public abstract Collection<Project> getReaderList(Reader reader);
-
-    @Override
-    public abstract void removeProjectFromReader(Reader reader, Project project);
-
-    @Override
-    public abstract Label createLabel(Reader reader, Project project, ControllerInterface controller);
-    
 }

@@ -50,8 +50,7 @@ public class DroppableScrollPane extends ScrollPane {
 
                 success = controller.moveProject(readerToAdd, readerToRemoveFrom, projectToMove);
                 if (success) {
-                    sourceHbox.getChildren().remove(sourceLabel);
-                    hbox.getChildren().add(sourceLabel);
+                    controller.refresh();
                 } else {
                     createErrorDialog();
                 }
@@ -60,14 +59,13 @@ public class DroppableScrollPane extends ScrollPane {
                 Project projectToAdd = (Project) listCell.getUserData();
 
                 success = controller.addProjectToReader(readerToAdd, projectToAdd);
-                if (success) {
-                    hbox.getChildren().add(new DragDropLabel(projectToAdd, controller));
-                } else {
-                    createErrorDialog();
-                }
-
+                if (!success) {
+                   createErrorDialog();
+                } 
+                
+                controller.refresh();
             }
-            event.setDropCompleted(success);
+            event.setDropCompleted(true);
             event.consume();
         });
     }
@@ -80,7 +78,7 @@ public class DroppableScrollPane extends ScrollPane {
         Alert alert = new Alert(AlertType.ERROR);
         alert.setTitle("Error");
         alert.setHeaderText("Cannot move!");
-        alert.setContentText("Either the reader already has project or cannot take any projects!");
+        alert.setContentText("The reader cannot take this project!");
         alert.showAndWait();
     }
 }
