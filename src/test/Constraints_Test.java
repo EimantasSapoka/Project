@@ -23,7 +23,7 @@ import model.Reader;
 public class Constraints_Test {
 	
 	private static final int TEST_COUNT = 100;
-	MCMFModel arbitraryGraph,readerGraph;;
+	MCMFModel arbitraryGraph,readerGraph;
 	
 	/**
 	 * checks that the constraints hold after running the algorithm on the 
@@ -34,11 +34,11 @@ public class Constraints_Test {
 		for (int i=0; i<TEST_COUNT; i++){
 
 			readerGraph = new RandomReaderAllocationModel();
-                        try {
-                            readerGraph.createGraph();
-                        } catch (ReaderShortlistException ex) {
-                            System.out.println(ex.getMessage());
-                        }
+            try {
+                readerGraph.createGraph();
+            } catch (ReaderShortlistException ex) {
+                // we don't really care for any reader shortlists. So do nothing.
+            }
 			Algorithm.runLoadBalancedAlgorithm(readerGraph);
 			checkReaderConstraints(readerGraph);
 		}
@@ -83,15 +83,9 @@ public class Constraints_Test {
 	}
 		
 	@Test
-	public void testArbitraryGraph(){
+	public void testArbitraryGraph() throws ReaderShortlistException{
 		for (int i = 0; i< TEST_COUNT ; i++){
 			arbitraryGraph = new RandomArbitraryModel();
-                        MCMFModel model = new MCMFModel();
-                        try {
-                            arbitraryGraph.createGraph();
-                        } catch (ReaderShortlistException ex) {
-                            System.out.println(ex.getMessage());
-                        }
 			Algorithm.runLoadBalancedAlgorithm(arbitraryGraph);
 			graphConstraintsTests(arbitraryGraph.getGraph());
 		}

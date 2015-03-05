@@ -3,6 +3,7 @@ package test.graph_creator;
 import java.util.ArrayList;
 import java.util.Random;
 
+import ford_fulkerson.ReaderShortlistException;
 import ford_fulkerson.graph.Edge;
 import ford_fulkerson.graph.Graph;
 import ford_fulkerson.graph.Vertex;
@@ -19,8 +20,7 @@ public class RandomArbitraryModel extends MCMFModel {
 	private static final int EDGE_CAPACITY = 10;
 	private static final int EDGE_WEIGHT_MAX = 4;
 	Random rand;
-        
-        private Graph graph;
+    private Graph graph;
 	
 	private int pEdge;
 	private int numVertices;
@@ -28,11 +28,14 @@ public class RandomArbitraryModel extends MCMFModel {
 	/**
 	 * creates a random arbitrary graph with the default 
 	 * probability values
+	 * @throws ReaderShortlistException 
 	 */
-	public RandomArbitraryModel(){
+	public RandomArbitraryModel() throws ReaderShortlistException{
 		super();
 		rand = new Random();
+		createGraph();
 		graph = this.getGraph();
+		
 		
 		this.numVertices = rand.nextInt(8) + 25; 
 		this.pEdge = rand.nextInt(20)+1; // 1 <= n < 21
@@ -48,8 +51,9 @@ public class RandomArbitraryModel extends MCMFModel {
 	 * creates a random graph with the probability of the edge between any two 
 	 * vertices being probEdge 
 	 * @param probEdge (0<=pEdge<=100)
+	 * @throws ReaderShortlistException 
 	 */
-	public RandomArbitraryModel(int probEdge){
+	public RandomArbitraryModel(int probEdge) throws ReaderShortlistException{
 		this();
 
 		if (probEdge > 0 && probEdge < 100){
@@ -62,8 +66,9 @@ public class RandomArbitraryModel extends MCMFModel {
 	 * and the edge pobability between them provided
 	 * @param probEdge
 	 * @param numVertices
+	 * @throws ReaderShortlistException 
 	 */
-	public RandomArbitraryModel(int probEdge, int numVertices){
+	public RandomArbitraryModel(int probEdge, int numVertices) throws ReaderShortlistException{
 		this(probEdge);
 		this.numVertices = numVertices;
 	}

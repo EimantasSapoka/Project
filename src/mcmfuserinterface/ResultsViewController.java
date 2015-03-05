@@ -169,18 +169,20 @@ public class ResultsViewController extends ViewController{
         dialog.setResultConverter(dialogButton -> {
             if ( dialogButton == exportButton) {
                 List<String> parameters = new ArrayList<String>();
-                if (readerNames.isSelected()){
-                    parameters.add("names");
-                }
-                if (readerID.isSelected()){
+                 if (readerID.isSelected()){
                     parameters.add("ids");
                 }
+                 if (readerNames.isSelected()){
+                    parameters.add("names");
+                }
+                 if(capacityAssigned.isSelected()){
+                    parameters.add("cap");
+                }
+               
                 if(readerSupervisedProjects.isSelected()){
                     parameters.add("supervised");
                 }
-                if(capacityAssigned.isSelected()){
-                    parameters.add("cap");
-                }
+                
                 return parameters;
             }
             return null;
@@ -273,7 +275,8 @@ public class ResultsViewController extends ViewController{
         Map<Integer, Integer> preferenceToCount = new HashMap<Integer,Integer>();
         for (Reader reader: model.getReaders()){
             for (Project assigned : reader.getAssigned()){
-                int preference = reader.getPreferences().indexOf(assigned) + 1;
+                int preference = reader.getPreferences().indexOf(assigned);
+                preference += preference == -1? reader.getPreferences().size()+2:1;
                 if (preferenceToCount.containsKey(preference)){
                     preferenceToCount.replace(preference, preferenceToCount.get(preference) + 1);
                 } else {

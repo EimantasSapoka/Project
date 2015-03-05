@@ -24,6 +24,7 @@ public class UserInterface extends Application {
         String css = UserInterface.class.getResource("css/stylesheet.css").toExternalForm();
         scene.getStylesheets().add(css);
         stage.setScene(scene);
+        stage.setTitle("Reader Allocator 1.0");
         stage.show();
     }
 

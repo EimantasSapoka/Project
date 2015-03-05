@@ -131,6 +131,9 @@ public class TextScanner {
         if (!model.hasReader(readerID)) {
             reader = new Reader(readerName, readerID, readerCapacity);
             model.addReader(reader);
+            for (int id : retrieveSupervisedProjects(model, reader)){
+            	reader.addSupervisingProject(id);
+            }
             if (readerInfo.length == 4) {
                 parseProjectPreferences(readerInfo[3], reader, model);
             }
@@ -141,6 +144,23 @@ public class TextScanner {
     }
 
     /**
+     * given the reader and the model, retrieves all project ids which are 
+     * supervised by the reader. 
+     * @param model
+     * @param reader
+     * @return
+     */
+    private static List<Integer> retrieveSupervisedProjects(MCMFModel model, Reader reader) {
+    	List<Integer> list = new ArrayList<Integer>();
+		for (Project p : model.getProjects()){
+			if (p.getSupervisorID() == reader.getID()){
+				list.add(p.getId());
+			}
+		}
+		return list;
+	}
+
+	/**
      * method to parse the preferences specified by the reader
      *
      * @param barSplit
@@ -158,11 +178,15 @@ public class TextScanner {
                 if (project == null) {
                     throw new InvalidInputException("Project with id " + id + " is not in among the data input!");
                 }
+                if (reader.getSupervisorProjects().contains(project.getId())){
+                	throw new InvalidInputException("Project id " + id + " is supervised by reader " 
+                									+ reader.getName() + " and is in its preference list!");
+                }
                 reader.addPreference(project);
             }
         } catch (Exception ex){
             throw new InvalidInputException("Could not parse projects for reader " 
-                    + reader.getName() + "\n"+ex.getMessage(), ex);
+                    + reader.getName() + ", because -> "+ex.getMessage(), ex);
         }
     }
 

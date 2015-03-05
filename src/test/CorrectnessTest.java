@@ -65,8 +65,6 @@ public class CorrectnessTest {
 		network = alg.solve(network);
 		
 		assertTrue(model.isLoadBalanced() && !network.isLoadBalanced());
-		
-		network.networkDescription();
 	}
 	
 	
@@ -80,16 +78,16 @@ public class CorrectnessTest {
 	public void readerAllocationGraphTest() throws Exception{
 		System.out.println("STARTING READER GRAPH TESTS");
 		for (int i=0; i<TEST_COUNT; i++){
-			if (i%1000 == 0){
+			if (i%100 == 0){
 				System.out.println("TEST " + i);
 			}
 			// create a new random reader graph
 			MCMFModel testGraph = new RandomReaderAllocationModel(i%40 + 10, (i%40+10)*4);
 			try {
-                            testGraph.createGraph();
-                        } catch(ReaderShortlistException ex){
-                            System.out.println(ex.getMessage());
-                        }
+                testGraph.createGraph();
+            } catch(ReaderShortlistException ex){
+            	// nobody cares about shortlists in testing.
+            }
 			Network network = alg.createReaderNetworkFromModel(testGraph);
 			
 			runTests(testGraph, network);
@@ -108,15 +106,15 @@ public class CorrectnessTest {
 	@Test
 	public void arbitraryGraphTest() throws Exception{
 		for (int i = 0; i<TEST_COUNT; i++){
-			if (i%1000 == 0){
+			if (i%100 == 0){
 				System.out.println("TEST " + i);
 			}
 			MCMFModel testGraph = new RandomArbitraryModel();
-                        try {
-                            testGraph.createGraph();
-                        } catch(ReaderShortlistException ex){
-                            System.out.println(ex.getMessage());
-                        }
+            try {
+                testGraph.createGraph();
+            } catch(ReaderShortlistException ex){
+                // nobody cares about shortlists in testing.
+            }
 			Network network = alg.createNetworkFromGraph(testGraph.getGraph());
 			
 			runTests(testGraph, network);
