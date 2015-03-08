@@ -8,11 +8,13 @@ package mcmfuserinterface;
 import java.net.URL;
 import java.util.Collection;
 import java.util.ResourceBundle;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
@@ -22,12 +24,15 @@ import javafx.scene.control.TableView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import mcmfuserinterface.drag_drop_table.DragLabel;
 import mcmfuserinterface.drag_drop_table.TableObjectInterface;
 import model.MCMFModel;
 import model.Project;
 import model.Reader;
+
+import org.controlsfx.control.PopOver;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 /**
@@ -38,6 +43,7 @@ public abstract class ViewController implements Initializable, ControllerInterfa
 
     protected MCMFModel model;
     protected Label dragLabel;
+    protected PopOver errorPopOver;
     @FXML 
     protected AnchorPane anchorPane;
     @FXML
@@ -49,6 +55,8 @@ public abstract class ViewController implements Initializable, ControllerInterfa
     public void refresh(){
         refreshTable();
         refreshLowSelectedProjectList();
+        this.dragLabel.setVisible(false);
+        this.errorPopOver.hide();
     }
     
    
@@ -56,7 +64,6 @@ public abstract class ViewController implements Initializable, ControllerInterfa
     public void refreshTable() {
         table.getColumns().get(0).setVisible(false);
         table.getColumns().get(0).setVisible(true);
-        this.dragLabel.setVisible(false);
     }
     
      protected void createDragLabel() {
@@ -134,6 +141,16 @@ public abstract class ViewController implements Initializable, ControllerInterfa
         refreshTable();
     }
     
+    
+    public void showErrorPopOver(String errorMsg, Node parent){
+    	errorPopOver = new PopOver();
+		Label popText = new Label(errorMsg);
+		popText.setTextFill(Color.BLACK);
+        popText.setPadding(new Insets(10, 10, 10, 10));
+        errorPopOver.setContentNode(popText);
+        errorPopOver.show(parent);
+	}
+    
     /**************************** ANCHOR PANE EVENTS ********************/
     
     @FXML
@@ -148,12 +165,7 @@ public abstract class ViewController implements Initializable, ControllerInterfa
         if (!dragLabel.isVisible()) {
             dragLabel.setVisible(true);
             dragLabel.toFront();
-            Project project;
-            if (event.getGestureSource() instanceof DragLabel) {
-                project = (Project) ((Label) event.getGestureSource()).getUserData();
-            } else {
-                project = (Project) ((ListCell) event.getGestureSource()).getUserData();
-            }
+            Project project = (Project) ((Node) event.getGestureSource()).getUserData();
             dragLabel.setText(project.getId() + "");
         }
         dragLabel.relocate(
@@ -163,6 +175,7 @@ public abstract class ViewController implements Initializable, ControllerInterfa
 
     @FXML
     protected void anchorPaneDragDone(DragEvent event) {
+    	errorPopOver.hide();
         dragLabel.setVisible(false);
     }
     

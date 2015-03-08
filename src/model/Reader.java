@@ -52,16 +52,18 @@ public class Reader  implements TableObjectInterface{
             return addPreference(preferences.size(), project);
 	}
         
-        public boolean addPreference(int indexToPlace, Project project) {
-            if (this.capacity > 0 && !preferences.contains(project)){
-		project.select();
-		this.preferences.add(indexToPlace, project);
-		this.preferenceCountProperty.set(preferences.size()+"");
-                return true;
-            } else {
-                return false;
-            }
+    public boolean addPreference(int indexToPlace, Project project) {
+        if (	capacity == 0 || 
+        		preferences.contains(project) ||
+        		supervisorProjects.contains(project.getId()) ){
+        	return false;
+        } else {
+            project.select();
+			this.preferences.add(indexToPlace, project);
+			this.preferenceCountProperty.set(preferences.size()+"");
+            return true;
         }
+    }
 
 	public Vertex getVertex() {
 		return this.vertex;
@@ -88,11 +90,13 @@ public class Reader  implements TableObjectInterface{
 	}
 	
         /**
-        * returns all assigned projects
+        * returns all assigned projects. WARNING!!
+        * HAS A SIDE EFFECT OF OVERWRITING ASSIGNMENT DATA WITH 
+        * WHAT IS IN THE GRAPH.
         *
         * @return
         */
-       public ArrayList<Project> getAssignedProjectsFromGraph() {
+       private ArrayList<Project> getAssignedProjectsFromGraph() {
            ArrayList<Project> temp = new ArrayList<Project>();
            for (Edge edge : this.vertex.getOutEdges()) {
                 if (edge.getFlow() > 0) {
@@ -113,6 +117,9 @@ public class Reader  implements TableObjectInterface{
        }
 	
 	public boolean equals(Reader r){
+		if (r == null){
+			return false;
+		}
 		return this.id == r.getID() && this.vertex.equals(r.getVertex());
 	}
 	
@@ -152,7 +159,9 @@ public class Reader  implements TableObjectInterface{
     } 
     
     public boolean assignProject(int indexToPlace, Project projectToMove) {
-        if (this.capacity == assigned.size() || assigned.contains(projectToMove)){
+        if (	this.capacity == assigned.size() || 
+        		assigned.contains(projectToMove) || 
+        		supervisorProjects.contains(projectToMove.getId()) ){
             return false;
         } else {
             projectToMove.assignToReader(this);

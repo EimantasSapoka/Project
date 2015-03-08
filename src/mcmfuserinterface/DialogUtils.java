@@ -1,30 +1,41 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mcmfuserinterface;
 
+import java.awt.Toolkit;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+
+import model.Project;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 
-/**
- *
- * @author Eimantas
- */
-public class ExceptionDialog extends Alert {
-
-    public ExceptionDialog( Exception ex) {
-        super(AlertType.ERROR);
-
-        setTitle("Exception Dialog");
-        setHeaderText("Exception has been thrown!");
-        setContentText(ex.getMessage());
+public class DialogUtils {
+	
+	public static void createErrorDialog(String errorMsg) {
+        final Runnable runnable = (Runnable) Toolkit.getDefaultToolkit().getDesktopProperty("win.sound.exclamation");
+        if (runnable != null) {
+            runnable.run();
+        }
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("Cannot move!");
+        alert.setContentText(errorMsg);
+        alert.showAndWait();
+    }
+	
+	public static void createErrorDialog(Project project, String errorMsg) {
+        createErrorDialog(errorMsg + "\nProject name: "
+                + project.getName() + ",  ID: " + project.getId());
+    }
+	
+	public static void createExceptionDialog( Exception ex){
+		Alert alert = new Alert(AlertType.ERROR);
+		alert.setTitle("Exception Dialog");
+		alert.setHeaderText("Exception has been thrown!");
+		alert.setContentText(ex.getMessage());
 
         // Create expandable Exception.
         StringWriter sw = new StringWriter();
@@ -49,7 +60,8 @@ public class ExceptionDialog extends Alert {
         expContent.add(textArea, 0, 1);
 
         // Set expandable Exception into the dialog pane.
-        getDialogPane().setExpandableContent(expContent);
-    }
+        alert.getDialogPane().setExpandableContent(expContent);
+        alert.showAndWait();
+	}
 
 }

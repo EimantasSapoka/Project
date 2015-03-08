@@ -271,6 +271,7 @@ public class Graph {
 		for (Vertex v: vertices){
 			v.setDistanceFromSource(0);
 		}
+		
 	}
 	
 

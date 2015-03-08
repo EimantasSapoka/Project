@@ -49,16 +49,17 @@ public class Algorithm {
 	 */
 	
 	private static void loadBalance(MCMFModel model) {
-            Graph graph = model.getGraph();
+        Graph graph = model.getGraph();
 		while( !model.isLoadBalanced()){
 			graph.reset();
+			model.reset();
 			graph.decreaseCapacityOffset();
 			solveGraph(graph);
 		}
 
-		
 		while (graph.getLowerCapacityOffset() != 0){
 			graph.increaseCapacityOffset();
+			model.reset();
 			solveGraph(graph);
 		}
 	}

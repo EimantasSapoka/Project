@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
+
+import org.controlsfx.control.PopOver;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -82,6 +85,7 @@ public class ResultsViewController extends ViewController{
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         createDragLabel();
+        errorPopOver = new PopOver();
         table.setOnDragDone(event -> {
                 if (preferencesCheckBox.isSelected()){
                     refresh();
@@ -94,6 +98,10 @@ public class ResultsViewController extends ViewController{
         String output = createOutput();
         if (output != null){
              FileChooser fileChooser = new FileChooser();
+            File desktopFolder = new File(MainViewController.DESKTOP_DIRECTORY);
+            if (desktopFolder.exists()){
+            	fileChooser.setInitialDirectory(desktopFolder);
+            }
             fileChooser.setTitle("Save file");
             FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("text files", "*.txt");
             fileChooser.getExtensionFilters().add(extFilter);
@@ -104,8 +112,7 @@ public class ResultsViewController extends ViewController{
                     writer.print(output);
                     writer.close();
                 } catch (IOException ex) {
-                    Alert alert = new ExceptionDialog(ex);
-                    alert.showAndWait();
+                    DialogUtils.createExceptionDialog(ex);
                 }
             }
         }
@@ -397,45 +404,44 @@ public class ResultsViewController extends ViewController{
            event.acceptTransferModes(TransferMode.MOVE);
        });
        unselectedList.setOnDragDropped(event -> {
-           System.out.println("dropping");
-                if (event.getAcceptedTransferMode().equals(TransferMode.MOVE)){
-                    Label sourceLabel = (Label) event.getGestureSource();
-                    HBox sourceHbox = (HBox) sourceLabel.getParent();
-                    Project projectToMove = (Project) sourceLabel.getUserData();
-                    Reader readerToRemoveFrom = (Reader) (sourceHbox).getUserData();
-                    
-                    removeProjectFromReader(readerToRemoveFrom, projectToMove);
-                    if (!preferencesCheckBox.isSelected()){
-                        for (Node n : sourceHbox.getChildren()) {
-                            if (n.getUserData().equals(projectToMove)) {
-                                sourceHbox.getChildren().remove(n);
-                                break;
-                            }
+            if (event.getAcceptedTransferMode().equals(TransferMode.MOVE)){
+                Label sourceLabel = (Label) event.getGestureSource();
+                HBox sourceHbox = (HBox) sourceLabel.getParent();
+                Project projectToMove = (Project) sourceLabel.getUserData();
+                Reader readerToRemoveFrom = (Reader) (sourceHbox).getUserData();
+                
+                removeProjectFromReader(readerToRemoveFrom, projectToMove);
+                if (!preferencesCheckBox.isSelected()){
+                    for (Node n : sourceHbox.getChildren()) {
+                        if (n.getUserData().equals(projectToMove)) {
+                            sourceHbox.getChildren().remove(n);
+                            break;
                         }
-                    } 
-                    dragLabel.setVisible(false);
-                    refreshLowSelectedProjectList();
-                }
+                    }
+                } 
+                dragLabel.setVisible(false);
+                refreshLowSelectedProjectList();
+            }
        });
     }
 
     @Override
-    public int moveProject(Reader reader, Reader readerToRemoveFrom, Project projectToMove, Project projectToPlaceBefore) {
-        return -1; // method should not be used in the results table as reordering is not really necessary.
+    public String moveProject(Reader reader, Reader readerToRemoveFrom, Project projectToMove, Project projectToPlaceBefore) {
+        return null; // method should not be used in the results table as reordering is not really necessary.
     }
 
     @Override
-    public boolean moveProject(Reader readerToAdd, Reader readerToRemoveFrom, Project projectToMove) {
+    public String moveProject(Reader readerToAdd, Reader readerToRemoveFrom, Project projectToMove) {
         return model.moveAssignedProject(readerToAdd, readerToRemoveFrom, projectToMove);    
     }
 
     @Override
-    public boolean addProjectToReader(Reader reader, Project projectToAdd) {
+    public String addProjectToReader(Reader reader, Project projectToAdd) {
         return model.assignProjectToReader(reader, projectToAdd);
     }
 
     @Override
-    public int addProjectToReader(Reader reader, Project projectToAdd, Project projectToAddBefore) {
+    public String addProjectToReader(Reader reader, Project projectToAdd, Project projectToAddBefore) {
         return model.assignProjectToReader(reader, projectToAdd, projectToAddBefore);
     }
 
@@ -489,4 +495,15 @@ public class ResultsViewController extends ViewController{
 
         return label;
     }
+
+	@Override
+	public String canMoveProject(Reader readerToAdd, Project projectToAdd) {
+		return canMoveProject(readerToAdd, null, projectToAdd);
+	}
+
+	@Override
+	public String canMoveProject(Reader readerToAdd, Reader readerToRemoveFrom,Project projectToAdd) {
+		errorPopOver.hide();
+		return model.canAddAssignment(readerToAdd, readerToRemoveFrom, projectToAdd);
+	}
 }

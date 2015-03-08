@@ -93,6 +93,11 @@ public class ListContextMenu extends ContextMenu {
             List<Project> choices = new ArrayList<Project>();
             choices.addAll(controller.getProjects());
             choices.removeAll(controller.getReaderList(reader));
+            for (int i = 0; i< choices.size(); i++){
+            	if(reader.getSupervisorProjects().contains(choices.get(i).getId())){
+            		choices.remove(i--);
+            	}
+            }
             choices.sort(null);
             if (choices.isEmpty()){
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);

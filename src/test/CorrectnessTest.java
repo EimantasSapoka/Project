@@ -56,7 +56,7 @@ public class CorrectnessTest {
                 try {
                     model.createGraph();
                 } catch(ReaderShortlistException ex){
-                    System.out.println(ex.getMessage());
+                    // no need for warnings in tests
                 }
 		
 		Network network = alg.createReaderNetworkFromModel(model);

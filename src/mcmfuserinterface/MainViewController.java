@@ -5,18 +5,10 @@
  */
 package mcmfuserinterface;
 
-import mcmfuserinterface.drag_drop_table.TableObjectInterface;
-import ford_fulkerson.Algorithm;
-import ford_fulkerson.ReaderShortlistException;
-import model.MCMFModel;
-import model.Reader;
-
 import java.io.File;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -25,7 +17,9 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -50,26 +44,38 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import javafx.util.Pair;
 import mcmfuserinterface.drag_drop_table.DragDropLabel;
 import mcmfuserinterface.drag_drop_table.ListContextMenu;
+import mcmfuserinterface.drag_drop_table.TableObjectInterface;
 import mcmfuserinterface.drag_drop_table.columns.CapacityColumn;
-import mcmfuserinterface.drag_drop_table.columns.PreferenceListSizeColumn;
 import mcmfuserinterface.drag_drop_table.columns.ListColumn;
+import mcmfuserinterface.drag_drop_table.columns.PreferenceListSizeColumn;
 import mcmfuserinterface.drag_drop_table.columns.ReaderNameColumn;
+import model.MCMFModel;
 import model.Project;
+import model.Reader;
+
+import org.controlsfx.control.PopOver;
 import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.GlyphFont;
 import org.controlsfx.glyphfont.GlyphFontRegistry;
+
 import test.graph_creator.RandomReaderAllocationModel;
+import ford_fulkerson.Algorithm;
+import ford_fulkerson.ReaderShortlistException;
 
 /**
  *
  * @author Eimantas
  */
 public class MainViewController extends ViewController {
+	
+	public static final String DESKTOP_DIRECTORY = System.getProperty("user.home") + File.separator + "Desktop" + File.separator;
     
     private ResultsViewController resultsController;
     
@@ -97,6 +103,7 @@ public class MainViewController extends ViewController {
     private Button extendPrefListButton;
     private Project highlightedProject;
     
+    
     /******************    /
      METHODS
     /*********************/
@@ -105,6 +112,7 @@ public class MainViewController extends ViewController {
     public void initialize(URL url, ResourceBundle rb) {
         resultsStage = new Stage();
         resultsStage.setTitle("Assignments");
+        errorPopOver = new PopOver();
         
         createDragLabel();
         
@@ -155,8 +163,7 @@ public class MainViewController extends ViewController {
                 
                 resultsStage.show();
             } catch (Exception ex) {
-                Alert alert = new ExceptionDialog(ex);
-                alert.showAndWait();
+               DialogUtils.createExceptionDialog(ex);
             }
         } else {
             resultsController.setModel(model);
@@ -288,6 +295,10 @@ public class MainViewController extends ViewController {
     private void openFileButtonAction() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Input File");
+        File desktopDir = new File(DESKTOP_DIRECTORY);
+        if (desktopDir.exists()){
+        	fileChooser.setInitialDirectory(desktopDir);
+        }
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text files", "*.txt"));
         File file = fileChooser.showOpenDialog(menuBar.getScene().getWindow());
         if (file != null) {
@@ -296,8 +307,7 @@ public class MainViewController extends ViewController {
                 createTableFromModel();
                 createLowSelectedProjectsList();
             } catch (Exception ex){
-                Alert alert = new ExceptionDialog(ex);
-                alert.showAndWait();
+                DialogUtils.createExceptionDialog(ex);
             }
         }
     }
@@ -498,22 +508,22 @@ public class MainViewController extends ViewController {
     
 
     @Override
-    public int moveProject(Reader reader, Reader readerToRemoveFrom, Project projectToMove, Project projectToPlaceBefore) {
+    public String moveProject(Reader reader, Reader readerToRemoveFrom, Project projectToMove, Project projectToPlaceBefore) {
         return model.movePreference(reader, readerToRemoveFrom, projectToMove, projectToPlaceBefore);
     }
 
     @Override
-    public boolean moveProject(Reader readerToAdd, Reader readerToRemoveFrom, Project projectToMove) {
+    public String moveProject(Reader readerToAdd, Reader readerToRemoveFrom, Project projectToMove) {
         return model.movePreference(readerToAdd, readerToRemoveFrom, projectToMove);
     }
 
     @Override
-    public boolean addProjectToReader(Reader reader, Project projectToAdd) {
+    public String addProjectToReader(Reader reader, Project projectToAdd) {
        return model.addProjectToReaderPreferences(reader, projectToAdd);
     }
 
     @Override
-    public int addProjectToReader(Reader reader, Project projectToAdd, Project projectToAddBefore) {
+    public String addProjectToReader(Reader reader, Project projectToAdd, Project projectToAddBefore) {
         return model.addProjectToReaderPreferences(reader, projectToAdd, projectToAddBefore);
     }
 
@@ -551,8 +561,28 @@ public class MainViewController extends ViewController {
         return label;
     }
 
+    /**
+     * highlights all occurrences of the project. 
+     * if the project is already highlighted, it is unhighlighted - 
+     * method works as a toggle if the same object is passed. 
+     * @param project
+     */
     public void setHighlightedProject(Project project) {
-        this.highlightedProject = project;
+    	if (project != null && project.equals(this.highlightedProject)){
+    		this.highlightedProject = null;
+    	} else {
+    		this.highlightedProject = project;
+    	}
     }
 
+	public String canMoveProject(Reader readerToAdd, Project projectToAdd) {
+		return canMoveProject(readerToAdd, null, projectToAdd);
+	}
+	
+	public String canMoveProject(Reader readerToAdd, Reader readerToRemoveFrom, Project projectToAdd){
+		errorPopOver.hide();
+		return model.canAddPreference(readerToAdd, readerToRemoveFrom, projectToAdd);
+	}
+
+	
 }

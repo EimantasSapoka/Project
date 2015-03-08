@@ -6,6 +6,7 @@
 package mcmfuserinterface.drag_drop_table;
 
 import java.awt.Toolkit;
+
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -41,14 +42,12 @@ public class DragDropLabel extends DragLabel {
                     }
                 }
         });
-        this.setOnDragOver(event -> {
-            event.acceptTransferModes(TransferMode.ANY);
-        });
+       
 
         this.setOnDragEntered(event -> {
-            if ((event.getGestureSource() != this)) {
-                setText("\t" + getText());
-            }
+       		 if ( event.getGestureSource() != this ) {
+       			 setText("\t" + getText());
+       		 }
         });
 
         this.setOnDragExited(event -> {
@@ -58,35 +57,31 @@ public class DragDropLabel extends DragLabel {
         this.setOnDragDropped(event -> {
             HBox hbox = (HBox) getParent();
             Project projectToPlaceBefore = project;
-            Reader readerToAdd = (Reader) hbox.getUserData();
-            int indexToPlace;
-
+            Reader readerToAdd = (Reader) hbox.getUserData();            
+            Node sourceNode = (Node) event.getGestureSource();
+            Project projectToAdd = (Project) sourceNode.getUserData();
+            
+            String errorMsg;
+            
             if (event.getTransferMode() == TransferMode.MOVE) {
-                Label sourceLabel = (Label) event.getGestureSource();
-                HBox sourceHbox = (HBox) sourceLabel.getParent();
-                Project projectToMove = (Project) sourceLabel.getUserData();
+                HBox sourceHbox = (HBox) sourceNode.getParent();
                 Reader readerToRemoveFrom = (Reader) sourceHbox.getUserData();
 
-                indexToPlace = controller.moveProject(readerToAdd, readerToRemoveFrom, projectToMove, projectToPlaceBefore);
-                if (indexToPlace == -1) {
-                    createErrorDialog(projectToMove);
-                } 
+                errorMsg = controller.moveProject(readerToAdd, readerToRemoveFrom, projectToAdd, projectToPlaceBefore);
             } else {
-                ListCell listCell = (ListCell) event.getGestureSource();
-                Project projectToAdd = (Project) listCell.getUserData();
-
-                indexToPlace = controller.addProjectToReader(readerToAdd, projectToAdd, projectToPlaceBefore);
-                if (indexToPlace == -1) {
-                   createErrorDialog(projectToAdd);
-                } 
+                errorMsg = controller.addProjectToReader(readerToAdd, projectToAdd, projectToPlaceBefore);
             }
+            
+            if (errorMsg != null) {
+                createErrorDialog(projectToAdd, errorMsg);
+            } 
             
             controller.refresh();
             event.consume();
         });
     }
 
-    protected void createErrorDialog(Project projectToAdd) {
+    protected void createErrorDialog(Project project, String errorMsg) {
         final Runnable runnable = (Runnable) Toolkit.getDefaultToolkit().getDesktopProperty("win.sound.exclamation");
         if (runnable != null) {
             runnable.run();
@@ -94,8 +89,8 @@ public class DragDropLabel extends DragLabel {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
         alert.setHeaderText("Cannot move");
-        alert.setContentText("The reader already has this project!\nProject name: "
-                + projectToAdd.getName() + ",  ID: " + projectToAdd.getId());
+        alert.setContentText(errorMsg + "\nProject name: "
+                + project.getName() + ",  ID: " + project.getId());
         alert.setResizable(true);
         alert.showAndWait();
     }

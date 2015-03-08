@@ -64,12 +64,7 @@ public class Project implements Comparable<Project>, TableObjectInterface{
 		return this.timesSelected - project.getSelectedCount();
 	}
         
-        public boolean equals(Project project){
-            if (project == null) {
-                return false;
-            }
-            return this.id == project.getId() && this.vertex.equals(project.getVertex());
-        }
+   
 
     void unselect() {
         this.timesSelected--;
@@ -85,6 +80,17 @@ public class Project implements Comparable<Project>, TableObjectInterface{
 
     public Reader getAssignedReader() {
         return assigned;
+    }
+    
+    public boolean equals(int id){
+    	return this.id == id;
+    } 
+    
+    public boolean equals(Project project){
+        if (project == null) {
+            return false;
+        }
+        return this.id == project.getId() && this.vertex.equals(project.getVertex());
     }
 }
 

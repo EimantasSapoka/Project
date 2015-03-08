@@ -53,7 +53,6 @@ public class UserInterface extends Application {
         		return false;
         	} else if (javaVersion == 1.8){
         		Double buildVersion = Double.parseDouble(version.substring(version.indexOf('_')+1));
-        		System.out.println(buildVersion);
         		if (buildVersion < 20){
         			return false; // has to be java 1.8 build higher than 20
         		} else {

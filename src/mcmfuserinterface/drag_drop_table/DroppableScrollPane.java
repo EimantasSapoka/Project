@@ -6,7 +6,9 @@
 package mcmfuserinterface.drag_drop_table;
 
 import java.awt.Toolkit;
+
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
@@ -16,6 +18,8 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import mcmfuserinterface.ControllerInterface;
+import mcmfuserinterface.DialogUtils;
+import mcmfuserinterface.MainViewController;
 import model.Project;
 import model.Reader;
 
@@ -24,61 +28,83 @@ import model.Reader;
  * @author Eimantas
  */
 public class DroppableScrollPane extends ScrollPane {
+	
+	private boolean dropAccepted;
 
     public DroppableScrollPane(final ControllerInterface controller) {
         super();
 
         setOnDragOver(event -> {
-            event.acceptTransferModes(TransferMode.ANY);
+        	if (dropAccepted){
+        		event.acceptTransferModes(TransferMode.ANY);
+        	}
         });
+        
+
+        setOnDragEntered(event -> {
+        	if (event.isAccepted()){
+        		return;
+        	}
+            Reader readerToAdd = (Reader) getContent().getUserData();            
+            Node sourceNode = (Node) event.getGestureSource();
+            Project projectToAdd = (Project) sourceNode.getUserData();
+            String errorMsg;
+            
+            if (event.getTransferMode() == TransferMode.MOVE) {
+                Node sourceHbox = (Node) sourceNode.getParent();
+                Reader readerToRemoveFrom = (Reader) (sourceHbox).getUserData();
+                
+                errorMsg = controller.canMoveProject(readerToAdd, readerToRemoveFrom, projectToAdd);
+            } else {
+                errorMsg = controller.canMoveProject(readerToAdd, projectToAdd);
+            }
+            
+	       	if ( errorMsg == null){
+	       		event.acceptTransferModes(TransferMode.ANY);
+	       		dropAccepted = true;
+	       	} else {
+	       		dropAccepted = false;
+	       		controller.showErrorPopOver(errorMsg, this);
+	       		event.acceptTransferModes(TransferMode.NONE);
+	       	}
+        });
+        
 
         setOnDragDropped(event -> {
-            HBox hbox = (HBox) getContent();
+        	Node hbox = getContent();
             if (hbox.getUserData() == null) {
                 event.consume();
                 return;
             }
-            boolean success;
 
             Reader readerToAdd = (Reader) hbox.getUserData();
-
+            Node sourceNode = (Node) event.getGestureSource();
+            Project projectToAdd = (Project) sourceNode.getUserData();
+            
+            String errorMsg;
+            
             if (event.getTransferMode() == TransferMode.MOVE) {
-                Label sourceLabel = (Label) event.getGestureSource();
-                HBox sourceHbox = (HBox) sourceLabel.getParent();
-                Project projectToMove = (Project) sourceLabel.getUserData();
+                HBox sourceHbox = (HBox) sourceNode.getParent();
                 Reader readerToRemoveFrom = (Reader) (sourceHbox).getUserData();
 
-                success = controller.moveProject(readerToAdd, readerToRemoveFrom, projectToMove);
-                if (success) {
-                    controller.refresh();
-                } else {
-                    createErrorDialog();
-                }
+                errorMsg = controller.moveProject(readerToAdd, readerToRemoveFrom, projectToAdd);
             } else {
-                ListCell listCell = (ListCell) event.getGestureSource();
-                Project projectToAdd = (Project) listCell.getUserData();
-
-                success = controller.addProjectToReader(readerToAdd, projectToAdd);
-                if (!success) {
-                   createErrorDialog();
-                } 
-                
-                controller.refresh();
+                errorMsg = controller.addProjectToReader(readerToAdd, projectToAdd);
             }
+            
+            if (errorMsg != null) {
+                DialogUtils.createErrorDialog(errorMsg);
+            }
+            
+            controller.refresh();
             event.setDropCompleted(true);
             event.consume();
         });
     }
-
-    protected void createErrorDialog() {
-        final Runnable runnable = (Runnable) Toolkit.getDefaultToolkit().getDesktopProperty("win.sound.exclamation");
-        if (runnable != null) {
-            runnable.run();
-        }
-        Alert alert = new Alert(AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText("Cannot move!");
-        alert.setContentText("The reader cannot take this project!");
-        alert.showAndWait();
+    
+    protected boolean isDropAccepted(){
+    	return dropAccepted;
     }
+    
+
 }

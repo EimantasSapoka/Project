@@ -9,6 +9,7 @@ import ford_fulkerson.ReaderShortlistException;
 import ford_fulkerson.TextScanner;
 import ford_fulkerson.graph.Edge;
 import ford_fulkerson.graph.Graph;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,7 +21,12 @@ import java.util.List;
  */
 public class MCMFModel {
 
-    public ArrayList<Reader> readers;		// readers list
+    private static final String READER_AT_MARKING_TARGET_ERR_MSG = "Reader is at his marking target";
+	private static final String READER_ALREADY_ASSIGNED_PROJECT_ERR_MSG = "Reader is already assigned this project";
+	private static final String READER_CAPACITY_ZERO_ERR_MSG = "Reader has reader target of zero";
+	private static final String PROJECT_ALREADY_PREFERENCE_ERROR_MSG = "Project already in preference list";
+	private static final String PROJECT_SUPERVISED_ERROR_MSG = "Project is already supervised by this reader";
+	public ArrayList<Reader> readers;		// readers list
     public ArrayList<Project> projects;		// projects list
 
     private Graph graph;
@@ -131,19 +137,12 @@ public class MCMFModel {
      * @return
      */
     public boolean isLoadBalanced() {
-        int capacityFlowGap = 0;
-        boolean capacitySet = false;
-
         for (Reader reader : this.readers) {
-            if (!capacitySet) {
-                capacityFlowGap = reader.getCapacity() + graph.getLowerCapacityOffset() - reader.getAssignedProjectsFromGraph().size();
-                if (capacityFlowGap >= 0) {
-                    capacitySet = true;
-                }
-            } else {
-                if (reader.getCapacity() + graph.getLowerCapacityOffset() - reader.getAssignedProjectsFromGraph().size() > capacityFlowGap + 1) {
-                    return false;
-                }
+        	int readerCapacityGap = reader.getCapacity() + graph.getLowerCapacityOffset() - reader.getAssigned().size();
+            for (Reader otherReader : readers){
+            	if (Math.abs(otherReader.getCapacity() + graph.getLowerCapacityOffset() - otherReader.getAssigned().size() - readerCapacityGap) > 1){
+            		return false; 
+            	}
             }
         }
         return true;
@@ -271,73 +270,106 @@ public class MCMFModel {
         return null;
     }
 
-    public int movePreference(Reader reader, Reader readerToRemoveFrom, Project projectToMove, Project projectToPlaceBefore) {
-        if (!projectToMove.equals(projectToPlaceBefore) &&
-                (!reader.getPreferences().contains(projectToMove) || reader.equals(readerToRemoveFrom)) ) {
-          
-            readerToRemoveFrom.removePreference(projectToMove);
-            int indexToPlace = reader.getPreferences().indexOf(projectToPlaceBefore);
-            reader.addPreference(indexToPlace, projectToMove);
-            return indexToPlace;
-        } else {
-            return -1;
+    
+    public String movePreference(Reader readerToAdd, Reader readerToRemoveFrom, Project projectToMove, Project projectToPlaceBefore) {
+        
+    	if (readerToAdd.getPreferences().contains(projectToMove) && !readerToAdd.equals(readerToRemoveFrom)) {
+    		return PROJECT_ALREADY_PREFERENCE_ERROR_MSG;
+    	}
+    	
+    	if (readerToAdd.getSupervisorProjects().contains(projectToMove.getId())){
+    		return PROJECT_SUPERVISED_ERROR_MSG;
+    	}
+    	if (projectToMove.equals(projectToPlaceBefore) ){
+        	return null; // do not take action, as no change needed, but do not report an error
         }
+    		
+        readerToRemoveFrom.removePreference(projectToMove);
+        int indexToPlace = readerToAdd.getPreferences().indexOf(projectToPlaceBefore);
+        if (indexToPlace == -1){
+        	readerToAdd.addPreference(projectToMove);
+        } else {
+        	readerToAdd.addPreference(indexToPlace, projectToMove);
+        }
+        return null; 
     }
 
-    public boolean movePreference(Reader readerToAdd, Reader readerToRemoveFrom, Project projectToMove) {
-        if (!readerToAdd.getPreferences().contains(projectToMove) && readerToAdd.getCapacity() > 0) {
-            readerToRemoveFrom.removePreference(projectToMove);
-            readerToAdd.addPreference(projectToMove);
-            return true;
-        } else if (readerToAdd.equals(readerToRemoveFrom)){
-             readerToRemoveFrom.removePreference(projectToMove);
-             readerToAdd.addPreference(projectToMove);
-             return true;
-        } else {
-            return false;
+    public String movePreference(Reader readerToAdd, Reader readerToRemoveFrom, Project projectToMove) {
+    	return movePreference(readerToAdd, readerToRemoveFrom, projectToMove, null);
+    }
+    
+    public String moveAssignedProject(Reader readerToAdd, Reader readerToRemoveFrom, Project projectToMove){
+    	if (readerToAdd.equals(readerToRemoveFrom)){
+            return null; // just so it wouldn't throw an error window
         }
+        if (readerToAdd.getAssigned().contains(projectToMove)){
+        	return READER_ALREADY_ASSIGNED_PROJECT_ERR_MSG;
+        }
+        if (readerToAdd.getAssigned().size() == readerToAdd.getCapacity()) {
+            return READER_AT_MARKING_TARGET_ERR_MSG;
+        }
+        if (readerToAdd.getSupervisorProjects().contains(projectToMove.getId())){
+    		return PROJECT_SUPERVISED_ERROR_MSG;
+    	}
+        
+        readerToRemoveFrom.removeAssignedProject(projectToMove);
+        readerToAdd.assignProject(projectToMove);
+        return null;
     }
     
-    public boolean moveAssignedProject(Reader readerToAdd, Reader readerToRemoveFrom, Project projectToMove){
-        if (!readerToAdd.getAssigned().contains(projectToMove)){
-            if (readerToAdd.getAssigned().size() == readerToAdd.getCapacity()) {
-                return false;
-            }
-            readerToRemoveFrom.removeAssignedProject(projectToMove);
-            return readerToAdd.assignProject(projectToMove);
-         } else if (readerToAdd.equals(readerToRemoveFrom)){
-             return true; // just so it wouldn't throw an error window
+    public String addProjectToReaderPreferences(Reader readerToAdd, Project projectToAdd){
+    	 if (readerToAdd.getPreferences().contains(projectToAdd)){
+             return PROJECT_ALREADY_PREFERENCE_ERROR_MSG;
+         } 
+    	 if (readerToAdd.getSupervisorProjects().contains(projectToAdd.getId())){
+         	return PROJECT_SUPERVISED_ERROR_MSG;
          }
-        return false;
-    }
-    
-     public boolean addProjectToReaderPreferences(Reader reader, Project projectToAdd){
-         return reader.addPreference(projectToAdd);
+ 
+         readerToAdd.addPreference(projectToAdd);
+         return null;
     }
      
-     public boolean assignProjectToReader(Reader reader, Project projectToAdd) {
-         return reader.assignProject(projectToAdd);
+     public String assignProjectToReader(Reader readerToAdd, Project projectToAdd) {
+    	 if (readerToAdd.getPreferences().contains(projectToAdd)){
+             return READER_ALREADY_ASSIGNED_PROJECT_ERR_MSG;
+         } 
+         
+    	 if (readerToAdd.getSupervisorProjects().contains(projectToAdd.getId())){
+         	return PROJECT_SUPERVISED_ERROR_MSG;
+         }
+         readerToAdd.assignProject(projectToAdd);
+         return null;
      }
     
     
-    public int addProjectToReaderPreferences(Reader reader, Project projectToAdd, Project projectToAddBefore){
-        if (reader.getPreferences().contains(projectToAdd)){
-            return -1;
-        } else {
-            int indexToPlace = reader.getPreferences().indexOf(projectToAddBefore);
-            reader.addPreference(indexToPlace, projectToAdd);
-            return indexToPlace;
+    public String addProjectToReaderPreferences(Reader readerToAdd, Project projectToAdd, Project projectToAddBefore){
+    	if (readerToAdd.getPreferences().contains(projectToAdd)){
+            return PROJECT_ALREADY_PREFERENCE_ERROR_MSG;
+        } 
+        if (readerToAdd.getSupervisorProjects().contains(projectToAdd.getId())){
+        	return PROJECT_SUPERVISED_ERROR_MSG;
         }
+        
+        int indexToPlace = readerToAdd.getPreferences().indexOf(projectToAddBefore);
+        readerToAdd.addPreference(indexToPlace, projectToAdd);
+        return null;
+        
     }
 
-    public int assignProjectToReader(Reader reader, Project projectToAdd, Project projectToAddBefore){
-        if (reader.getAssigned().contains(projectToAdd) || reader.getAssigned().size() == reader.getCapacity()){
-            return -1;
-        } else {
-            int indexToPlace = reader.getAssigned().indexOf(projectToAddBefore);
-            reader.assignProject(indexToPlace, projectToAdd);
-            return indexToPlace;
+    public String assignProjectToReader(Reader reader, Project projectToAdd, Project projectToAddBefore){
+        if (reader.getAssigned().contains(projectToAdd)){
+            return READER_ALREADY_ASSIGNED_PROJECT_ERR_MSG;
+        } 
+        if ( reader.getAssigned().size() == reader.getCapacity()){
+        	return READER_AT_MARKING_TARGET_ERR_MSG;
         }
+        if (reader.getSupervisorProjects().contains(projectToAdd.getId())){
+        	return PROJECT_SUPERVISED_ERROR_MSG;
+        }
+        
+        int indexToPlace = reader.getAssigned().indexOf(projectToAddBefore);
+        reader.assignProject(indexToPlace, projectToAdd);
+        return null;
     }
     
     public void removeProjectFromReaderPreferences(Reader readerToRemoveFrom, Project projectToRemove) {
@@ -372,5 +404,45 @@ public class MCMFModel {
         Double avg = new Double(totalCap);
         return avg/readers.size();
     }
+
+	public void reset() {
+		for (Reader r: readers){
+			r.clearAssignedProjects();
+		}
+	}
+
+	public String canAddPreference(Reader readerToAdd, Reader readerToRemoveFrom, Project projectToAdd) {
+		if (readerToAdd.getPreferences().contains(projectToAdd) && !readerToAdd.equals(readerToRemoveFrom)) {
+    		return PROJECT_ALREADY_PREFERENCE_ERROR_MSG;
+    	}
+		
+		if (readerToAdd.getCapacity() == 0){
+			return READER_CAPACITY_ZERO_ERR_MSG;
+		}
+    	
+    	if (readerToAdd.getSupervisorProjects().contains(projectToAdd.getId())){
+    		return PROJECT_SUPERVISED_ERROR_MSG;
+    	}
+    	return null;
+	}
+
+	public String canAddAssignment(Reader readerToAdd,Reader readerToRemoveFrom, Project projectToAdd) {
+		if (readerToAdd.getCapacity() == 0){
+			return READER_CAPACITY_ZERO_ERR_MSG;
+		}
+		
+		if (readerToAdd.getCapacity() == readerToAdd.getAssigned().size()){
+			return READER_AT_MARKING_TARGET_ERR_MSG;
+		}
+		
+		if (readerToAdd.getAssigned().contains(projectToAdd) && !readerToAdd.equals(readerToRemoveFrom)) {
+    		return READER_ALREADY_ASSIGNED_PROJECT_ERR_MSG;
+    	}
+		
+    	if (readerToAdd.getSupervisorProjects().contains(projectToAdd.getId())){
+    		return PROJECT_SUPERVISED_ERROR_MSG;
+    	}
+		return null;
+	}
 
 }
