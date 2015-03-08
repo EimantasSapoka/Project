@@ -109,12 +109,9 @@ public class MainViewController extends ViewController {
     /*********************/
 
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
+    public void initialize() {
         resultsStage = new Stage();
         resultsStage.setTitle("Assignments");
-        errorPopOver = new PopOver();
-        
-        createDragLabel();
         
         GlyphFont fontAwesome = GlyphFontRegistry.font("FontAwesome");
         trashBin.setGraphic(fontAwesome.create(FontAwesome.Glyph.TRASH_ALT));
@@ -584,5 +581,9 @@ public class MainViewController extends ViewController {
 		return model.canAddPreference(readerToAdd, readerToRemoveFrom, projectToAdd);
 	}
 
-	
+	@Override
+	protected boolean isReaderListComplete(Reader reader) {
+		return reader.getPreferences().size() >= reader.getCapacity()*2;
+	}
+
 }

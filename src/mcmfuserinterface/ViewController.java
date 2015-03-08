@@ -50,6 +50,16 @@ public abstract class ViewController implements Initializable, ControllerInterfa
     protected TableView<TableObjectInterface> table;
     @FXML
     protected CheckBox zeroCapacityReaderCheckbox;
+    @FXML
+    protected CheckBox completeListReaderCheckBox;
+    
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+    	errorPopOver = new PopOver();
+        createDragLabel();
+        initialize();
+        
+    }
     
     @Override
     public void refresh(){
@@ -90,20 +100,55 @@ public abstract class ViewController implements Initializable, ControllerInterfa
      */
     @FXML
     protected void toggleShowZeroCapacityReaders() {
-        if (model != null){
+        if (model != null && completeListReaderCheckBox.isSelected()){
             ObservableList<TableObjectInterface> items = FXCollections.observableArrayList();
             if (zeroCapacityReaderCheckbox.isSelected()){
                 items.addAll(model.getReaders());
             } else {
-                for (Reader r : model.getReaders()){
-                    if (!(r.getCapacity() == 0)){
-                        items.add(r);
-                    }
-                }
+                addNonZeroCapacityReaders(items);
             }
             table.setItems(null);
             table.setItems(items);
         }
+    }
+
+	private void addNonZeroCapacityReaders(ObservableList<TableObjectInterface> items) {
+		for (Reader r : model.getReaders()){
+		    if (!(r.getCapacity() == 0)){
+		        items.add(r);
+		    }
+		}
+	}
+    
+    
+    /**
+     * changes between showing and hiding readers with complete lists
+     * - that is sufficiently good lists.
+     */
+    @FXML
+    protected void toggleShowReadersWithCompleteLists(){
+    	if (model != null ){
+    		 ObservableList<TableObjectInterface> items = FXCollections.observableArrayList();
+             if (completeListReaderCheckBox.isSelected()){
+            	 if (zeroCapacityReaderCheckbox.isSelected()){
+	                 items.addAll(model.getReaders());
+	             } else {
+	                 addNonZeroCapacityReaders(items);
+	             }
+             } else {
+            	 addIncompleteReaders(items);
+             }
+             table.setItems(null);
+             table.setItems(items);
+    	}
+    }
+    
+    protected void addIncompleteReaders(ObservableList<TableObjectInterface> items){
+    	for (Reader r : model.getReaders()){
+		    if (!isReaderListComplete(r)){
+		        items.add(r);
+		    }
+		}
     }
     
     
@@ -127,11 +172,7 @@ public abstract class ViewController implements Initializable, ControllerInterfa
         if (this.zeroCapacityReaderCheckbox.isSelected()){
             items.addAll(model.getReaders());
         } else {
-            for (Reader r : model.getReaders()){
-                if (!(r.getCapacity() == 0)){
-                    items.add(r);
-                }
-            }
+            addNonZeroCapacityReaders(items);
         }
         
        
@@ -179,8 +220,8 @@ public abstract class ViewController implements Initializable, ControllerInterfa
         dragLabel.setVisible(false);
     }
     
-    
-    
+    protected abstract boolean isReaderListComplete(Reader reader);
+    protected abstract void initialize();
     protected abstract void setTableRowFactory();
     protected abstract void createTableColumns();
 }

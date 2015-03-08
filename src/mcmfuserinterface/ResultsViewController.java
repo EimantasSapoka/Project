@@ -83,14 +83,7 @@ public class ResultsViewController extends ViewController{
     
     
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        createDragLabel();
-        errorPopOver = new PopOver();
-        table.setOnDragDone(event -> {
-                if (preferencesCheckBox.isSelected()){
-                    refresh();
-                }
-        });
+    public void initialize() {
     }
     
     @FXML
@@ -505,5 +498,10 @@ public class ResultsViewController extends ViewController{
 	public String canMoveProject(Reader readerToAdd, Reader readerToRemoveFrom,Project projectToAdd) {
 		errorPopOver.hide();
 		return model.canAddAssignment(readerToAdd, readerToRemoveFrom, projectToAdd);
+	}
+
+	@Override
+	protected boolean isReaderListComplete(Reader reader) {
+		return reader.getAssigned().size() == reader.getCapacity();
 	}
 }

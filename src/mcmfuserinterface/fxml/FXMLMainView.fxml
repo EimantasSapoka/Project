@@ -60,13 +60,14 @@
          <bottom>
             <HBox prefHeight="67.0" prefWidth="800.0" BorderPane.alignment="CENTER">
                <children>
-                  <Pane prefHeight="100.0" prefWidth="300.0" HBox.hgrow="SOMETIMES">
+                  <Pane prefHeight="67.0" prefWidth="323.0" HBox.hgrow="SOMETIMES">
                      <children>
-                        <CheckBox fx:id="zeroCapacityReaderCheckbox" layoutX="106.0" layoutY="25.0" mnemonicParsing="false" onAction="#toggleShowZeroCapacityReaders" selected="true" text="Show Readers with zero capacity" />
+                        <CheckBox fx:id="zeroCapacityReaderCheckbox" layoutX="106.0" layoutY="6.0" mnemonicParsing="false" onAction="#toggleShowZeroCapacityReaders" selected="true" text="Show Readers with zero capacity" />
                         <Label fx:id="trashBin" layoutX="35.0" layoutY="9.0" minHeight="-Infinity" minWidth="-Infinity" onDragDropped="#onTrashBinDragDropped" onDragExited="#onTrashBinDragExit" onDragOver="#onTrashBinDragOver" prefHeight="35.0" prefWidth="39.0" />
+                        <CheckBox fx:id="completeListReaderCheckBox" layoutX="106.0" layoutY="36.0" mnemonicParsing="false" onAction="#toggleShowReadersWithCompleteLists" prefHeight="17.0" prefWidth="207.0" selected="true" text="Show readers with complete lists" />
                      </children>
                   </Pane>
-                  <Pane prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+                  <Pane prefHeight="67.0" prefWidth="160.0" HBox.hgrow="ALWAYS">
                      <children>
                         <Button fx:id="extendPrefListButton" layoutX="50.0" layoutY="21.0" mnemonicParsing="false" onAction="#extendPreferenceLists" text="Extend pref lists" />
                      </children>

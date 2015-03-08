@@ -43,8 +43,9 @@
                <children>
                   <Pane prefHeight="67.0" prefWidth="463.0" HBox.hgrow="SOMETIMES">
                      <children>
-                        <CheckBox fx:id="zeroCapacityReaderCheckbox" layoutX="14.0" layoutY="25.0" mnemonicParsing="false" onAction="#toggleShowZeroCapacityReaders" selected="true" text="Show Readers with zero capacity" />
-                        <Label fx:id="trashBin" layoutX="35.0" layoutY="9.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="39.0" />
+                        <CheckBox fx:id="zeroCapacityReaderCheckbox" layoutX="13.0" layoutY="14.0" mnemonicParsing="false" onAction="#toggleShowZeroCapacityReaders" selected="true" text="Show Readers with zero capacity" />
+                        <Label fx:id="trashBin" disable="true" layoutX="35.0" layoutY="9.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="39.0" visible="false" />
+                        <CheckBox fx:id="completeListReaderCheckBox" layoutX="14.0" layoutY="36.0" mnemonicParsing="false" onAction="#toggleShowReadersWithCompleteLists" prefHeight="17.0" prefWidth="207.0" selected="true" text="Show readers with complete lists" />
                      </children>
                   </Pane>
                   <Pane prefHeight="67.0" prefWidth="825.0" HBox.hgrow="NEVER">
@@ -52,7 +53,7 @@
                         <Button layoutX="369.0" layoutY="21.0" mnemonicParsing="false" onAction="#export" prefHeight="25.0" prefWidth="103.0" text="Export" />
                         <Button fx:id="cancelButton" layoutX="507.0" layoutY="21.0" mnemonicParsing="false" onAction="#closeWindow" prefHeight="25.0" prefWidth="57.0" text="Cancel" />
                         <Button fx:id="infoButton" layoutX="226.0" layoutY="21.0" mnemonicParsing="false" onAction="#showInfo" text="Info" />
-                        <CheckBox fx:id="preferencesCheckBox" layoutY="25.0" mnemonicParsing="false" onAction="#showPreferencesToggle" prefHeight="17.0" prefWidth="161.0" text="Show preferences" />
+                        <CheckBox fx:id="preferencesCheckBox" layoutX="25.0" layoutY="25.0" mnemonicParsing="false" onAction="#showPreferencesToggle" prefHeight="17.0" prefWidth="161.0" text="Show preferences" />
                      </children>
                   </Pane>
                </children>
