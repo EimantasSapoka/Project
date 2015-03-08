@@ -21,7 +21,9 @@ public class ListColumn  extends TableColumn<TableObjectInterface, TableObjectIn
     
     public ListColumn(String name, ControllerInterface contr){
         super(name);
-        setMinWidth(300);
+        setMinWidth(450);
+        setPrefWidth(750);
+        setMaxWidth(1000);
         
         setCellValueFactory(features -> {
               return new ReadOnlyObjectWrapper(features.getValue());

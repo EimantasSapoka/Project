@@ -427,17 +427,20 @@ public class MCMFModel {
 	}
 
 	public String canAddAssignment(Reader readerToAdd,Reader readerToRemoveFrom, Project projectToAdd) {
+		if (readerToAdd.equals(readerToRemoveFrom)){
+			return null;
+		}
+		
 		if (readerToAdd.getCapacity() == 0){
 			return READER_CAPACITY_ZERO_ERR_MSG;
 		}
 		
+		if (readerToAdd.getAssigned().contains(projectToAdd)) {
+    		return READER_ALREADY_ASSIGNED_PROJECT_ERR_MSG;
+    	}
 		if (readerToAdd.getCapacity() == readerToAdd.getAssigned().size()){
 			return READER_AT_MARKING_TARGET_ERR_MSG;
 		}
-		
-		if (readerToAdd.getAssigned().contains(projectToAdd) && !readerToAdd.equals(readerToRemoveFrom)) {
-    		return READER_ALREADY_ASSIGNED_PROJECT_ERR_MSG;
-    	}
 		
     	if (readerToAdd.getSupervisorProjects().contains(projectToAdd.getId())){
     		return PROJECT_SUPERVISED_ERROR_MSG;

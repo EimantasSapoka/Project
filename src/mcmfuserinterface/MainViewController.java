@@ -56,6 +56,7 @@ import mcmfuserinterface.drag_drop_table.columns.CapacityColumn;
 import mcmfuserinterface.drag_drop_table.columns.ListColumn;
 import mcmfuserinterface.drag_drop_table.columns.PreferenceListSizeColumn;
 import mcmfuserinterface.drag_drop_table.columns.ReaderNameColumn;
+import mcmfuserinterface.drag_drop_table.columns.SupervisedProjectsColumn;
 import model.MCMFModel;
 import model.Project;
 import model.Reader;
@@ -315,6 +316,7 @@ public class MainViewController extends ViewController {
         table.getColumns().add(new CapacityColumn("Cap"));
         table.getColumns().add(new PreferenceListSizeColumn("#Pref"));
         table.getColumns().add(new ListColumn("Preferences", this));
+        table.getColumns().add(new SupervisedProjectsColumn("Supervised Projects"));
     }
 
     /**
