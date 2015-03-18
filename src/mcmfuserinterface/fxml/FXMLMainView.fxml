@@ -9,7 +9,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" fx:id="anchorPane" onDragDetected="#anchorPaneDragDetected" onDragDone="#anchorPaneDragDone" onDragOver="#anchorPaneDragOver" onMouseMoved="#hide" prefHeight="500.0" prefWidth="800.0" styleClass="labelStylesheet.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mcmfuserinterface.MainViewController">
+<AnchorPane id="AnchorPane" fx:id="anchorPane" onDragDone="#anchorPaneDragDone" onDragOver="#anchorPaneDragOver" onMouseMoved="#hide" prefHeight="500.0" prefWidth="800.0" styleClass="labelStylesheet.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mcmfuserinterface.MainViewController">
    <children>
       <BorderPane layoutX="-72.0" layoutY="-27.0" prefHeight="200.0" prefWidth="320.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <top>
@@ -25,13 +25,24 @@
                           <MenuItem mnemonicParsing="false" onAction="#closeWindow" text="Close" />
                         </items>
                       </Menu>
+                        <Menu mnemonicParsing="false" text="View">
+                           <items>
+                              <CheckMenuItem fx:id="zeroCapacityReaderCheckbox" mnemonicParsing="false" onAction="#toggleShowZeroCapacityReaders" selected="true" text="Show Readers with zero capacity" />
+                              <CheckMenuItem fx:id="completeListReaderCheckBox" mnemonicParsing="false" onAction="#toggleShowReadersWithCompleteLists" selected="true" text="Show readers with complete lists" />
+                           </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="Data">
+                          <items>
+                            <MenuItem mnemonicParsing="false" onAction="#extendPreferenceLists" text="Fix shortlists" />
+                          </items>
+                        </Menu>
                     </menus>
                   </MenuBar>
                </children>
             </HBox>
          </top>
          <right>
-            <VBox prefHeight="408.0" prefWidth="129.0" BorderPane.alignment="CENTER">
+            <VBox prefHeight="438.0" prefWidth="129.0" BorderPane.alignment="CENTER">
                <children>
                   <Pane prefHeight="54.0" prefWidth="129.0" style="-fx-background-color: whitesmoke;" VBox.vgrow="NEVER">
                      <children>
@@ -47,46 +58,38 @@
                         </TextField>
                      </children>
                   </Pane>
-                  <ListView fx:id="lowSelectedList" onMouseMoved="#hide" prefHeight="366.0" prefWidth="133.0" VBox.vgrow="ALWAYS" />
+                  <ListView fx:id="lowSelectedList" onMouseMoved="#hide" prefHeight="263.0" prefWidth="129.0" VBox.vgrow="SOMETIMES">
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </ListView>
+                  <Pane prefHeight="84.0" prefWidth="129.0">
+                     <children>
+                        <CheckBox fx:id="loadBalancedCheckbox" layoutX="14.0" layoutY="6.0" mnemonicParsing="false" selected="true" text="Load balancing" VBox.vgrow="NEVER" />
+                        <Button fx:id="runAlgorithmButton" layoutX="13.0" layoutY="31.0" mnemonicParsing="false" onAction="#runAlgorithm" prefHeight="45.0" prefWidth="104.0" text="Run algorithm" />
+                     </children>
+                  </Pane>
                </children>
             </VBox>
          </right>
-         <bottom>
-            <HBox prefHeight="67.0" prefWidth="800.0" BorderPane.alignment="CENTER">
-               <children>
-                  <Pane prefHeight="67.0" prefWidth="323.0" HBox.hgrow="SOMETIMES">
-                     <children>
-                        <CheckBox fx:id="zeroCapacityReaderCheckbox" layoutX="106.0" layoutY="6.0" mnemonicParsing="false" onAction="#toggleShowZeroCapacityReaders" selected="true" text="Show Readers with zero capacity" />
-                        <Label fx:id="trashBin" layoutX="35.0" layoutY="16.0" minHeight="-Infinity" minWidth="-Infinity" onDragDropped="#onTrashBinDragDropped" onDragExited="#onTrashBinDragExit" onDragOver="#onTrashBinDragOver" prefHeight="35.0" prefWidth="39.0" scaleX="2.5" scaleY="2.5">
-                           <padding>
-                              <Insets left="10.0" />
-                           </padding></Label>
-                        <CheckBox fx:id="completeListReaderCheckBox" layoutX="106.0" layoutY="36.0" mnemonicParsing="false" onAction="#toggleShowReadersWithCompleteLists" prefHeight="17.0" prefWidth="207.0" selected="true" text="Show readers with complete lists" />
-                     </children>
-                  </Pane>
-                  <Pane prefHeight="67.0" prefWidth="160.0" HBox.hgrow="ALWAYS">
-                     <children>
-                        <Button fx:id="extendPrefListButton" layoutX="50.0" layoutY="21.0" mnemonicParsing="false" onAction="#extendPreferenceLists" text="Extend pref lists" />
-                     </children>
-                  </Pane>
-                  <Pane prefHeight="100.0" prefWidth="300.0" HBox.hgrow="NEVER">
-                     <children>
-                        <Button fx:id="runAlgorithmButton" layoutX="175.0" layoutY="15.0" mnemonicParsing="false" onAction="#runAlgorithm" prefHeight="38.0" prefWidth="104.0" text="Run algorithm" />
-                        <CheckBox fx:id="loadBalancedCheckbox" layoutX="41.0" layoutY="25.0" mnemonicParsing="false" selected="true" text="Load balancing" />
-                     </children>
-                  </Pane>
-               </children>
-            </HBox>
-         </bottom>
          <center>
-            <TableView fx:id="table" cache="true" cacheHint="SPEED" fixedCellSize="50.0" onMouseMoved="#hide" tableMenuButtonVisible="true" BorderPane.alignment="CENTER">
-               <cursor>
-                  <Cursor fx:constant="DEFAULT" />
-               </cursor>
-               <BorderPane.margin>
-                  <Insets />
-               </BorderPane.margin>
-            </TableView>
+            <StackPane>
+               <children>
+                  <TableView fx:id="table" cache="true" fixedCellSize="50.0" onMouseMoved="#hide" tableMenuButtonVisible="true" BorderPane.alignment="CENTER">
+                     <cursor>
+                        <Cursor fx:constant="DEFAULT" />
+                     </cursor>
+                     <BorderPane.margin>
+                        <Insets />
+                     </BorderPane.margin>
+                  </TableView>
+                  <Label fx:id="trashBin" cache="true" onDragDropped="#onTrashBinDragDropped" onDragExited="#onTrashBinDragExit" onDragOver="#onTrashBinDragOver" prefHeight="30.0" prefWidth="30.0" scaleX="2.5" scaleY="2.5" translateX="50.0" translateY="-30.0" visible="false" StackPane.alignment="BOTTOM_LEFT">
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </Label>
+               </children>
+            </StackPane>
          </center>
       </BorderPane>
    </children>

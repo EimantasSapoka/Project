@@ -26,6 +26,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
@@ -61,7 +62,7 @@ public class ResultsViewController extends ViewController{
     @FXML    Button infoButton;
     @FXML    Button cancelButton;
     @FXML    ListView<Project> unselectedList;
-    @FXML    CheckBox preferencesCheckBox;
+    @FXML    CheckMenuItem preferencesCheckBox;
     
     private  BarChart<String,Number> barChart;
     

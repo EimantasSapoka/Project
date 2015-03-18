@@ -65,6 +65,7 @@ import org.controlsfx.glyphfont.GlyphFontRegistry;
 import test.graph_creator.RandomReaderAllocationModel;
 import ford_fulkerson.Algorithm;
 import ford_fulkerson.ReaderShortlistException;
+import javafx.scene.input.MouseEvent;
 
 /**
  *
@@ -83,13 +84,12 @@ public class MainViewController extends ViewController {
     private Stage resultsStage; 
     private Project highlightedProject;
     
-    @FXML 	 private MenuBar menuBar;
+    @FXML    private MenuBar menuBar;
     @FXML    private Button runAlgorithmButton;
     @FXML    private CheckBox loadBalancedCheckbox;
     @FXML    private TextField projectLowSelectionLimitBox;
     @FXML    private ListView<Project> lowSelectedList;
     @FXML    private Label trashBin;
-    @FXML    private Button extendPrefListButton;
    
     
     
@@ -656,5 +656,19 @@ public class MainViewController extends ViewController {
 	protected boolean isReaderListComplete(Reader reader) {
 		return reader.getPreferences().size() >= reader.getCapacity()*2;
 	}
+        
+        @FXML
+        @Override
+        protected void anchorPaneDragOver(DragEvent dragEvent) {
+            super.anchorPaneDragOver(dragEvent);
+            trashBin.setVisible(true);
+        }
+
+        @FXML
+        @Override
+        protected void anchorPaneDragDone(DragEvent event) {
+            super.anchorPaneDragDone(event);
+            trashBin.setVisible(false);
+        }
 
 }

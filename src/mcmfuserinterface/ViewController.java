@@ -20,6 +20,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.input.DragEvent;
@@ -51,8 +52,8 @@ public abstract class ViewController implements Initializable, ControllerInterfa
     
     @FXML     protected AnchorPane anchorPane;
     @FXML     protected TableView<TableObjectInterface> table;
-    @FXML     protected CheckBox zeroCapacityReaderCheckbox;
-    @FXML     protected CheckBox completeListReaderCheckBox;
+    @FXML     protected CheckMenuItem zeroCapacityReaderCheckbox;
+    @FXML     protected CheckMenuItem completeListReaderCheckBox;
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -223,15 +224,6 @@ public abstract class ViewController implements Initializable, ControllerInterfa
     }
     
     /**************************** ANCHOR PANE EVENTS ********************/
-    
-    
-    
-    @FXML
-    protected void anchorPaneDragDetected(MouseEvent t) {
-        dragLabel.relocate(
-                (int) (t.getSceneX() - dragLabel.getBoundsInLocal().getWidth() / 2),
-                (int) (t.getSceneY() - dragLabel.getBoundsInLocal().getHeight() / 2));
-    }
 
     @FXML
     protected void anchorPaneDragOver(DragEvent dragEvent) {
@@ -276,8 +268,7 @@ public abstract class ViewController implements Initializable, ControllerInterfa
      */
     @FXML 
     protected void hide(MouseEvent event){
-    	errorPopOver.hide();
-        dragLabel.setVisible(false);
+    	anchorPaneDragDone(null);
     }
     
     
