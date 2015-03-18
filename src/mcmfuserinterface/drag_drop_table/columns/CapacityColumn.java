@@ -6,9 +6,7 @@
 package mcmfuserinterface.drag_drop_table.columns;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TableColumn;
-import javafx.util.Callback;
 import mcmfuserinterface.drag_drop_table.TableObjectInterface;
 import model.Reader;
 
@@ -21,7 +19,7 @@ public class CapacityColumn extends TableColumn<TableObjectInterface, TableObjec
     public CapacityColumn(String name){
         super(name);
         setMinWidth(30);
-        setPrefWidth(50);
+        setPrefWidth(40);
         setMaxWidth(60);
         
         setCellValueFactory(features -> {

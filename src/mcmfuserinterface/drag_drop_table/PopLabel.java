@@ -8,9 +8,8 @@ package mcmfuserinterface.drag_drop_table;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
-import javafx.util.Duration;
+
 import org.controlsfx.control.PopOver;
 
 /**

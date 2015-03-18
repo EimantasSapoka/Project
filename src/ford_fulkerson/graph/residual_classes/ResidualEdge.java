@@ -13,13 +13,13 @@ import ford_fulkerson.graph.Vertex;
  *
  */
 public class ResidualEdge extends Edge {
-	private boolean isBackwards;				// indicator if the edge is backwards
-	private Edge originalEdge;					// reference to the real graph edge this residual edge was created from
+	protected boolean isBackwards;				// indicator if the edge is backwards
+	protected Edge originalEdge;					// reference to the real graph edge this residual edge was created from
 	
-	public ResidualEdge(Vertex parent, Vertex destination, int capacity,  boolean isBackwards, Edge e){
+	public ResidualEdge(Vertex parent, Vertex destination, int capacity, Edge e){
 		super(parent, destination, capacity, 0);
 		this.originalEdge = e;
-		this.isBackwards = isBackwards;
+		this.isBackwards = false;
 	}
 
 	public boolean isBackwards() {

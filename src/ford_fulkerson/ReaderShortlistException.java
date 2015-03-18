@@ -10,7 +10,9 @@ package ford_fulkerson;
  * @author Eimantas
  */
 public class ReaderShortlistException extends Exception {
-    private boolean isError;
+	
+	private static final long serialVersionUID = -2203795208763946900L;
+	private boolean isError;
     
     public ReaderShortlistException(String msg, boolean isError) {
         super(msg);

@@ -244,27 +244,18 @@ public class Network
 		return cap;
 	}
 
-	public boolean isLoadBalanced(){
-		int capacityFlowGap = 0;
-		boolean capacitySet = false;
-		
-		
-		for (Node n : this.nodes){
-			if (NodeType.LECTURER.equals(n.getType())){
+	public boolean isLoadBalanced(){		
+		for (Node lecturer : this.nodes){
+			if (NodeType.LECTURER.equals(lecturer.getType())){
 				
-				int readerFlow = 0;
-				for (Edge e : n.getOutgoingEdges()){
-					if (e.getFlow() > 0){
-						readerFlow++;
-					}
-				}
-				
-				if (!capacitySet){
-					capacityFlowGap = n.capacity - readerFlow;
-					capacitySet = true;
-				} else {
-					if (n.capacity -readerFlow > capacityFlowGap+1){
-						return false;
+				int readerFlow = calculateReaderFlow(lecturer);
+				for (Node otherLecturer: this.nodes){
+					if (NodeType.LECTURER.equals(otherLecturer.getType())){
+						
+						int otherFlow = calculateReaderFlow(otherLecturer);
+						if (Math.abs( (lecturer.capacity -readerFlow) - (otherLecturer.capacity - otherFlow)) > 1){
+							return false;
+						}
 					}
 				}
 			}
@@ -272,6 +263,16 @@ public class Network
 		
 		
 		return true;
+	}
+
+	private int calculateReaderFlow(Node lecturer) {
+		int readerFlow = 0;
+		for (Edge e : lecturer.getOutgoingEdges()){
+			if (e.getFlow() > 0){
+				readerFlow++;
+			}
+		}
+		return readerFlow;
 	}
 	
 	

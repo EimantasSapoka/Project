@@ -5,22 +5,13 @@
  */
 package mcmfuserinterface.drag_drop_table;
 
-import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.scene.Node;
-import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
-import javafx.util.Duration;
 import mcmfuserinterface.ControllerInterface;
 import model.Project;
-import org.controlsfx.control.PopOver;
 
 /**
  *

@@ -5,19 +5,12 @@
  */
 package mcmfuserinterface;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.ResourceBundle;
-
-import org.controlsfx.control.PopOver;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -47,7 +40,6 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
 import mcmfuserinterface.drag_drop_table.DragLabel;
 import mcmfuserinterface.drag_drop_table.ListContextMenu;
 import mcmfuserinterface.drag_drop_table.PopLabel;
@@ -66,17 +58,10 @@ import model.Reader;
  */
 public class ResultsViewController extends ViewController{
     
-    @FXML
-    Button infoButton;
-    
-    @FXML
-    Button cancelButton;
-    
-    @FXML
-    ListView<Project> unselectedList;
-    
-    @FXML
-    CheckBox preferencesCheckBox;
+    @FXML    Button infoButton;
+    @FXML    Button cancelButton;
+    @FXML    ListView<Project> unselectedList;
+    @FXML    CheckBox preferencesCheckBox;
     
     private  BarChart<String,Number> barChart;
     
@@ -84,35 +69,11 @@ public class ResultsViewController extends ViewController{
     
     @Override
     public void initialize() {
+    	
     }
     
-    @FXML
-    private void export(){
-        String output = createOutput();
-        if (output != null){
-             FileChooser fileChooser = new FileChooser();
-            File desktopFolder = new File(MainViewController.DESKTOP_DIRECTORY);
-            if (desktopFolder.exists()){
-            	fileChooser.setInitialDirectory(desktopFolder);
-            }
-            fileChooser.setTitle("Save file");
-            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("text files", "*.txt");
-            fileChooser.getExtensionFilters().add(extFilter);
-            File file = fileChooser.showSaveDialog(table.getScene().getWindow());
-            if (file != null) {
-                try {
-                    PrintWriter writer = new PrintWriter(file, "UTF-8");
-                    writer.print(output);
-                    writer.close();
-                } catch (IOException ex) {
-                    DialogUtils.createExceptionDialog(ex);
-                }
-            }
-        }
-        
-    }
-    
-    private String createOutput() {
+    @Override
+    protected String createOutput() {
         Optional<List<String>> result =  createParameterDialogWindow();
         if (result.isPresent() && result.get() != null){
             List<String> parameters = result.get();
@@ -233,9 +194,9 @@ public class ResultsViewController extends ViewController{
         } else {
             barChart.getData().clear();
         }
-        XYChart.Series series1 = new XYChart.Series();    
+        XYChart.Series<String, Number> series1 = new XYChart.Series<String,Number>();    
         for (int preference : preferenceStatistics.keySet()){
-            series1.getData().add(new XYChart.Data(preference+"", preferenceStatistics.get(preference)));
+            series1.getData().add(new XYChart.Data<String, Number>(preference+"", preferenceStatistics.get(preference)));
         }
         
         barChart.getData().add(series1);
@@ -413,14 +374,9 @@ public class ResultsViewController extends ViewController{
                     }
                 } 
                 dragLabel.setVisible(false);
-                refreshLowSelectedProjectList();
+                refresh();
             }
        });
-    }
-
-    @Override
-    public String moveProject(Reader reader, Reader readerToRemoveFrom, Project projectToMove, Project projectToPlaceBefore) {
-        return null; // method should not be used in the results table as reordering is not really necessary.
     }
 
     @Override
@@ -433,10 +389,6 @@ public class ResultsViewController extends ViewController{
         return model.assignProjectToReader(reader, projectToAdd);
     }
 
-    @Override
-    public String addProjectToReader(Reader reader, Project projectToAdd, Project projectToAddBefore) {
-        return model.assignProjectToReader(reader, projectToAdd, projectToAddBefore);
-    }
 
     @Override
     public ContextMenu createContextMenu(Reader reader, Node container) {
@@ -448,9 +400,11 @@ public class ResultsViewController extends ViewController{
     }
     
     @Override
+    @SuppressWarnings("unchecked")
     public Collection<Project> getReaderList(Reader reader) {
         if (preferencesCheckBox.isSelected()){
-            List<Project> list = (List<Project>) reader.getPreferences().clone();
+            
+			List<Project> list = (List<Project>) reader.getPreferences().clone();
             for (Project project : reader.getAssigned()){
                 if (!list.contains(project)){
                     list.add(project);
@@ -468,12 +422,12 @@ public class ResultsViewController extends ViewController{
     }
 
     @Override
-    public Label createLabel(Reader reader, Project project, ControllerInterface controller) {
+    public Label createLabel(Reader reader, Project project) {
         Reader assignedReader = project.getAssignedReader();
         PopLabel label;
         
         if (assignedReader != null && reader.equals(assignedReader)) {
-            label = new DragLabel(project, controller);
+            label = new DragLabel(project, this);
             if (preferencesCheckBox.isSelected()){
                 label.getStyleClass().add("bordered");
             }

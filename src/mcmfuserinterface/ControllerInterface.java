@@ -21,15 +21,13 @@ public interface ControllerInterface {
     public void refresh();
     public void refreshTable();
     public void refreshLowSelectedProjectList();
-    public String moveProject(Reader reader, Reader readerToRemoveFrom, Project projectToMove, Project projectToPlaceBefore);
     public String moveProject(Reader readerToAdd, Reader readerToRemoveFrom, Project projectToMove);
     public String addProjectToReader(Reader reader, Project projectToAdd);
-    public String addProjectToReader(Reader reader, Project projectToAdd, Project projectToAddBefore);
     public ContextMenu createContextMenu(Reader reader, Node node);
     public Collection<Project> getProjects();
     public Collection<Project> getReaderList(Reader reader);
     public void removeProjectFromReader(Reader reader, Project project);
-    public Label createLabel(Reader reader, Project project, ControllerInterface controller);
+    public Label createLabel(Reader reader, Project project);
 	public void showErrorPopOver(String errorMsg, Node parent);
 	public String canMoveProject(Reader readerToAdd, Project projectToAdd);
 	public String canMoveProject(Reader readerToAdd, Reader readerToRemoveFrom,Project projectToAdd);

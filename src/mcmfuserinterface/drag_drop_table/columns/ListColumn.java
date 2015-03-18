@@ -6,9 +6,7 @@
 package mcmfuserinterface.drag_drop_table.columns;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TableColumn;
-import javafx.util.Callback;
 import mcmfuserinterface.ControllerInterface;
 import mcmfuserinterface.drag_drop_table.TableCellWithListFactory;
 import mcmfuserinterface.drag_drop_table.TableObjectInterface;
@@ -21,9 +19,9 @@ public class ListColumn  extends TableColumn<TableObjectInterface, TableObjectIn
     
     public ListColumn(String name, ControllerInterface contr){
         super(name);
-        setMinWidth(450);
-        setPrefWidth(750);
-        setMaxWidth(1000);
+        setMinWidth(350);
+        setPrefWidth(450);
+        setMaxWidth(2000);
         
         setCellValueFactory(features -> {
               return new ReadOnlyObjectWrapper(features.getValue());

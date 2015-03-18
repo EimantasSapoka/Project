@@ -1,16 +1,17 @@
 package ford_fulkerson;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import ford_fulkerson.graph.Edge;
-import ford_fulkerson.graph.Graph;
+import model.MCMFModel;
 import model.Project;
 import model.Reader;
+import ford_fulkerson.graph.Edge;
+import ford_fulkerson.graph.Graph;
 import ford_fulkerson.graph.Vertex;
 import ford_fulkerson.graph.residual_classes.ResidualEdge;
 import ford_fulkerson.graph.residual_classes.ResidualGraph;
 import ford_fulkerson.graph.residual_classes.ResidualVertex;
-import model.MCMFModel;
 
 /**
  * class which runs the min cost max flow algorithm.
@@ -20,8 +21,8 @@ import model.MCMFModel;
  */
 public class Algorithm {
 	
-	public static void runUnbalancedAlgorithm(MCMFModel model){
-		solveGraph(model.getGraph());
+	public static void runUnbalancedAlgorithm(Graph graph){
+		solveGraph(graph);
 	}
 
 	/**
@@ -96,11 +97,12 @@ public class Algorithm {
 	private static void solveGraph(Graph graph) {
 		
 		ResidualGraph residualGraph = new ResidualGraph(graph, graph);
-		ArrayList<ResidualEdge> path = null;
+		List<ResidualEdge> path = dijkstra(graph, residualGraph);
 		
-		while( (path = dijkstra(graph, residualGraph)) != null) {
+		while( path != null) {
 			updateEdges(path, 1);
 			residualGraph = new ResidualGraph(graph, residualGraph);
+			path = dijkstra(graph, residualGraph);
 		}
 	}
 	
@@ -168,7 +170,7 @@ public class Algorithm {
 	 * @param graph
 	 * @param maxFlow 
 	 */
-	private static void updateEdges(ArrayList<ResidualEdge> path, int maxFlow) {
+	private static void updateEdges(List<ResidualEdge> path, int maxFlow) {
 		Edge realEdge;
 		
 		for (ResidualEdge edge: path){
@@ -204,7 +206,7 @@ public class Algorithm {
 
 		while (! vertex.equals(graph.source())){
 			edge = vertex.getPath();
-			vertex = edge.getParent();
+			vertex = edge.getSource();
 			path.add(0,edge);
 		}
 	

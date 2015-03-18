@@ -1,7 +1,5 @@
 package ford_fulkerson.graph.residual_classes;
 
-import java.util.ArrayList;
-
 import ford_fulkerson.graph.Edge;
 import ford_fulkerson.graph.Graph;
 import ford_fulkerson.graph.Vertex;
@@ -14,40 +12,50 @@ public class ResidualGraph extends ford_fulkerson.graph.Graph {
 	 */
 	public ResidualGraph(Graph realGraph, Graph previous){
 		
-		this.vertices = new ArrayList<Vertex>();
-		this.edges = new ArrayList<Edge>();
+		// removes the source and sink vertices created by Graph constructor
+		this.vertices.clear(); 
 		
 		// copy vertices
 		for (Vertex v : realGraph.getVertices()){
 			this.vertices.add(new ResidualVertex(v));
 		}
 		
-		// create residual edges
-		for (Edge e : realGraph.getEdges()){
-			
-			if (e.getResidualCapacity() > 0){
+		// set source and sink vertices
+		this.source = this.getVertex(SOURCE_ID);
+		this.sink = this.getVertex(SINK_ID);
 				
-				this.addEdge(new ResidualEdge(this.getVertex(e.getParent()), this.getVertex(e.getDestination()),e.getResidualCapacity(), false, e));
+		
+		// create residual edges
+		for (Edge edge : realGraph.getEdges()){
+			
+			Vertex source = getVertex(edge.getSource());
+			Vertex destination = getVertex(edge.getDestination());
+			
+			// if it has residual capacity left, add a residual edge with residual capacity
+			if (edge.getResidualCapacity() > 0){
+				this.addEdge(new ResidualEdge(source, destination,edge.getResidualCapacity(), edge));
 			}
-			if (e.getFlow() > 0 ){
-				this.addEdge(new ResidualEdge( this.getVertex(e.getDestination()), this.getVertex(e.getParent()), e.getFlow(), true, e));
+			
+			// if it has any flow, create a backwards residual edge with capacity equal to flow
+			if (edge.getFlow() > 0 ){
+				this.addEdge(new BackwardsResidualEdge(destination, source, edge.getFlow(), edge));
 			}
 		}
 		
 		// update the edge weights 
 		for (Edge e: this.edges){
 			Edge previousEdge = previous.getEdge(e);
+			
 			if (previousEdge != null){
+				
+				int sourceDistance = realGraph.getVertex(e.getSource()).getDistanceFromSource();
+				int destinationDistance = realGraph.getVertex(e.getDestination()).getDistanceFromSource();
+				
 				// calculate the new edge weight: previousWeight + sourceVertexDistance - destinationVertexDistance
-				int weight = realGraph.getVertex(e.getParent()).getDistanceFromSource() + previousEdge.getWeight() - realGraph.getVertex(e.getDestination()).getDistanceFromSource();
+				int weight = previousEdge.getWeight() + sourceDistance - destinationDistance;
 				e.setWeight(weight);
 			}
 		}
-		
-		
-		// set source and sink vertices
-		this.source = this.getVertex(SOURCE_ID);
-		this.sink = this.getVertex(SINK_ID);
 		
 	}
 	

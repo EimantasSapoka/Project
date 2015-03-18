@@ -6,20 +6,19 @@
 package mcmfuserinterface;
 
 import java.io.File;
-import java.net.URL;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
-import java.util.ResourceBundle;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
-import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -41,14 +40,12 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.util.Duration;
-import javafx.util.Pair;
 import mcmfuserinterface.drag_drop_table.DragDropLabel;
 import mcmfuserinterface.drag_drop_table.ListContextMenu;
 import mcmfuserinterface.drag_drop_table.TableObjectInterface;
@@ -61,7 +58,6 @@ import model.MCMFModel;
 import model.Project;
 import model.Reader;
 
-import org.controlsfx.control.PopOver;
 import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.GlyphFont;
 import org.controlsfx.glyphfont.GlyphFontRegistry;
@@ -75,34 +71,26 @@ import ford_fulkerson.ReaderShortlistException;
  * @author Eimantas
  */
 public class MainViewController extends ViewController {
+	    
+    private static final String READER_PREFERENCES_MAX = "readerPreferencesMax";
+	private static final String READER_PREFERENCES_MIN = "readerPreferencesMin";
+	private static final String READER_TARGET_MAX = "readerTargetMax";
+	private static final String READER_TARGET_MIN = "readerTargetMin";
+	private static final String PROJECT_COUNT = "projectCount";
+	private static final String READER_COUNT = "readerCount";
 	
-	public static final String DESKTOP_DIRECTORY = System.getProperty("user.home") + File.separator + "Desktop" + File.separator;
-    
-    private ResultsViewController resultsController;
-    
-    private Stage resultsStage;
-
-    @FXML
-    private MenuBar menuBar;
-
-    @FXML
-    private Button runAlgorithmButton;
-    
-    @FXML 
-    private CheckBox loadBalancedCheckbox;
-    
-    @FXML
-    private TextField projectLowSelectionLimitBox;
-    
-    @FXML
-    private ListView<Project> lowSelectedList;
-    
-    @FXML
-    private Label trashBin;
-    
-    @FXML
-    private Button extendPrefListButton;
+	private ResultsViewController resultsController;
+    private Stage resultsStage; 
     private Project highlightedProject;
+    
+    @FXML 	 private MenuBar menuBar;
+    @FXML    private Button runAlgorithmButton;
+    @FXML    private CheckBox loadBalancedCheckbox;
+    @FXML    private TextField projectLowSelectionLimitBox;
+    @FXML    private ListView<Project> lowSelectedList;
+    @FXML    private Label trashBin;
+    @FXML    private Button extendPrefListButton;
+   
     
     
     /******************    /
@@ -136,7 +124,7 @@ public class MainViewController extends ViewController {
                 if (loadBalancedCheckbox.isSelected()) {
                     Algorithm.runLoadBalancedAlgorithm(model);
                 } else {
-                    Algorithm.runUnbalancedAlgorithm(model);
+                    Algorithm.runUnbalancedAlgorithm(model.getGraph());
                 }
                 showResultsView();
             }
@@ -213,6 +201,29 @@ public class MainViewController extends ViewController {
         }
         
     }
+    
+    /**
+     * generates the output to be exported in to a text file
+     */
+    protected String createOutput(){
+    	if (model == null || (model.getProjects().isEmpty() && model.getReaders().isEmpty())){
+    		return null;
+    	} 
+    	
+    	String output = model.getProjects().size() + ", " + model.getReaders().size() + "\n";
+    	for (Project p: model.getProjects()){
+    		output += p.getId() + ", " + p.getName() + ", " + p.getSupervisorID()+"\n";
+    	}
+    	for (Reader r: model.getReaders()){
+    		output += r.getID() + ", " + r.getName() +", " + r.getCapacity() + ", ";
+    		for (Project p: r.getPreferences()){
+    			output += p.getId() +" ";
+    		}
+    		output += "\n";
+    	}
+    	return output;
+    	
+    }
 
     /**
      * checks if the text field input is digits.
@@ -231,7 +242,7 @@ public class MainViewController extends ViewController {
     
     @FXML
     private void createRandomInstance(){
-        Dialog<Pair<Integer, Integer>> dialog = new Dialog<>();
+        Dialog<Map<String, Integer>> dialog = new Dialog<>();
         dialog.setTitle("Create random instance");
         dialog.setHeaderText("Enter instance parameters");
         
@@ -247,20 +258,43 @@ public class MainViewController extends ViewController {
         readerCount.setPromptText("Number of readers");
         TextField projectCount = new TextField();
         projectCount.setPromptText("Number of projects");
+        TextField readerTargetMin = new TextField();
+        readerTargetMin.setPromptText("Min. Optional");
+        TextField readerTargetMax = new TextField();
+        readerTargetMax.setPromptText("Max. Optional");
+        TextField readerPreferencesMin = new TextField();
+        readerPreferencesMin.setPromptText("Min. Optional");
+        TextField readerPreferencesMax = new TextField();
+        readerPreferencesMax.setPromptText("Max. Optional");
         
-        readerCount.setOnKeyTyped(event -> {
-                if (!event.getCharacter().matches("\\d") || readerCount.getText().length() > 2){
+        EventHandler<KeyEvent> acceptOnlyIntegers = new EventHandler<KeyEvent>(){
+			@Override
+			public void handle(KeyEvent event) {
+				if (	!event.getCharacter().matches("\\d") || 
+						((TextField)event.getSource()).getText().length() > 2 ){
                     event.consume();
-                }});
-        projectCount.setOnKeyTyped(event -> {
-                if (!event.getCharacter().matches("\\d") || projectCount.getText().length() > 2){
-                    event.consume();
-                }});
-       
+                }
+			}
+        };
+        
+        
+        readerCount.setOnKeyTyped(acceptOnlyIntegers);
+        projectCount.setOnKeyTyped(acceptOnlyIntegers);
+        readerTargetMax.setOnKeyTyped(acceptOnlyIntegers);
+        readerTargetMin.setOnKeyTyped(acceptOnlyIntegers);
+        readerPreferencesMax.setOnKeyTyped(acceptOnlyIntegers);
+        readerPreferencesMin.setOnKeyTyped(acceptOnlyIntegers);
+        
         grid.add(new Label("Readers:"), 0, 0);
         grid.add(readerCount, 1, 0);
         grid.add(new Label("Projects:"), 0, 1);
         grid.add(projectCount, 1, 1);
+        grid.add(new Label("Reader Target:"), 0, 2);
+        grid.add(readerTargetMin, 1, 2);
+        grid.add(readerTargetMax, 2, 2);
+        grid.add(new Label("Reader Pref. List size"), 0, 3);
+        grid.add(readerPreferencesMin, 1, 3);
+        grid.add(readerPreferencesMax, 2, 3);
        
         dialog.getDialogPane().setContent(grid);
         
@@ -268,17 +302,46 @@ public class MainViewController extends ViewController {
             if ( dialogButton == createButtonType &&
                 !readerCount.getText().isEmpty() &&
                 !projectCount.getText().isEmpty() ) {
+               
+            	Map<String, Integer> input = new HashMap<String,Integer>();
+                input.put(READER_COUNT, Integer.parseInt(readerCount.getText()) );
+                input.put(PROJECT_COUNT, Integer.parseInt(projectCount.getText()) );
                 
-                Pair<Integer, Integer> pair =  new Pair<>(Integer.parseInt(readerCount.getText()), 
-                                                          Integer.parseInt(projectCount.getText()) );
-                return pair;
+                if (!readerTargetMin.getText().isEmpty()){
+                	input.put(READER_TARGET_MIN, Integer.parseInt(readerTargetMin.getText()) );
+                }
+                
+                if (!readerTargetMax.getText().isEmpty()){
+                	input.put(READER_TARGET_MAX, Integer.parseInt(readerTargetMax.getText()) );
+                }
+               
+                if (!readerPreferencesMin.getText().isEmpty()){
+                	input.put(READER_PREFERENCES_MIN, Integer.parseInt(readerPreferencesMin.getText()) );
+                }
+                
+                if (!readerPreferencesMax.getText().isEmpty()){
+                	input.put(READER_PREFERENCES_MAX, Integer.parseInt(readerPreferencesMax.getText()) );
+                }
+                
+                return input;
             }
             return null;
         });
 
-        Optional<Pair<Integer, Integer>> result = dialog.showAndWait();
+        Optional<Map<String, Integer>> result = dialog.showAndWait();
         if (result.isPresent() && result.get() != null){
-            model = new RandomReaderAllocationModel(result.get().getKey(), result.get().getValue());
+        	Map<String, Integer> input = result.get();
+        	
+        	int targetMin = input.containsKey(READER_TARGET_MIN)? input.get(READER_TARGET_MIN):0;
+        	int targetMax = input.containsKey(READER_TARGET_MAX)? input.get(READER_TARGET_MAX):0;
+        	int preferenceMin = input.containsKey(READER_PREFERENCES_MIN)? input.get(READER_PREFERENCES_MIN):0;
+        	int preferenceMax = input.containsKey(READER_PREFERENCES_MAX)? input.get(READER_PREFERENCES_MAX):0;
+        	
+            model = new RandomReaderAllocationModel(
+            		input.get(READER_COUNT), 
+            		input.get(PROJECT_COUNT), 
+            		targetMin, targetMax, 
+            		preferenceMin, preferenceMax);
             createTableFromModel();
             createLowSelectedProjectsList();
         }
@@ -370,7 +433,7 @@ public class MainViewController extends ViewController {
     }
     
     public void refreshLowSelectedProjectList(){
-        SortedList list = (SortedList) lowSelectedList.getItems();
+        SortedList<Project> list = (SortedList<Project>) lowSelectedList.getItems();
         list.setComparator(new Comparator<Project>() {
             @Override
             public int compare(Project o1, Project o2) {
@@ -386,7 +449,7 @@ public class MainViewController extends ViewController {
     private void createLowSelectedProjectsList() {
         
         ObservableList<Project> lowSelectedProjectList = FXCollections.observableArrayList();
-        SortedList sortedLowSelectedProjectList = new SortedList(lowSelectedProjectList, new Comparator<Project>() {
+        SortedList<Project> sortedLowSelectedProjectList = new SortedList<Project>(lowSelectedProjectList, new Comparator<Project>() {
 
             @Override
             public int compare(Project o1, Project o2) {
@@ -477,16 +540,16 @@ public class MainViewController extends ViewController {
     private void onTrashBinDragOver(DragEvent event) {
         if (event.getGestureSource() instanceof DragDropLabel) {
             event.acceptTransferModes(TransferMode.MOVE);
-            trashBin.setScaleY(1.5);
-            trashBin.setScaleX(1.5);
+            trashBin.setScaleY(3.5);
+            trashBin.setScaleX(3.5);
         }
     }
     
     @FXML
     private void onTrashBinDragExit(DragEvent event) {
         if (event.getGestureSource() instanceof DragDropLabel) {
-            trashBin.setScaleX(1);
-            trashBin.setScaleY(1);
+            trashBin.setScaleX(2.5);
+            trashBin.setScaleY(2.5);
         }
     }
     
@@ -506,7 +569,7 @@ public class MainViewController extends ViewController {
     }
     
 
-    @Override
+    
     public String moveProject(Reader reader, Reader readerToRemoveFrom, Project projectToMove, Project projectToPlaceBefore) {
         return model.movePreference(reader, readerToRemoveFrom, projectToMove, projectToPlaceBefore);
     }
@@ -521,7 +584,7 @@ public class MainViewController extends ViewController {
        return model.addProjectToReaderPreferences(reader, projectToAdd);
     }
 
-    @Override
+    
     public String addProjectToReader(Reader reader, Project projectToAdd, Project projectToAddBefore) {
         return model.addProjectToReaderPreferences(reader, projectToAdd, projectToAddBefore);
     }
@@ -545,13 +608,19 @@ public class MainViewController extends ViewController {
     }
 
     @Override
-    public Label createLabel(Reader reader, Project project, ControllerInterface controller) {
-        DragDropLabel label =  new DragDropLabel(project,controller);
+    public Label createLabel(Reader reader, Project project) {
+        DragDropLabel label =  new DragDropLabel(project,this);
         
         if (project.equals(highlightedProject)){
             label.getStyleClass().add("highlighted");
         } else {
             label.getStyleClass().remove("highlighted");
+        }
+        
+        if (reader.getPreferences().indexOf(project)< reader.getCapacity()){
+        	label.getStyleClass().add("topChoice");
+        } else {
+        	label.getStyleClass().remove("topChoice");
         }
         label.setPopText("Name: " + project.getName() +
                          "\nID: " + project.getId() +

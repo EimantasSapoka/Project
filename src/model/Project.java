@@ -1,7 +1,7 @@
 package model;
 
-import ford_fulkerson.graph.Vertex;
 import mcmfuserinterface.drag_drop_table.TableObjectInterface;
+import ford_fulkerson.graph.Vertex;
 
 public class Project implements Comparable<Project>, TableObjectInterface{
 	private final int id;			// project id

@@ -2,11 +2,11 @@ package test.augustineMCMF;
 
 import java.util.ArrayList;
 
-import ford_fulkerson.graph.Graph;
+import model.MCMFModel;
 import model.Project;
 import model.Reader;
+import ford_fulkerson.graph.Graph;
 import ford_fulkerson.graph.Vertex;
-import model.MCMFModel;
 
 public class MinCostMaxFlowSPA 
 {
@@ -327,7 +327,7 @@ public class MinCostMaxFlowSPA
 		
 		// copy edges
 		for (ford_fulkerson.graph.Edge e : graph.getEdges()){
-			Edge edge = new Edge(network.getNode((e.getParent().getVertexID())+""), network.getNode((e.getDestination().getVertexID())+""), 0, e.getCapacity(), e.getWeight());
+			Edge edge = new Edge(network.getNode((e.getSource().getVertexID())+""), network.getNode((e.getDestination().getVertexID())+""), 0, e.getCapacity(), e.getWeight());
 			network.addEdge(edge);
 		}
 		
@@ -370,7 +370,7 @@ public class MinCostMaxFlowSPA
 		
 		// copy edges
 		for (ford_fulkerson.graph.Edge e : model.getGraph().getEdges()){
-			Edge edge = new Edge(network.getNode((e.getParent().getVertexID())+""), network.getNode((e.getDestination().getVertexID())+""), e.getCapacity(), e.getCapacity(), e.getWeight());
+			Edge edge = new Edge(network.getNode((e.getSource().getVertexID())+""), network.getNode((e.getDestination().getVertexID())+""), e.getCapacity(), e.getCapacity(), e.getWeight());
 			network.addEdge(edge);
 		}
 				

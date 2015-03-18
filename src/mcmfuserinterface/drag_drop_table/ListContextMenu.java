@@ -5,17 +5,14 @@
  */
 package mcmfuserinterface.drag_drop_table;
 
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.HBox;
 import mcmfuserinterface.ControllerInterface;
@@ -112,8 +109,7 @@ public class ListContextMenu extends ContextMenu {
             Optional<Project> result = dialog.showAndWait();
             if (result.isPresent()) {
                 controller.addProjectToReader(reader, result.get());
-                hbox.getChildren().add(new DragDropLabel(result.get(), controller));
-                controller.refreshLowSelectedProjectList();
+                controller.refresh();
             }
         });
         getItems().add(add);

@@ -5,6 +5,9 @@
  */
 package mcmfuserinterface;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.util.Collection;
 import java.util.ResourceBundle;
@@ -17,48 +20,45 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.TableView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import mcmfuserinterface.drag_drop_table.DragLabel;
 import mcmfuserinterface.drag_drop_table.TableObjectInterface;
 import model.MCMFModel;
 import model.Project;
 import model.Reader;
 
 import org.controlsfx.control.PopOver;
-import org.controlsfx.control.spreadsheet.SpreadsheetView;
+import org.controlsfx.control.PopOver.ArrowLocation;
 
 /**
  *
  * @author Eimantas
  */
 public abstract class ViewController implements Initializable, ControllerInterface {
+	
+	public static final String DESKTOP_DIRECTORY = System.getProperty("user.home") + File.separator + "Desktop" + File.separator;
 
     protected MCMFModel model;
     protected Label dragLabel;
     protected PopOver errorPopOver;
-    @FXML 
-    protected AnchorPane anchorPane;
-    @FXML
-    protected TableView<TableObjectInterface> table;
-    @FXML
-    protected CheckBox zeroCapacityReaderCheckbox;
-    @FXML
-    protected CheckBox completeListReaderCheckBox;
+    int scroll = 10;
+    
+    @FXML     protected AnchorPane anchorPane;
+    @FXML     protected TableView<TableObjectInterface> table;
+    @FXML     protected CheckBox zeroCapacityReaderCheckbox;
+    @FXML     protected CheckBox completeListReaderCheckBox;
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
     	errorPopOver = new PopOver();
         createDragLabel();
-        initialize();
-        
+        initialize();      
     }
     
     @Override
@@ -78,6 +78,8 @@ public abstract class ViewController implements Initializable, ControllerInterfa
     
      protected void createDragLabel() {
         dragLabel = new Label("");
+        dragLabel.getStyleClass().add("myLabel");
+        dragLabel.getStyleClass().add("shadow");
         dragLabel.setMouseTransparent(true);
         dragLabel.setVisible(false);
         dragLabel.toFront();
@@ -95,6 +97,7 @@ public abstract class ViewController implements Initializable, ControllerInterfa
         ((Stage) table.getScene().getWindow()).close();
     }
     
+   
     /**
      * changes between showing and hiding readers with zero capacity
      */
@@ -156,6 +159,7 @@ public abstract class ViewController implements Initializable, ControllerInterfa
      * creates a table with reader information and preferences list.
      */
     protected void createTableFromModel() {
+    	
         if (model == null) { 
             /* should not happen as this is only called locally after
                the model is instanciated */
@@ -169,15 +173,13 @@ public abstract class ViewController implements Initializable, ControllerInterfa
         }
         
         ObservableList<TableObjectInterface> items = FXCollections.observableArrayList();
-        if (this.zeroCapacityReaderCheckbox.isSelected()){
-            items.addAll(model.getReaders());
-        } else {
-            addNonZeroCapacityReaders(items);
-        }
+        items.addAll(model.getReaders());
+        
+        this.zeroCapacityReaderCheckbox.setSelected(true);
+        this.completeListReaderCheckBox.setSelected(true);
         
        
         table.setItems(items);
-        table.setFixedCellSize(50);
         setTableRowFactory();
         refreshTable();
     }
@@ -189,10 +191,40 @@ public abstract class ViewController implements Initializable, ControllerInterfa
 		popText.setTextFill(Color.BLACK);
         popText.setPadding(new Insets(10, 10, 10, 10));
         errorPopOver.setContentNode(popText);
+        errorPopOver.setArrowLocation(ArrowLocation.RIGHT_CENTER);
         errorPopOver.show(parent);
 	}
     
+    
+    @FXML
+    public void export(){
+        String output = createOutput();
+        if (output != null){
+            FileChooser fileChooser = new FileChooser();
+            File desktopFolder = new File(DESKTOP_DIRECTORY);
+            if (desktopFolder.exists()){
+            	fileChooser.setInitialDirectory(desktopFolder);
+            }
+            fileChooser.setTitle("Save file");
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("text files", "*.txt");
+            fileChooser.getExtensionFilters().add(extFilter);
+            File file = fileChooser.showSaveDialog(table.getScene().getWindow());
+            if (file != null) {
+                try {
+                    PrintWriter writer = new PrintWriter(file, "UTF-8");
+                    writer.print(output);
+                    writer.close();
+                } catch (IOException ex) {
+                    DialogUtils.createExceptionDialog(ex);
+                }
+            }
+        }
+        
+    }
+    
     /**************************** ANCHOR PANE EVENTS ********************/
+    
+    
     
     @FXML
     protected void anchorPaneDragDetected(MouseEvent t) {
@@ -202,16 +234,34 @@ public abstract class ViewController implements Initializable, ControllerInterfa
     }
 
     @FXML
-    protected void anchorPaneDragOver(DragEvent event) {
+    protected void anchorPaneDragOver(DragEvent dragEvent) {
+    	double sceneY = dragEvent.getSceneY();
+    	double sceneX = dragEvent.getSceneX();
+    	double tableMaxY = table.getBoundsInParent().getMaxY();
+    	double tableMinY = table.getBoundsInParent().getMinY();
+    	double tableMinX = table.getBoundsInLocal().getMinX();
+		    	
         if (!dragLabel.isVisible()) {
             dragLabel.setVisible(true);
             dragLabel.toFront();
-            Project project = (Project) ((Node) event.getGestureSource()).getUserData();
+            Project project = (Project) ((Node) dragEvent.getGestureSource()).getUserData();
             dragLabel.setText(project.getId() + "");
         }
         dragLabel.relocate(
-                (int) (event.getSceneX() - dragLabel.getBoundsInLocal().getWidth() / 2),
-                (int) (event.getSceneY() - dragLabel.getBoundsInLocal().getHeight() / 2));
+                (int) (dragEvent.getSceneX() - dragLabel.getBoundsInLocal().getWidth() / 2),
+                (int) (sceneY - dragLabel.getBoundsInLocal().getHeight() / 2));
+        
+        if (sceneY > tableMaxY-30 && sceneY < tableMaxY+20 && sceneX > tableMinX+240){
+    		table.scrollTo(scroll/2);
+    		if (scroll < table.getItems().size()*2){
+    			scroll++;
+    		}
+    	} else if (sceneY < tableMinY+50 && sceneY > tableMinY && sceneX > tableMinX+240){
+    		table.scrollTo(scroll/2);
+    		if (scroll > 0){
+    			scroll--;
+    		}
+    	}
     }
 
     @FXML
@@ -220,6 +270,18 @@ public abstract class ViewController implements Initializable, ControllerInterfa
         dragLabel.setVisible(false);
     }
     
+    /**
+     * resolving a javafx bug...
+     * @param event
+     */
+    @FXML 
+    protected void hide(MouseEvent event){
+    	errorPopOver.hide();
+        dragLabel.setVisible(false);
+    }
+    
+    
+    protected abstract String createOutput();
     protected abstract boolean isReaderListComplete(Reader reader);
     protected abstract void initialize();
     protected abstract void setTableRowFactory();

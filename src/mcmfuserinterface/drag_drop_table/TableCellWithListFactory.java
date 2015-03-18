@@ -43,7 +43,7 @@ public class TableCellWithListFactory implements Callback<TableColumn<TableObjec
                     
                     Reader reader = (Reader) object;
                     for (Project project : controller.getReaderList(reader)) {
-                        Label label = controller.createLabel(reader, project, controller);
+                        Label label = controller.createLabel(reader, project);
                         hbox.getChildren().add(label);
                     }
                     hbox.setUserData(object);

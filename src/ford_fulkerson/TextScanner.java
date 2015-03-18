@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
+
 import model.MCMFModel;
 import model.Project;
 import model.Reader;
@@ -33,9 +34,10 @@ public class TextScanner {
         
         try {
             line = textReader.readLine();
-            projectCount = Integer.parseInt(line.split(",")[0]);
-            readerCount = Integer.parseInt(line.split(",")[1]);
+            projectCount = Integer.parseInt(line.split(",")[0].trim());
+            readerCount = Integer.parseInt(line.split(",")[1].trim());
         } catch (Exception ex) {
+        	textReader.close();
             throw new InvalidInputException("text file does not contain two integers with project count and reader count >"+line, ex);
         }
 
@@ -52,6 +54,7 @@ public class TextScanner {
                 }
             }
         } catch (Exception ex) {
+        	textReader.close();
             throw new InvalidInputException("project description line malformed! >" + line +"\n"+ex.getMessage() , ex);
         }
 
@@ -67,8 +70,10 @@ public class TextScanner {
                 createReader(model, readerName, readerID, readerCapacity, readerInfo);
             }
         } catch (Exception ex) {
+        	textReader.close();
             throw new InvalidInputException("reader description line malformed! >" + line + "\n" + ex.getMessage(), ex);
         }
+        textReader.close();
 
     }
 

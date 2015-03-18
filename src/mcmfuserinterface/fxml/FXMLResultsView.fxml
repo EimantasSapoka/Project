@@ -9,14 +9,14 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" fx:id="anchorPane" onDragDetected="#anchorPaneDragDetected" onDragDone="#anchorPaneDragDone" onDragOver="#anchorPaneDragOver" prefHeight="500.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mcmfuserinterface.ResultsViewController">
+<AnchorPane id="AnchorPane" fx:id="anchorPane" onDragDetected="#anchorPaneDragDetected" onDragDone="#anchorPaneDragDone" onDragOver="#anchorPaneDragOver" onMouseMoved="#hide" prefHeight="500.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mcmfuserinterface.ResultsViewController">
    <children>
       <BorderPane layoutX="-72.0" layoutY="-27.0" prefHeight="200.0" prefWidth="320.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <top>
             <HBox />
          </top>
          <center>
-            <TableView fx:id="table" prefHeight="407.0" prefWidth="644.0" BorderPane.alignment="CENTER">
+            <TableView fx:id="table" onMouseMoved="#hide" prefHeight="407.0" prefWidth="644.0" BorderPane.alignment="CENTER">
                <columnResizePolicy>
                   <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                </columnResizePolicy>
@@ -34,7 +34,7 @@
                         </Label>
                      </children>
                   </Pane>
-                  <ListView fx:id="unselectedList" prefHeight="366.0" prefWidth="133.0" VBox.vgrow="ALWAYS" />
+                  <ListView fx:id="unselectedList" onMouseMoved="#hide" prefHeight="366.0" prefWidth="133.0" VBox.vgrow="ALWAYS" />
                </children>
             </VBox>
          </right>

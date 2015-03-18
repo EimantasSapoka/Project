@@ -1,9 +1,9 @@
 package ford_fulkerson.graph;
 
+import java.util.ArrayList;
+
 import model.Project;
 import model.Reader;
-import java.util.ArrayList;
-import java.util.Collections;
 
 public class Graph {
 	
@@ -12,13 +12,13 @@ public class Graph {
 	public static final int SOURCE_ID = 0;
 	public static final int SINK_ID = 1;
 
-	public int lowerCapacityOffset; 		// the offset used to calculate the lower capacity of edges. 
+	private int lowerCapacityOffset; 		// the offset used to calculate the lower capacity of edges. 
 	
-	public Vertex source;					// the source vertex reference
-	public Vertex sink;						// the sink vertex reference
+	protected Vertex source;					// the source vertex reference
+	protected Vertex sink;						// the sink vertex reference
 	
-	public ArrayList<Vertex> vertices;		// all the vertices in the graph
-	public ArrayList<Edge> edges;			// all the edges in the graph
+	protected ArrayList<Vertex> vertices;		// all the vertices in the graph
+	protected ArrayList<Edge> edges;			// all the edges in the graph
 	
 	public Graph(){
 		
@@ -44,7 +44,7 @@ public class Graph {
 	 */
 	public void addEdge(Edge edge){
 		if (! edges.contains(edge)){
-			this.getVertex(edge.getParent().getVertexID()).addOutEdge(edge);
+			this.getVertex(edge.getSource().getVertexID()).addOutEdge(edge);
 			edges.add(edge);
 		}
 	}
@@ -284,7 +284,7 @@ public class Graph {
 		for (Edge e : edges){
 			if (e.getDestination().equals(this.sink)){
 				if (e.getFlow() == 0){
-					unassigned.add((Project) e.getParent().getObject());
+					unassigned.add((Project) e.getSource().getObject());
 				}
 			}
 		}

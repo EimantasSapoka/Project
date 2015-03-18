@@ -6,9 +6,7 @@
 package mcmfuserinterface.drag_drop_table.columns;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TableColumn;
-import javafx.util.Callback;
 import mcmfuserinterface.drag_drop_table.TableObjectInterface;
 import model.Reader;
 
@@ -23,7 +21,7 @@ public class ReaderNameColumn extends TableColumn<TableObjectInterface, TableObj
         super(name);
         setMinWidth(150);
         setMaxWidth(300);
-        
+       
        setCellValueFactory(features -> {
               Reader reader = (Reader) features.getValue();
               return new ReadOnlyObjectWrapper(reader.getName());

@@ -9,7 +9,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" fx:id="anchorPane" onDragDetected="#anchorPaneDragDetected" onDragDone="#anchorPaneDragDone" onDragOver="#anchorPaneDragOver" prefHeight="500.0" prefWidth="800.0" styleClass="labelStylesheet.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mcmfuserinterface.MainViewController">
+<AnchorPane id="AnchorPane" fx:id="anchorPane" onDragDetected="#anchorPaneDragDetected" onDragDone="#anchorPaneDragDone" onDragOver="#anchorPaneDragOver" onMouseMoved="#hide" prefHeight="500.0" prefWidth="800.0" styleClass="labelStylesheet.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mcmfuserinterface.MainViewController">
    <children>
       <BorderPane layoutX="-72.0" layoutY="-27.0" prefHeight="200.0" prefWidth="320.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <top>
@@ -21,6 +21,7 @@
                         <items>
                               <MenuItem mnemonicParsing="false" onAction="#openFileButtonAction" text="Open file..." />
                               <MenuItem mnemonicParsing="false" onAction="#createRandomInstance" text="Create random instance" />
+                              <MenuItem mnemonicParsing="false" onAction="#export" text="Export instance" />
                           <MenuItem mnemonicParsing="false" onAction="#closeWindow" text="Close" />
                         </items>
                       </Menu>
@@ -29,13 +30,6 @@
                </children>
             </HBox>
          </top>
-         <center>
-            <TableView fx:id="table" prefHeight="407.0" prefWidth="644.0" BorderPane.alignment="CENTER">
-               <columnResizePolicy>
-                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-               </columnResizePolicy>
-            </TableView>
-         </center>
          <right>
             <VBox prefHeight="408.0" prefWidth="129.0" BorderPane.alignment="CENTER">
                <children>
@@ -53,7 +47,7 @@
                         </TextField>
                      </children>
                   </Pane>
-                  <ListView fx:id="lowSelectedList" prefHeight="366.0" prefWidth="133.0" VBox.vgrow="ALWAYS" />
+                  <ListView fx:id="lowSelectedList" onMouseMoved="#hide" prefHeight="366.0" prefWidth="133.0" VBox.vgrow="ALWAYS" />
                </children>
             </VBox>
          </right>
@@ -63,7 +57,10 @@
                   <Pane prefHeight="67.0" prefWidth="323.0" HBox.hgrow="SOMETIMES">
                      <children>
                         <CheckBox fx:id="zeroCapacityReaderCheckbox" layoutX="106.0" layoutY="6.0" mnemonicParsing="false" onAction="#toggleShowZeroCapacityReaders" selected="true" text="Show Readers with zero capacity" />
-                        <Label fx:id="trashBin" layoutX="35.0" layoutY="9.0" minHeight="-Infinity" minWidth="-Infinity" onDragDropped="#onTrashBinDragDropped" onDragExited="#onTrashBinDragExit" onDragOver="#onTrashBinDragOver" prefHeight="35.0" prefWidth="39.0" />
+                        <Label fx:id="trashBin" layoutX="35.0" layoutY="16.0" minHeight="-Infinity" minWidth="-Infinity" onDragDropped="#onTrashBinDragDropped" onDragExited="#onTrashBinDragExit" onDragOver="#onTrashBinDragOver" prefHeight="35.0" prefWidth="39.0" scaleX="2.5" scaleY="2.5">
+                           <padding>
+                              <Insets left="10.0" />
+                           </padding></Label>
                         <CheckBox fx:id="completeListReaderCheckBox" layoutX="106.0" layoutY="36.0" mnemonicParsing="false" onAction="#toggleShowReadersWithCompleteLists" prefHeight="17.0" prefWidth="207.0" selected="true" text="Show readers with complete lists" />
                      </children>
                   </Pane>
@@ -81,6 +78,16 @@
                </children>
             </HBox>
          </bottom>
+         <center>
+            <TableView fx:id="table" cache="true" cacheHint="SPEED" fixedCellSize="50.0" onMouseMoved="#hide" tableMenuButtonVisible="true" BorderPane.alignment="CENTER">
+               <cursor>
+                  <Cursor fx:constant="DEFAULT" />
+               </cursor>
+               <BorderPane.margin>
+                  <Insets />
+               </BorderPane.margin>
+            </TableView>
+         </center>
       </BorderPane>
    </children>
 </AnchorPane>

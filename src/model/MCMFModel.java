@@ -5,15 +5,14 @@
  */
 package model;
 
-import ford_fulkerson.ReaderShortlistException;
-import ford_fulkerson.TextScanner;
-import ford_fulkerson.graph.Edge;
-import ford_fulkerson.graph.Graph;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import ford_fulkerson.ReaderShortlistException;
+import ford_fulkerson.TextScanner;
+import ford_fulkerson.graph.Graph;
 
 /**
  *
@@ -138,9 +137,16 @@ public class MCMFModel {
      */
     public boolean isLoadBalanced() {
         for (Reader reader : this.readers) {
+        	
         	int readerCapacityGap = reader.getCapacity() + graph.getLowerCapacityOffset() - reader.getAssigned().size();
+        	readerCapacityGap = readerCapacityGap < 0? 0:readerCapacityGap;
+        	
             for (Reader otherReader : readers){
-            	if (Math.abs(otherReader.getCapacity() + graph.getLowerCapacityOffset() - otherReader.getAssigned().size() - readerCapacityGap) > 1){
+            	
+            	int otherReaderCapacityGap = otherReader.getCapacity() + graph.getLowerCapacityOffset() - otherReader.getAssigned().size();
+            	otherReaderCapacityGap = otherReaderCapacityGap < 0? 0:otherReaderCapacityGap;
+            	
+            	if (Math.abs( otherReaderCapacityGap - readerCapacityGap) > 1){
             		return false; 
             	}
             }
@@ -330,7 +336,7 @@ public class MCMFModel {
     }
      
      public String assignProjectToReader(Reader readerToAdd, Project projectToAdd) {
-    	 if (readerToAdd.getPreferences().contains(projectToAdd)){
+    	 if (readerToAdd.getAssigned().contains(projectToAdd)){
              return READER_ALREADY_ASSIGNED_PROJECT_ERR_MSG;
          } 
          
@@ -356,21 +362,6 @@ public class MCMFModel {
         
     }
 
-    public String assignProjectToReader(Reader reader, Project projectToAdd, Project projectToAddBefore){
-        if (reader.getAssigned().contains(projectToAdd)){
-            return READER_ALREADY_ASSIGNED_PROJECT_ERR_MSG;
-        } 
-        if ( reader.getAssigned().size() == reader.getCapacity()){
-        	return READER_AT_MARKING_TARGET_ERR_MSG;
-        }
-        if (reader.getSupervisorProjects().contains(projectToAdd.getId())){
-        	return PROJECT_SUPERVISED_ERROR_MSG;
-        }
-        
-        int indexToPlace = reader.getAssigned().indexOf(projectToAddBefore);
-        reader.assignProject(indexToPlace, projectToAdd);
-        return null;
-    }
     
     public void removeProjectFromReaderPreferences(Reader readerToRemoveFrom, Project projectToRemove) {
         readerToRemoveFrom.removePreference(projectToRemove);
@@ -380,7 +371,8 @@ public class MCMFModel {
      * gets unselected projects
      * @return 
      */
-    public List<Project> getUnselectedProjects() {
+    @SuppressWarnings("unchecked")
+	public List<Project> getUnselectedProjects() {
         ArrayList<Project> unassigned = (ArrayList<Project>) projects.clone();
         
         for (Reader reader : readers){

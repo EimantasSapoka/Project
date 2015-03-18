@@ -6,6 +6,7 @@
 package mcmfuserinterface.drag_drop_table;
 
 import java.awt.Toolkit;
+
 import javafx.scene.control.Alert;
 import mcmfuserinterface.ControllerInterface;
 

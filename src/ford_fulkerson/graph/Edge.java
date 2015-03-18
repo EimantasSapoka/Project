@@ -5,7 +5,7 @@ public class Edge{
 	protected int capacity;			// edge capacity
 	protected int weight;			// edge weight
  	protected int flow;				// flow going through this edge
-	protected Vertex parent;		// where the edge is coming from, origin
+	protected Vertex source;		// where the edge is coming from, origin
 	protected Vertex destination;	// where the edge is going to, destination
 	
 	
@@ -23,7 +23,7 @@ public class Edge{
 		this.weight = 0;
 		this.capacity = 0;
 		this.flow = 0;
-		this.parent = parent;
+		this.source = parent;
 		this.destination = destination;
 	}
 	
@@ -43,11 +43,11 @@ public class Edge{
 		this.flow = flow;
 	}
 
-	public Vertex getParent() {
-		return parent;
+	public Vertex getSource() {
+		return source;
 	}
-	public void setParent(Vertex parent) {
-		this.parent = parent;
+	public void setSource(Vertex parent) {
+		this.source = parent;
 	}
 	public Vertex getDestination() {
 		return destination;
@@ -75,13 +75,13 @@ public class Edge{
 		}
 
 		Edge e = (Edge) o;
-		return this.parent.equals(e.getParent()) && this.destination.equals(e.getDestination()) && this.capacity == e.getCapacity();
+		return this.source.equals(e.getSource()) && this.destination.equals(e.getDestination()) && this.capacity == e.getCapacity();
 	}
 	
 	
 	public String toString(){
 		return String.format("%d (%d) -> %d (%d) ; weight: %d  -- flow/cap: %d/%d ",
-				this.parent.getVertexID(),this.parent.getDistanceFromSource(),
+				this.source.getVertexID(),this.source.getDistanceFromSource(),
 				this.destination.getVertexID(), this.destination.getDistanceFromSource(), this.weight,
 				this.flow, this.capacity);				
 	}

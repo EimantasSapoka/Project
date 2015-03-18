@@ -7,21 +7,12 @@ package mcmfuserinterface.drag_drop_table;
 
 import java.awt.Toolkit;
 
-import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
-import mcmfuserinterface.ControllerInterface;
 import mcmfuserinterface.MainViewController;
-import mcmfuserinterface.ResultsViewController;
 import model.Project;
 import model.Reader;
 
@@ -31,7 +22,8 @@ import model.Reader;
  */
 public class DragDropLabel extends DragLabel {
 
-    public DragDropLabel(final Project project, final ControllerInterface controller) {
+    public DragDropLabel(final Project project, final MainViewController controller) {
+    	
         super(project, controller);
         
         this.setOnMouseClicked(event -> {
@@ -66,7 +58,7 @@ public class DragDropLabel extends DragLabel {
             if (event.getTransferMode() == TransferMode.MOVE) {
                 HBox sourceHbox = (HBox) sourceNode.getParent();
                 Reader readerToRemoveFrom = (Reader) sourceHbox.getUserData();
-
+                
                 errorMsg = controller.moveProject(readerToAdd, readerToRemoveFrom, projectToAdd, projectToPlaceBefore);
             } else {
                 errorMsg = controller.addProjectToReader(readerToAdd, projectToAdd, projectToPlaceBefore);

@@ -3,11 +3,11 @@ package test.graph_creator;
 import java.util.ArrayList;
 import java.util.Random;
 
+import model.MCMFModel;
 import ford_fulkerson.ReaderShortlistException;
 import ford_fulkerson.graph.Edge;
 import ford_fulkerson.graph.Graph;
 import ford_fulkerson.graph.Vertex;
-import model.MCMFModel;
 
 /**
  * class which creates a random arbitrary graph

@@ -1,19 +1,19 @@
 package test;
 
 import static org.junit.Assert.assertTrue;
+import model.MCMFModel;
+import model.Project;
+import model.Reader;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import test.graph_creator.RandomArbitraryModel;
-import test.graph_creator.RandomReaderAllocationModel;
 import test.augustineMCMF.MinCostMaxFlowSPA;
 import test.augustineMCMF.Network;
+import test.graph_creator.RandomArbitraryModel;
+import test.graph_creator.RandomReaderAllocationModel;
 import ford_fulkerson.Algorithm;
 import ford_fulkerson.ReaderShortlistException;
-import model.MCMFModel;
-import model.Project;
-import model.Reader;
 
 public class CorrectnessTest {
 
@@ -128,11 +128,11 @@ public class CorrectnessTest {
 	 * a method which runs both algorithms on the testGraph and network
 	 * @throws Exception
 	 */
-	private void runTests(MCMFModel testGraph, Network network) throws Exception {
+	private void runTests(MCMFModel testModel, Network network) throws Exception {
 		
 		//run against both algorithms, measuring performance
 		long start = System.nanoTime();
-		Algorithm.runUnbalancedAlgorithm(testGraph);
+		Algorithm.runUnbalancedAlgorithm(testModel.getGraph());
 		long performanceMine = System.nanoTime() - start;
 		
 		long start2 = System.nanoTime();
@@ -143,17 +143,17 @@ public class CorrectnessTest {
 			System.out.println("Augustine algorithm performed faster by " + (performanceMine-performanceAugustine)/1000000 + "ms");
 		}
 	
-		if (network.getFlowSize() != testGraph.getGraph().getFlow() || network.getFlowCost() != testGraph.getGraph().getWeight()){
+		if (network.getFlowSize() != testModel.getGraph().getFlow() || network.getFlowCost() != testModel.getGraph().getWeight()){
 			System.out.println("augustine weight: " + network.getFlowCost() + " augustine flow: " + network.getFlowSize() +
-								"\nmy weight: " + testGraph.getGraph().getWeight() + " my flow: " + testGraph.getGraph().getFlow());
-			System.out.println("Augustine balanced: " + network.isLoadBalanced() + " mine balanced: " + testGraph.isLoadBalanced());
+								"\nmy weight: " + testModel.getGraph().getWeight() + " my flow: " + testModel.getGraph().getFlow());
+			System.out.println("Augustine balanced: " + network.isLoadBalanced() + " mine balanced: " + testModel.isLoadBalanced());
 		} 
 		
 		
 		// assert equal flow sizes and weights 
-		assertTrue(network.getFlowSize() <= testGraph.getGraph().getFlow());		
-		assertTrue(network.getFlowCost() >= testGraph.getGraph().getWeight());
-		assertTrue(testGraph.isLoadBalanced() || !network.isLoadBalanced());
+		assertTrue(network.getFlowSize() <= testModel.getGraph().getFlow());		
+		assertTrue(network.getFlowCost() >= testModel.getGraph().getWeight());
+		assertTrue(testModel.isLoadBalanced() || !network.isLoadBalanced());
 		
 	}
 }

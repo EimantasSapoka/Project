@@ -6,6 +6,10 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 
+import model.MCMFModel;
+import model.Project;
+import model.Reader;
+
 import org.junit.Test;
 
 import test.graph_creator.RandomArbitraryModel;
@@ -14,11 +18,6 @@ import ford_fulkerson.Algorithm;
 import ford_fulkerson.ReaderShortlistException;
 import ford_fulkerson.graph.Edge;
 import ford_fulkerson.graph.Graph;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import model.MCMFModel;
-import model.Project;
-import model.Reader;
 
 public class Constraints_Test {
 	
@@ -124,7 +123,7 @@ public class Constraints_Test {
 			// checks that the flow is equal or less to the capacity
 			assertTrue(e.getFlow() <= e.getCapacity());
 			
-			if (e.getParent().equals(graph.source())){
+			if (e.getSource().equals(graph.source())){
 				flowIn += e.getFlow();
 				capacityIn += e.getCapacity();
 			}
