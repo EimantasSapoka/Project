@@ -66,7 +66,7 @@ public class ListContextMenu extends ContextMenu {
                         break;
                     }
                 }
-                controller.refreshLowSelectedProjectList();
+                controller.refreshSideProjectList();
             }
         });
         getItems().add(remove);
@@ -79,7 +79,7 @@ public class ListContextMenu extends ContextMenu {
         MenuItem add = new MenuItem("Add..");
         add.setOnAction(e -> {
 
-            if (reader.getCapacity() == 0) {
+            if (reader.getMarkingTarget() == 0) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setHeaderText("Cannot add preference!");
                 alert.setContentText("Reader has capacity of zero!");
@@ -91,7 +91,7 @@ public class ListContextMenu extends ContextMenu {
             choices.addAll(controller.getProjects());
             choices.removeAll(controller.getReaderList(reader));
             for (int i = 0; i< choices.size(); i++){
-            	if(reader.getSupervisorProjects().contains(choices.get(i).getId())){
+            	if(reader.getSupervisorProjects().contains(choices.get(i).getID())){
             		choices.remove(i--);
             	}
             }

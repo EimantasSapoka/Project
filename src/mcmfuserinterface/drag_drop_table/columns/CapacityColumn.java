@@ -19,12 +19,12 @@ public class CapacityColumn extends TableColumn<TableObjectInterface, TableObjec
     public CapacityColumn(String name){
         super(name);
         setMinWidth(30);
-        setPrefWidth(40);
+        setPrefWidth(45);
         setMaxWidth(60);
         
         setCellValueFactory(features -> {
               Reader reader = (Reader) features.getValue();
-              return new ReadOnlyObjectWrapper(reader.getCapacity());
+              return new ReadOnlyObjectWrapper(reader.getMarkingTarget());
         });
         
     }

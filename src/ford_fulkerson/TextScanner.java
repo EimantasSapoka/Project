@@ -76,56 +76,8 @@ public class TextScanner {
         textReader.close();
 
     }
-
-    /**
-     * parses a text file with bar separated values. Deprecated method, replaced with newer, 
-     * parseCommaSeparatedInput.
-     * @param textFile
-     * @param model
-     * @throws Exception 
-     */
-    @Deprecated
-    public static void parseBarSeparatedInput(File textFile, MCMFModel model) throws Exception {
-        BufferedReader textReader = new BufferedReader(new FileReader(textFile));
-        String line = "";
-        try {
-            while ((line = textReader.readLine()) != null) {
-                if (line.isEmpty()) {
-                    continue;
-                }
-
-                String[] readerInfo = line.split("\\|");
-                int readerID = Integer.parseInt(readerInfo[0].trim());
-                int readerCapacity = Integer.parseInt(readerInfo[2].trim());
-                if (readerInfo.length == 4) {
-                    String[] projectsSplit = readerInfo[3].split(" ");
-                    for (String projectID : projectsSplit) {
-                        if (projectID.trim().isEmpty()) {
-                            continue;
-                        }
-                        int id = Integer.parseInt(projectID.trim());
-                        Project project = new Project(id);
-                        model.addProject(project);
-                    }
-                }
-                Reader reader = createReader(model, readerID, readerCapacity, readerInfo);
-                parseSupervisingProjects(readerInfo[1], reader);
-            }
-            textReader.close();
-            
-        } catch (Exception ex) {
-            textReader.close();
-            throw new InvalidInputException("Could not parse file " + textFile.getName() + "\n>" + ex.getMessage(), ex);
-        }
-    }
     
-    /**
-     * creates a reader with its name as id
-     * @throws InvalidInputException 
-     */
-    private static Reader createReader(MCMFModel model, int readerID, int readerCapacity, String[] readerInfo) throws InvalidInputException{
-        return createReader(model,readerID+"",readerID, readerCapacity, readerInfo);
-    }
+  
 
     /**
      * creates a reader from the given data and adds it to the model
@@ -137,7 +89,7 @@ public class TextScanner {
             reader = new Reader(readerName, readerID, readerCapacity);
             model.addReader(reader);
             for (int id : retrieveSupervisedProjects(model, reader)){
-            	reader.addSupervisingProject(id);
+            	reader.addSupervisingProject(model.getProject(id));
             }
             if (readerInfo.length == 4) {
                 parseProjectPreferences(readerInfo[3], reader, model);
@@ -159,7 +111,7 @@ public class TextScanner {
     	List<Integer> list = new ArrayList<Integer>();
 		for (Project p : model.getProjects()){
 			if (p.getSupervisorID() == reader.getID()){
-				list.add(p.getId());
+				list.add(p.getID());
 			}
 		}
 		return list;
@@ -183,7 +135,7 @@ public class TextScanner {
                 if (project == null) {
                     throw new InvalidInputException("Project with id " + id + " is not in among the data input!");
                 }
-                if (reader.getSupervisorProjects().contains(project.getId())){
+                if (reader.getSupervisorProjects().contains(project.getID())){
                 	throw new InvalidInputException("Project id " + id + " is supervised by reader " 
                 									+ reader.getName() + " and is in its preference list!");
                 }
@@ -195,19 +147,5 @@ public class TextScanner {
         }
     }
 
-    /**
-     * method to parse readers currently supervised projects
-     * @param barSplit
-     * @param reader
-     */
-    private static void parseSupervisingProjects(String projects,Reader reader) {
-        String[] supervisedProjects = projects.split(" ");
-        for (String projectID : supervisedProjects) {
-            if (projectID.trim().isEmpty()) {
-                continue;
-            }
-            int id = Integer.parseInt(projectID.trim());
-            reader.addSupervisingProject(id);
-        }
-    }
+ 
 }

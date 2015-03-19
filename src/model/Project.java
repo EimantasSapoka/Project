@@ -1,52 +1,53 @@
 package model;
 
 import mcmfuserinterface.drag_drop_table.TableObjectInterface;
-import ford_fulkerson.graph.Vertex;
+import ford_fulkerson.network.NetworkObjectInterface;
+import ford_fulkerson.network.Vertex;
 
-public class Project implements Comparable<Project>, TableObjectInterface{
+public class Project implements Comparable<Project>, TableObjectInterface, NetworkObjectInterface {
 	private final int id;			// project id
 	private final Vertex vertex;	// vertex associated with the project
 	private int timesSelected;		// number of times the project had been added to a pref list. 
-        private int supervisorID;       // id of the supervisor.
+    private int supervisorID;       // id of the supervisor.
 	private String name;
-        private Reader assigned;
+    private Reader assignedTo;
         
         
 	public Project (int id){
 		this.id = id;
 		this.vertex = new Vertex(id, this);
 		this.timesSelected = 0;
-                this.name = id+"";
-                this.supervisorID = -1;
+        this.name = id+"";
+        this.supervisorID = -1;
 	}
         
-        public Project(String projectName, int id){
-            this(id);
-            this.name = projectName;
-        }
-        
-        public Project(String projectName, int id, int projectSupervisorID){
-            this(projectName, id);
-            this.supervisorID = projectSupervisorID;
-        }
-        
-        public void assignToReader(Reader reader){
-            this.assigned = reader;
-        }
-        
-        public int getSupervisorID(){
-            return this.supervisorID;
-        }
+    public Project(String projectName, int id){
+        this(id);
+        this.name = projectName;
+    }
+    
+    public Project(String projectName, int id, int projectSupervisorID){
+        this(projectName, id);
+        this.supervisorID = projectSupervisorID;
+    }
+    
+    public void assignToReader(Reader reader){
+        this.assignedTo = reader;
+    }
+    
+    public int getSupervisorID(){
+        return this.supervisorID;
+    }
 
 	public Vertex getVertex() {
 		return vertex;
 	}
 
-	public int getId() {
+	public int getID() {
 		return id;
 	}
 	
-        @Override
+    @Override
 	public String toString(){
 		return "("+id+") " + name;
 	}
@@ -79,7 +80,7 @@ public class Project implements Comparable<Project>, TableObjectInterface{
     }
 
     public Reader getAssignedReader() {
-        return assigned;
+        return assignedTo;
     }
     
     public boolean equals(int id){
@@ -90,7 +91,7 @@ public class Project implements Comparable<Project>, TableObjectInterface{
         if (project == null) {
             return false;
         }
-        return this.id == project.getId() && this.vertex.equals(project.getVertex());
+        return this.id == project.getID() && this.vertex.equals(project.getVertex());
     }
 }
 

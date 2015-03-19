@@ -14,10 +14,10 @@ import org.junit.Test;
 
 import test.graph_creator.RandomArbitraryModel;
 import test.graph_creator.RandomReaderAllocationModel;
-import ford_fulkerson.Algorithm;
+import ford_fulkerson.MinCostMaxFlowAlgorithm;
 import ford_fulkerson.ReaderShortlistException;
-import ford_fulkerson.graph.Edge;
-import ford_fulkerson.graph.Graph;
+import ford_fulkerson.network.Edge;
+import ford_fulkerson.network.Network;
 
 public class Constraints_Test {
 	
@@ -34,11 +34,11 @@ public class Constraints_Test {
 
 			readerGraph = new RandomReaderAllocationModel();
             try {
-                readerGraph.createGraph();
+                readerGraph.createNetwork();
             } catch (ReaderShortlistException ex) {
                 // we don't really care for any reader shortlists. So do nothing.
             }
-			Algorithm.runLoadBalancedAlgorithm(readerGraph);
+			MinCostMaxFlowAlgorithm.runLoadBalancedAlgorithm(readerGraph);
 			checkReaderConstraints(readerGraph);
 		}
 	}
@@ -58,7 +58,7 @@ public class Constraints_Test {
 		
 		for (Reader r: model.getReaders()){
 			assigned = 0;
-			capacity = r.getCapacity();
+			capacity = r.getMarkingTarget();
 			for (Edge e : r.getVertex().getOutEdges()){
 				if (e.getFlow() > 0){
 					assigned ++;
@@ -85,8 +85,8 @@ public class Constraints_Test {
 	public void testArbitraryGraph() throws ReaderShortlistException{
 		for (int i = 0; i< TEST_COUNT ; i++){
 			arbitraryGraph = new RandomArbitraryModel();
-			Algorithm.runLoadBalancedAlgorithm(arbitraryGraph);
-			graphConstraintsTests(arbitraryGraph.getGraph());
+			MinCostMaxFlowAlgorithm.runLoadBalancedAlgorithm(arbitraryGraph);
+			networkConstraintsTests(arbitraryGraph.getNetwork());
 		}
 	}
 
@@ -100,7 +100,7 @@ public class Constraints_Test {
 	 */
 	private static boolean projectInList(int projectID, ArrayList<Project> preferences){
 		for (Project p: preferences){
-			if (p.getId() == projectID){
+			if (p.getID() == projectID){
 				return true;
 			}
 		}
@@ -111,23 +111,23 @@ public class Constraints_Test {
 	 * method which loops through graph's edges and checks
 	 * that each edge's flow does not exceed capacity and
 	 * flow into the graph is equal to flow out of the graph.
-	 * @param graph
+	 * @param network
 	 */
-	public static void graphConstraintsTests(Graph graph) {
+	public static void networkConstraintsTests(Network network) {
 		int flowIn = 0;
 		int flowOut = 0;
 		int capacityIn = 0;
 		int capacityOut = 0;
 		
-		for (Edge e : graph.getEdges()){
+		for (Edge e : network.getEdges()){
 			// checks that the flow is equal or less to the capacity
 			assertTrue(e.getFlow() <= e.getCapacity());
 			
-			if (e.getSource().equals(graph.source())){
+			if (e.getSource().equals(network.source())){
 				flowIn += e.getFlow();
 				capacityIn += e.getCapacity();
 			}
-			if (e.getDestination().equals(graph.sink())){
+			if (e.getDestination().equals(network.sink())){
 				flowOut += e.getFlow();
 				capacityOut += e.getCapacity();
 			}

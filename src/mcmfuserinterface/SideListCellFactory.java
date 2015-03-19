@@ -1,0 +1,64 @@
+package mcmfuserinterface;
+
+import mcmfuserinterface.drag_drop_table.TableObjectInterface;
+import model.Project;
+import javafx.scene.Node;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.Tooltip;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
+import javafx.util.Callback;
+
+public class SideListCellFactory implements Callback<ListView<Project>, ListCell<Project>> {
+
+	private final ControllerInterface controller;
+	    
+    public SideListCellFactory(ControllerInterface controller) {
+        this.controller = controller;
+    }
+	
+	@Override
+	public ListCell<Project> call(ListView<Project> arg0) {
+		 final ListCell<Project> listCell =  new ListCell<Project>(){
+
+             @Override
+             protected void updateItem(Project item, boolean empty) {
+                 super.updateItem(item, empty); 
+                 if (item != null){
+                     setUserData(item);
+                     setTooltip(new Tooltip(item.getName()));
+                     setStyle(controller.getListCellStyle(item));
+                     setText(controller.getListItemText(item));
+                 }else {
+                	 setText("");
+                	 setTooltip(null);
+                     setUserData(null);
+                     setVisible(false);
+                     setStyle(null);
+                 }
+             }               
+         };
+         if (controller instanceof MainViewController){
+        	 listCell.setOnMouseClicked(event -> {
+	             ((MainViewController) controller).setHighlightedProject((Project)((Node)event.getSource()).getUserData());
+	             controller.refresh();
+        	 });
+         }
+         
+         listCell.setOnDragDetected(event ->{
+         		TableObjectInterface data = (TableObjectInterface) listCell.getUserData();
+                 if (data == null){
+                     return;
+                 }
+                 Dragboard db = listCell.startDragAndDrop(TransferMode.COPY);
+                 ClipboardContent content = new ClipboardContent();
+
+                 content.putString(data.getName());
+                 db.setContent(content);
+         });
+         return listCell;
+     }
+
+}

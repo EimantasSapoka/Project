@@ -47,7 +47,7 @@ public class AssignedProjectsCountColumn extends TableColumn<TableObjectInterfac
                 protected void updateItem(TableObjectInterface arg0, boolean arg1) {
                     super.updateItem(arg0, arg1);
                     if (arg0 != null) {
-                        label.textProperty().bind(((Reader) arg0).getAssignedCountStringProperty());
+                        label.textProperty().bind(((Reader) arg0).getAssignedCountProperty());
                         setGraphic(label);
                     } else {
                         setGraphic(null);

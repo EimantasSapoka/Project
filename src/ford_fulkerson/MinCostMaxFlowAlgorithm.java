@@ -6,12 +6,12 @@ import java.util.List;
 import model.MCMFModel;
 import model.Project;
 import model.Reader;
-import ford_fulkerson.graph.Edge;
-import ford_fulkerson.graph.Graph;
-import ford_fulkerson.graph.Vertex;
-import ford_fulkerson.graph.residual_classes.ResidualEdge;
-import ford_fulkerson.graph.residual_classes.ResidualGraph;
-import ford_fulkerson.graph.residual_classes.ResidualVertex;
+import ford_fulkerson.network.Edge;
+import ford_fulkerson.network.Network;
+import ford_fulkerson.network.Vertex;
+import ford_fulkerson.network.residual_classes.ResidualEdge;
+import ford_fulkerson.network.residual_classes.ResidualNetwork;
+import ford_fulkerson.network.residual_classes.ResidualVertex;
 
 /**
  * class which runs the min cost max flow algorithm.
@@ -19,10 +19,10 @@ import ford_fulkerson.graph.residual_classes.ResidualVertex;
  * @author Eimantas
  *
  */
-public class Algorithm {
+public class MinCostMaxFlowAlgorithm {
 	
-	public static void runUnbalancedAlgorithm(Graph graph){
-		solveGraph(graph);
+	public static void runUnbalancedAlgorithm(Network network){
+		solveNetwork(network);
 	}
 
 	/**
@@ -34,7 +34,7 @@ public class Algorithm {
 	 * @param graph
 	 */
 	public static void runLoadBalancedAlgorithm(MCMFModel model){
-		solveGraph(model.getGraph());
+		solveNetwork(model.getNetwork());
 		loadBalance(model);
 	}
 
@@ -50,18 +50,18 @@ public class Algorithm {
 	 */
 	
 	private static void loadBalance(MCMFModel model) {
-        Graph graph = model.getGraph();
+        Network network = model.getNetwork();
 		while( !model.isLoadBalanced()){
-			graph.reset();
+			network.reset();
 			model.reset();
-			graph.decreaseCapacityOffset();
-			solveGraph(graph);
+			network.decreaseCapacityOffset();
+			solveNetwork(network);
 		}
 
-		while (graph.getLowerCapacityOffset() != 0){
-			graph.increaseCapacityOffset();
+		while (network.getLowerCapacityOffset() != 0){
+			network.increaseCapacityOffset();
 			model.reset();
-			solveGraph(graph);
+			solveNetwork(network);
 		}
 	}
 
@@ -74,9 +74,9 @@ public class Algorithm {
 	 */
 	public static void assignUnassignedProjects(MCMFModel model) throws ReaderShortlistException {
 		
-		if (!model.getGraph().isSaturatingFlow()){
+		if (!model.getNetwork().isSaturatingFlow()){
 			
-			ArrayList<Project> unassignedProjects = model.getGraph().findUnassignedProjects();
+			ArrayList<Project> unassignedProjects = model.getNetwork().findUnassignedProjects();
 			for (Reader reader : model.getReaders()){
 				if (reader.getResidualCapacity() > 0){
 					for (Project p: unassignedProjects){
@@ -84,25 +84,25 @@ public class Algorithm {
 					}
 				}
 			}
-			model.createGraph();
-			solveGraph(model.getGraph());
+			model.createNetwork();
+			solveNetwork(model.getNetwork());
 		}
 	}
 
 
 	/**
 	 * finds the min cost max flow solution to the given graph.
-	 * @param graph
+	 * @param network
 	 */
-	private static void solveGraph(Graph graph) {
+	private static void solveNetwork(Network network) {
 		
-		ResidualGraph residualGraph = new ResidualGraph(graph, graph);
-		List<ResidualEdge> path = dijkstra(graph, residualGraph);
+		ResidualNetwork residualNetwork = new ResidualNetwork(network, network);
+		List<ResidualEdge> path = dijkstra(network, residualNetwork);
 		
 		while( path != null) {
 			updateEdges(path, 1);
-			residualGraph = new ResidualGraph(graph, residualGraph);
-			path = dijkstra(graph, residualGraph);
+			residualNetwork = new ResidualNetwork(network, residualNetwork);
+			path = dijkstra(network, residualNetwork);
 		}
 	}
 	
@@ -111,13 +111,13 @@ public class Algorithm {
 	/**
 	 * method to traverse the residual graph using Dijkstra's algorithm and
 	 * find the shortest path from source to sink. 
-	 * @param realGraph
+	 * @param realNetwork
 	 */
-	public static ArrayList<ResidualEdge> dijkstra(Graph realGraph, ResidualGraph residualGraph){	
+	public static ArrayList<ResidualEdge> dijkstra(Network realNetwork, ResidualNetwork residualNetwork){	
 		
 		@SuppressWarnings("unchecked")
-		ArrayList<Vertex> unvisitedVertices = (ArrayList<Vertex>) residualGraph.getVertices().clone(); // list of all vertices
-		Vertex current = residualGraph.source();
+		ArrayList<Vertex> unvisitedVertices = (ArrayList<Vertex>) residualNetwork.getVertices().clone(); // list of all vertices
+		Vertex current = residualNetwork.source();
 		current.setDistanceFromSource(0); // set source distance from itself to be 0
 		
 		while ( !unvisitedVertices.isEmpty() ){
@@ -155,10 +155,10 @@ public class Algorithm {
 			}
 		}
 		
-		if ( residualGraph.sink().getPath() == null ){
+		if ( residualNetwork.sink().getPath() == null ){
 			return null;
 		} else {
-			return getPathArray(residualGraph);
+			return getPathArray(residualNetwork);
 		}
 		
 	}
@@ -196,15 +196,15 @@ public class Algorithm {
 	/**
 	 * method to traverse the graph backwards from the sink and return the path as an 
 	 * arraylist of edges from source to sink
-	 * @param graph
+	 * @param network
 	 * @return
 	 */
-	private static ArrayList<ResidualEdge> getPathArray(Graph graph) {
-		Vertex vertex = graph.sink();
+	private static ArrayList<ResidualEdge> getPathArray(Network network) {
+		Vertex vertex = network.sink();
 		ArrayList<ResidualEdge> path = new ArrayList<ResidualEdge>();
 		ResidualEdge edge;
 
-		while (! vertex.equals(graph.source())){
+		while (! vertex.equals(network.source())){
 			edge = vertex.getPath();
 			vertex = edge.getSource();
 			path.add(0,edge);

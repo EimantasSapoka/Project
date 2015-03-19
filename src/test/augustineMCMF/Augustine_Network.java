@@ -2,14 +2,14 @@ package test.augustineMCMF;
 
 import java.util.ArrayList;
 
-public class Network 
+public class Augustine_Network 
 {
 	private ArrayList<Edge> edges;
 	private ArrayList<Node> nodes;
 	
 	private Node source, sink;
 	
-	public Network()
+	public Augustine_Network()
 	{
 		edges = new ArrayList<Edge>();
 		nodes = new ArrayList<Node>();

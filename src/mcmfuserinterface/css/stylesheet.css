@@ -17,6 +17,10 @@
     -fx-text-fill: #3333CC !important;
 }
 
+.invisible{
+	visibility: hidden;
+}
+
 .topChoice {
 	-fx-text-fill: #33CC33;
 }

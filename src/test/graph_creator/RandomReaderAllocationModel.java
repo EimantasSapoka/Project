@@ -17,8 +17,6 @@ public class RandomReaderAllocationModel extends MCMFModel{
 	private int readerIDcounter = 1;
 	private final int PROJECT_COUNT;
 	private final int READER_COUNT;
-    private int projectsLeft;
-    private int readersLeft;
 	private ArrayList<Project> projectList;
     
     private int targetMin, targetMax, preferenceMin, preferenceMax;
@@ -54,8 +52,8 @@ public class RandomReaderAllocationModel extends MCMFModel{
 		this.preferenceMax = preferenceMax == 0? preferenceMin*2:preferenceMax;
 		
 		rand = new Random();
-		READER_COUNT = readersLeft = readerCount;
-		PROJECT_COUNT = projectsLeft = projectCount;
+		READER_COUNT = readerCount;
+		PROJECT_COUNT = projectCount;
         
 		projectList = new ArrayList<Project>(PROJECT_COUNT);
 		
@@ -106,14 +104,12 @@ public class RandomReaderAllocationModel extends MCMFModel{
         
 		int readerCapacity = readerCapacityMax == 0? readerCapacityMin:(rand.nextInt(readerCapacityMax+1) + readerCapacityMin);
                 
-        projectsLeft -= readerCapacity;
-        readersLeft--;
 		
 		Reader r = new Reader(readerIDcounter++, readerCapacity);
 		
 		for (Project p: projects){
 			if (p.getSupervisorID() == r.getID()){
-				r.addSupervisingProject(p.getId());
+				r.addSupervisingProject(p);
 			}
 		}
 		

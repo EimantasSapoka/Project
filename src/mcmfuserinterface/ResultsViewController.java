@@ -5,42 +5,22 @@
  */
 package mcmfuserinterface;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.chart.BarChart;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TableRow;
-import javafx.scene.control.Tooltip;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.Dragboard;
+import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import mcmfuserinterface.drag_drop_table.DragLabel;
 import mcmfuserinterface.drag_drop_table.ListContextMenu;
 import mcmfuserinterface.drag_drop_table.PopLabel;
@@ -61,7 +41,6 @@ public class ResultsViewController extends ViewController{
     
     @FXML    Button infoButton;
     @FXML    Button cancelButton;
-    @FXML    ListView<Project> unselectedList;
     @FXML    CheckMenuItem preferencesCheckBox;
     
     private  BarChart<String,Number> barChart;
@@ -69,13 +48,13 @@ public class ResultsViewController extends ViewController{
     
     
     @Override
-    public void initialize() {
+    public void initialize(){
     	
     }
     
     @Override
     protected String createOutput() {
-        Optional<List<String>> result =  createParameterDialogWindow();
+        Optional<List<String>> result =  DialogUtils.createParameterDialogWindow();
         if (result.isPresent() && result.get() != null){
             List<String> parameters = result.get();
             return createOutputText(parameters);
@@ -93,162 +72,50 @@ public class ResultsViewController extends ViewController{
                 resultString += reader.getName() +", ";
             }
             if(parameters.contains("cap")){
-                resultString += reader.getAssigned().size()+"/"+reader.getCapacity()+", ";
+                resultString += reader.getAssigned().size()+"/"+reader.getMarkingTarget()+", ";
             }
             if (parameters.contains("supervised")){
-                for (Integer project: reader.getSupervisorProjects()){
-                    resultString+= project + " ";
+                for (Project project: reader.getSupervisorProjects()){
+                    resultString+= project.getID() + " ";
                 }
                 resultString += ", ";
             }
             for (Project project : reader.getAssigned()){
-                resultString += project.getId()+" ";
+                resultString += project.getID()+" ";
             }
             resultString+="\n";
         }
         return resultString;
     }
 
-    private Optional<List<String>> createParameterDialogWindow() {
-        Dialog<List<String>> dialog = new Dialog<>();
-        dialog.setTitle("Choose export format");
-        dialog.setHeaderText("Select parameters ");
-        ButtonType exportButton = new ButtonType("Export", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(exportButton, ButtonType.CANCEL);
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
-        CheckBox readerNames = new CheckBox("reader names");
-        CheckBox readerID = new CheckBox("reader IDs");
-        CheckBox readerSupervisedProjects = new CheckBox("reader supervised projects");
-        CheckBox capacityAssigned = new CheckBox("assigned/Capacity");
-        grid.add(readerNames, 1, 0);
-        grid.add(readerID, 1, 1);
-        grid.add(readerSupervisedProjects, 1, 2);
-        grid.add(capacityAssigned, 1, 3);
-        dialog.getDialogPane().setContent(grid);
-        dialog.setResultConverter(dialogButton -> {
-            if ( dialogButton == exportButton) {
-                List<String> parameters = new ArrayList<String>();
-                 if (readerID.isSelected()){
-                    parameters.add("ids");
-                }
-                 if (readerNames.isSelected()){
-                    parameters.add("names");
-                }
-                 if(capacityAssigned.isSelected()){
-                    parameters.add("cap");
-                }
-               
-                if(readerSupervisedProjects.isSelected()){
-                    parameters.add("supervised");
-                }
-                
-                return parameters;
-            }
-            return null;
-        });
-        return dialog.showAndWait();
-    }
+
     
     @FXML
     private void showPreferencesToggle(){
         refreshTable();
     }
     
-    void setModel(MCMFModel model) {
+    protected void setModel(MCMFModel model) {
         this.model = model;
         createTableFromModel();
-        createUnselectedProjectsList();
+        createSideList();
     }
     
     @Override
     protected void createTableColumns() {
         table.getColumns().add(new ReaderNameColumn("Reader name"));
-        table.getColumns().add(new CapacityColumn("Cap"));
+        table.getColumns().add(new CapacityColumn("Target"));
         table.getColumns().add(new AssignedProjectsCountColumn("#Assigned"));
         table.getColumns().add(new ListColumn("Projects Assigned", this));
     }
     
     @FXML
     private void showInfo(){
-        Alert info = new Alert(Alert.AlertType.INFORMATION);
-        info.setHeaderText("Information on assignments:");
-        VBox box = new VBox();
-        box.getChildren().add(new Label("Load balanced? : " + model.isLoadBalanced() + 
-                                        "\tSaturating flow? : " + model.getGraph().isSaturatingFlow()));
-        
-        HBox hbox = new HBox();
-        hbox.getChildren().add(new Label("Flow: " + model.getGraph().getFlow() +
-                                        "\nWeight: " + model.getGraph().getWeight()));
-        
-        hbox.getChildren().add(new Label(String.format("Readers: %d\nProjects: %d\nAvg. reader target: %.2f", 
-                model.getReaders().size(),model.getProjects().size(), model.getAverageReaderCapacity())));
-        hbox.setSpacing(40);
-        box.getChildren().add(hbox);
-        
-        Map<Integer, Integer> preferenceStatistics = calculatePreferenceAssignmentStatistics();
-        box.getChildren().add(createPreferenceAssignedStatisticsTable(preferenceStatistics));
-        if (barChart == null){
-            createBarChart();
-        } else {
-            barChart.getData().clear();
-        }
-        XYChart.Series<String, Number> series1 = new XYChart.Series<String,Number>();    
-        for (int preference : preferenceStatistics.keySet()){
-            series1.getData().add(new XYChart.Data<String, Number>(preference+"", preferenceStatistics.get(preference)));
-        }
-        
-        barChart.getData().add(series1);
-        box.getChildren().add(barChart);
-        box.setSpacing(20);
-        info.getDialogPane().setContent(box);
-        info.showAndWait();
+        DialogUtils.showInformationDialog(barChart,model);
     }
 
-    private void createBarChart() {
-        CategoryAxis xAxis = new CategoryAxis();
-        NumberAxis yAxis = new NumberAxis();
-        barChart = new BarChart<String,Number>(xAxis,yAxis);
-        barChart.setTitle("How many readers got which preference");
-        xAxis.setLabel("Reader preference");
-        yAxis.setLabel("How many readers got it");
-        yAxis.setTickUnit(1.0);
-        yAxis.setMinorTickVisible(false);
-    }
+	
 
-    public GridPane createPreferenceAssignedStatisticsTable(Map<Integer, Integer> preferenceStatistics) {
-        GridPane grid = new GridPane();
-        grid.setGridLinesVisible(true);
-        grid.add(new Label("Preference:"), 0, 0);
-        grid.add(new Label("# assigned"), 0, 1);
-        grid.getColumnConstraints().add(new ColumnConstraints(100));
-        int column = 1;
-        for (int pref : preferenceStatistics.keySet()){
-            grid.getColumnConstraints().add(new ColumnConstraints(30));
-            grid.add(new Label("  "+ pref+""), column, 0);
-            grid.add(new Label("  "+preferenceStatistics.get(pref)+""), column++, 1);
-        }
-        return grid;
-    }
-
-    private Map<Integer, Integer> calculatePreferenceAssignmentStatistics() {
-        Map<Integer, Integer> preferenceToCount = new HashMap<Integer,Integer>();
-        for (Reader reader: model.getReaders()){
-            for (Project assigned : reader.getAssigned()){
-                int preference = reader.getPreferences().indexOf(assigned);
-                preference += preference == -1? reader.getPreferences().size()+2:1;
-                if (preferenceToCount.containsKey(preference)){
-                    preferenceToCount.replace(preference, preferenceToCount.get(preference) + 1);
-                } else {
-                    preferenceToCount.put(preference, 1);
-                }
-            }
-        }
-        return preferenceToCount;
-    }    
-    
      /**
      * creates the table row factory which adds colors to the rows
      */
@@ -263,9 +130,9 @@ public class ResultsViewController extends ViewController{
                         if (item != null){
                             
                             final Reader reader = (Reader) item;
-                            reader.getAssignedCountStringProperty().addListener( (observable, oldValue,  newValue) -> {
+                            reader.getAssignedCountProperty().addListener( (observable, oldValue,  newValue) -> {
                                     if (getUserData()!= null){
-                                        int cap = ((Reader) getUserData()).getCapacity();
+                                        int cap = ((Reader) getUserData()).getMarkingTarget();
                                         int assignedCount = Integer.parseInt(newValue);
                                         if (reader.equals(getUserData())){
                                             if (cap - 1 > assignedCount){
@@ -280,7 +147,7 @@ public class ResultsViewController extends ViewController{
                                         setStyle("");
                                     }
                                 });
-                            int cap = ((Reader) getUserData()).getCapacity();
+                            int cap = ((Reader) getUserData()).getMarkingTarget();
                             int assignedCount = reader.getAssigned().size();
                             if (reader.equals(getUserData())){
                                 if (cap - 1 > assignedCount){
@@ -300,85 +167,29 @@ public class ResultsViewController extends ViewController{
             });
     }
     
-    public void refreshLowSelectedProjectList(){
+    @Override
+    public void refreshSideProjectList(){
         ObservableList<Project> unselectedProjectList = FXCollections.observableArrayList();
         unselectedProjectList.addAll(model.getUnselectedProjects());
-        unselectedList.setItems(unselectedProjectList);
-        unselectedList.setVisible(false);
-        unselectedList.setVisible(true);
+        sideProjectListView.setItems(unselectedProjectList);
     }
-    /**
-     * creates side list with lowest selected projects in ascending order
-     */
-    private void createUnselectedProjectsList() {
-        
-        ObservableList<Project> unselectedProjectList = FXCollections.observableArrayList();
-        unselectedProjectList.addAll(model.getUnselectedProjects());
-        unselectedList.setItems(unselectedProjectList);
-        unselectedList.setCellFactory(param -> {
-                final ListCell<Project> listCell =  new ListCell<Project>(){
+   
+	@FXML
+	protected void onSideListDragOver(DragEvent event) {
+		event.acceptTransferModes(TransferMode.MOVE);
+	}
 
-                    @Override
-                    protected void updateItem(Project item, boolean empty) {
-                        super.updateItem(item, empty); 
-                        if (item != null){
-                            setUserData(item);
-                            setStyle("-fx-background-color: red;");
-                            setTooltip(new Tooltip(item.getName()));
-                            setText(item.getId()+"");
-                        } else {
-                            setText("");
-                            setVisible(false);
-                            setStyle("");
-                            setUserData(null);
-                            setGraphic(null);
-                        }
-                    }               
-                };
-                
-                listCell.setOnDragDetected(event -> {
-                    if (listCell.getUserData() == null){
-                        return;
-                    }
-                    Dragboard db = listCell.startDragAndDrop(TransferMode.COPY);
-                    ClipboardContent content = new ClipboardContent();
+	@FXML
+	protected void onSideListDragDropped(DragEvent event) {
+		if (event.getAcceptedTransferMode().equals(TransferMode.MOVE)) {
+			Label sourceLabel = (Label) event.getGestureSource();
+			Project projectToMove = (Project) sourceLabel.getUserData();
+			Reader readerToRemoveFrom = (Reader) sourceLabel.getParent().getUserData();
 
-                    content.putString("test");
-                    db.setContent(content);
-                });
-            return listCell;
-        });
-
-       unselectedList.setOnDragDone(event -> {
-               refreshLowSelectedProjectList();
-               if (preferencesCheckBox.isSelected()){
-                   refresh();
-               }
-            });
-       unselectedList.setOnDragOver(event ->{
-           event.acceptTransferModes(TransferMode.MOVE);
-       });
-       unselectedList.setOnDragDropped(event -> {
-            if (event.getAcceptedTransferMode().equals(TransferMode.MOVE)){
-                Label sourceLabel = (Label) event.getGestureSource();
-                HBox sourceHbox = (HBox) sourceLabel.getParent();
-                Project projectToMove = (Project) sourceLabel.getUserData();
-                Reader readerToRemoveFrom = (Reader) (sourceHbox).getUserData();
-                
-                removeProjectFromReader(readerToRemoveFrom, projectToMove);
-                if (!preferencesCheckBox.isSelected()){
-                    for (Node n : sourceHbox.getChildren()) {
-                        if (n.getUserData().equals(projectToMove)) {
-                            sourceHbox.getChildren().remove(n);
-                            break;
-                        }
-                    }
-                } 
-                dragLabel.setVisible(false);
-                refresh();
-            }
-       });
-    }
+			removeProjectFromReader(readerToRemoveFrom, projectToMove);
+			refresh();
+		}
+	}
 
     @Override
     public String moveProject(Reader readerToAdd, Reader readerToRemoveFrom, Project projectToMove) {
@@ -433,11 +244,11 @@ public class ResultsViewController extends ViewController{
                 label.getStyleClass().add("bordered");
             }
         } else {
-            label = new PopLabel(project.getId() + "");
+            label = new PopLabel(project.getID() + "");
         }
 
         label.setPopText("Name: " + project.getName()
-                + "\nID: " + project.getId()
+                + "\nID: " + project.getID()
                 + "\nTimes selected: " + project.getSelectedCount()
                 + "\nAssigned to: " + ((assignedReader == null)? "nobody":assignedReader.getName()));
 
@@ -457,6 +268,23 @@ public class ResultsViewController extends ViewController{
 
 	@Override
 	protected boolean isReaderListComplete(Reader reader) {
-		return reader.getAssigned().size() == reader.getCapacity();
+		return reader.getAssigned().size() == reader.getMarkingTarget();
+	}
+	
+	@Override
+	protected ObservableList<Project> getSideListProjects(){
+    	ObservableList<Project> list = FXCollections.observableArrayList();
+    	list.addAll( model.getUnselectedProjects());
+		return list;		
+	}
+	
+	@Override
+	public String getListItemText(Project item){
+		return item.getID()+"";
+	}
+	
+	@Override
+	public String getListCellStyle(Project item){
+		return "-fx-background-color: red;";
 	}
 }

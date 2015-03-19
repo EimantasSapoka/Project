@@ -9,10 +9,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import test.augustineMCMF.MinCostMaxFlowSPA;
-import test.augustineMCMF.Network;
+import test.augustineMCMF.Augustine_Network;
 import test.graph_creator.RandomArbitraryModel;
 import test.graph_creator.RandomReaderAllocationModel;
-import ford_fulkerson.Algorithm;
+import ford_fulkerson.MinCostMaxFlowAlgorithm;
 import ford_fulkerson.ReaderShortlistException;
 
 public class CorrectnessTest {
@@ -54,17 +54,17 @@ public class CorrectnessTest {
 		model.addReader(reader2);
 		
                 try {
-                    model.createGraph();
+                    model.createNetwork();
                 } catch(ReaderShortlistException ex){
                     // no need for warnings in tests
                 }
 		
-		Network network = alg.createReaderNetworkFromModel(model);
+		Augustine_Network augustine_Network = alg.createReaderAugustine_NetworkFromModel(model);
                 
-		Algorithm.runLoadBalancedAlgorithm(model);
-		network = alg.solve(network);
+		MinCostMaxFlowAlgorithm.runLoadBalancedAlgorithm(model);
+		augustine_Network = alg.solve(augustine_Network);
 		
-		assertTrue(model.isLoadBalanced() && !network.isLoadBalanced());
+		assertTrue(model.isLoadBalanced() && !augustine_Network.isLoadBalanced());
 	}
 	
 	
@@ -78,19 +78,17 @@ public class CorrectnessTest {
 	public void readerAllocationGraphTest() throws Exception{
 		System.out.println("STARTING READER GRAPH TESTS");
 		for (int i=0; i<TEST_COUNT; i++){
-			if (i%100 == 0){
-				System.out.println("TEST " + i);
-			}
+
 			// create a new random reader graph
 			MCMFModel testGraph = new RandomReaderAllocationModel(i%40 + 10, (i%40+10)*4);
 			try {
-                testGraph.createGraph();
+                testGraph.createNetwork();
             } catch(ReaderShortlistException ex){
             	// nobody cares about shortlists in testing.
             }
-			Network network = alg.createReaderNetworkFromModel(testGraph);
+			Augustine_Network augustine_Network = alg.createReaderAugustine_NetworkFromModel(testGraph);
 			
-			runTests(testGraph, network);
+			runTests(testGraph, augustine_Network);
 			
 			// check reader graph constraints
 			Constraints_Test.checkReaderConstraints(testGraph);			
@@ -106,21 +104,19 @@ public class CorrectnessTest {
 	@Test
 	public void arbitraryGraphTest() throws Exception{
 		for (int i = 0; i<TEST_COUNT; i++){
-			if (i%100 == 0){
-				System.out.println("TEST " + i);
-			}
+		
 			MCMFModel testGraph = new RandomArbitraryModel();
             try {
-                testGraph.createGraph();
+                testGraph.createNetwork();
             } catch(ReaderShortlistException ex){
                 // nobody cares about shortlists in testing.
             }
-			Network network = alg.createNetworkFromGraph(testGraph.getGraph());
+			Augustine_Network augustine_Network = alg.createAugustine_NetworkFromGraph(testGraph.getNetwork());
 			
-			runTests(testGraph, network);
+			runTests(testGraph, augustine_Network);
 			
 			// check if the graph satisfies constraints
-			Constraints_Test.graphConstraintsTests(testGraph.getGraph());		
+			Constraints_Test.networkConstraintsTests(testGraph.getNetwork());		
 		}
 	}
 	
@@ -128,32 +124,32 @@ public class CorrectnessTest {
 	 * a method which runs both algorithms on the testGraph and network
 	 * @throws Exception
 	 */
-	private void runTests(MCMFModel testModel, Network network) throws Exception {
+	private void runTests(MCMFModel testModel, Augustine_Network augustine_Network) throws Exception {
 		
 		//run against both algorithms, measuring performance
 		long start = System.nanoTime();
-		Algorithm.runUnbalancedAlgorithm(testModel.getGraph());
+		MinCostMaxFlowAlgorithm.runUnbalancedAlgorithm(testModel.getNetwork());
 		long performanceMine = System.nanoTime() - start;
 		
 		long start2 = System.nanoTime();
-		network = alg.solve(network);
+		augustine_Network = alg.solve(augustine_Network);
 		long performanceAugustine = System.nanoTime() - start2;
 		
 		if (performanceAugustine < performanceMine){
 			System.out.println("Augustine algorithm performed faster by " + (performanceMine-performanceAugustine)/1000000 + "ms");
 		}
 	
-		if (network.getFlowSize() != testModel.getGraph().getFlow() || network.getFlowCost() != testModel.getGraph().getWeight()){
-			System.out.println("augustine weight: " + network.getFlowCost() + " augustine flow: " + network.getFlowSize() +
-								"\nmy weight: " + testModel.getGraph().getWeight() + " my flow: " + testModel.getGraph().getFlow());
-			System.out.println("Augustine balanced: " + network.isLoadBalanced() + " mine balanced: " + testModel.isLoadBalanced());
+		if (augustine_Network.getFlowSize() != testModel.getNetwork().getFlow() || augustine_Network.getFlowCost() != testModel.getNetwork().getWeight()){
+			System.out.println("augustine weight: " + augustine_Network.getFlowCost() + " augustine flow: " + augustine_Network.getFlowSize() +
+								"\nmy weight: " + testModel.getNetwork().getWeight() + " my flow: " + testModel.getNetwork().getFlow());
+			System.out.println("Augustine balanced: " + augustine_Network.isLoadBalanced() + " mine balanced: " + testModel.isLoadBalanced());
 		} 
 		
 		
 		// assert equal flow sizes and weights 
-		assertTrue(network.getFlowSize() <= testModel.getGraph().getFlow());		
-		assertTrue(network.getFlowCost() >= testModel.getGraph().getWeight());
-		assertTrue(testModel.isLoadBalanced() || !network.isLoadBalanced());
+		assertTrue(augustine_Network.getFlowSize() <= testModel.getNetwork().getFlow());		
+		assertTrue(augustine_Network.getFlowCost() >= testModel.getNetwork().getWeight());
+		assertTrue(testModel.isLoadBalanced() || !augustine_Network.isLoadBalanced());
 		
 	}
 }

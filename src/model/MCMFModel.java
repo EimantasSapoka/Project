@@ -12,7 +12,7 @@ import java.util.List;
 
 import ford_fulkerson.ReaderShortlistException;
 import ford_fulkerson.TextScanner;
-import ford_fulkerson.graph.Graph;
+import ford_fulkerson.network.Network;
 
 /**
  *
@@ -25,10 +25,11 @@ public class MCMFModel {
 	private static final String READER_CAPACITY_ZERO_ERR_MSG = "Reader has reader target of zero";
 	private static final String PROJECT_ALREADY_PREFERENCE_ERROR_MSG = "Project already in preference list";
 	private static final String PROJECT_SUPERVISED_ERROR_MSG = "Project is already supervised by this reader";
-	public ArrayList<Reader> readers;		// readers list
-    public ArrayList<Project> projects;		// projects list
+	
+	protected ArrayList<Reader> readers;		// readers list
+    protected ArrayList<Project> projects;		// projects list
 
-    private Graph graph;
+    private Network network;
 
     public MCMFModel(File file) throws Exception {
        this();
@@ -44,8 +45,8 @@ public class MCMFModel {
         TextScanner.parseCommaSeparatedInput(file, this);
     }
 
-    public Graph getGraph() {
-        return this.graph;
+    public Network getNetwork() {
+        return this.network;
     }
 
     /**
@@ -86,7 +87,7 @@ public class MCMFModel {
      */
     public Project getProject(int id) {
         for (Project p : projects) {
-            if (p.getId() == id) {
+            if (p.getID() == id) {
                 return p;
             }
         }
@@ -138,12 +139,12 @@ public class MCMFModel {
     public boolean isLoadBalanced() {
         for (Reader reader : this.readers) {
         	
-        	int readerCapacityGap = reader.getCapacity() + graph.getLowerCapacityOffset() - reader.getAssigned().size();
+        	int readerCapacityGap = reader.getMarkingTarget() + network.getLowerCapacityOffset() - reader.getAssigned().size();
         	readerCapacityGap = readerCapacityGap < 0? 0:readerCapacityGap;
         	
             for (Reader otherReader : readers){
             	
-            	int otherReaderCapacityGap = otherReader.getCapacity() + graph.getLowerCapacityOffset() - otherReader.getAssigned().size();
+            	int otherReaderCapacityGap = otherReader.getMarkingTarget() + network.getLowerCapacityOffset() - otherReader.getAssigned().size();
             	otherReaderCapacityGap = otherReaderCapacityGap < 0? 0:otherReaderCapacityGap;
             	
             	if (Math.abs( otherReaderCapacityGap - readerCapacityGap) > 1){
@@ -183,18 +184,18 @@ public class MCMFModel {
      * creates the vertices and edges between them according to the reader and
      * preference information.
      */
-    public void createGraph() throws ReaderShortlistException {
+    public void createNetwork() throws ReaderShortlistException {
         String warnings = "";
         String errors = "";
-        graph = new Graph();
+        network = new Network();
         
         for (Project project : this.projects){
             
            project.resetVertex();
-           graph.addProject(project);
+           network.addProject(project);
            
            if (project.getSelectedCount() == 0){
-               errors += ">PROJECT " + project.getName() + " ("+project.getId()+") HAS NOT BEEN SELECTED BY ANYONE\n" ;
+               errors += ">PROJECT " + project.getName() + " ("+project.getID()+") HAS NOT BEEN SELECTED BY ANYONE\n" ;
            } 
         }
 
@@ -202,13 +203,13 @@ public class MCMFModel {
             reader.resetVertex();
             reader.clearAssignedProjects();
             
-            graph.addReader(reader);
+            network.addReader(reader);
             
-            if (reader.getPreferences().size() < reader.getCapacity()) {
-                errors += ">READER "+reader.getName() +" (" + reader.getID() + ") HAS CAPACITY OF " + reader.getCapacity()
+            if (reader.getPreferences().size() < reader.getMarkingTarget()) {
+                errors += ">READER "+reader.getName() +" (" + reader.getID() + ") HAS CAPACITY OF " + reader.getMarkingTarget()
                         + " AND PREFERENCE LIST SIZE " + reader.getPreferences().size()+"\n";
-            } else if (reader.getPreferences().size() < reader.getCapacity() * 2) {
-                warnings += ">reader "+reader.getName() +" (" + reader.getID() + ") has capacity of " + reader.getCapacity()
+            } else if (reader.getPreferences().size() < reader.getMarkingTarget() * 2) {
+                warnings += ">reader "+reader.getName() +" (" + reader.getID() + ") has capacity of " + reader.getMarkingTarget()
                         + " and preference list size " + reader.getPreferences().size()+"\n";
             }
         }
@@ -234,13 +235,13 @@ public class MCMFModel {
             ArrayList<Project> preferences = r.getPreferences();
             ArrayList<Project> projectList = (ArrayList<Project>) this.projects.clone();
 
-            while (preferences.size() < 2 * r.getCapacity() && !projectList.isEmpty()) {
+            while (preferences.size() < 2 * r.getMarkingTarget() && !projectList.isEmpty()) {
 
                 Collections.sort(projectList);
                 Project proj = projectList.remove(0);
 
                 if (!preferences.contains(proj)) {
-                    if (!r.getSupervisorProjects().contains(proj.getId())) {
+                    if (!r.getSupervisorProjects().contains(proj.getID())) {
                         r.addPreference(proj);
                     }
                 }
@@ -260,7 +261,7 @@ public class MCMFModel {
         for (Reader reader : readers){
             result += reader.getID() +", ";
             for (Project project : reader.getAssigned()){
-                result += project.getId()+" ";
+                result += project.getID()+" ";
             }
             result+="\n";
         }
@@ -283,7 +284,7 @@ public class MCMFModel {
     		return PROJECT_ALREADY_PREFERENCE_ERROR_MSG;
     	}
     	
-    	if (readerToAdd.getSupervisorProjects().contains(projectToMove.getId())){
+    	if (readerToAdd.getSupervisorProjects().contains(projectToMove.getID())){
     		return PROJECT_SUPERVISED_ERROR_MSG;
     	}
     	if (projectToMove.equals(projectToPlaceBefore) ){
@@ -311,10 +312,10 @@ public class MCMFModel {
         if (readerToAdd.getAssigned().contains(projectToMove)){
         	return READER_ALREADY_ASSIGNED_PROJECT_ERR_MSG;
         }
-        if (readerToAdd.getAssigned().size() == readerToAdd.getCapacity()) {
+        if (readerToAdd.getAssigned().size() == readerToAdd.getMarkingTarget()) {
             return READER_AT_MARKING_TARGET_ERR_MSG;
         }
-        if (readerToAdd.getSupervisorProjects().contains(projectToMove.getId())){
+        if (readerToAdd.getSupervisorProjects().contains(projectToMove.getID())){
     		return PROJECT_SUPERVISED_ERROR_MSG;
     	}
         
@@ -327,7 +328,7 @@ public class MCMFModel {
     	 if (readerToAdd.getPreferences().contains(projectToAdd)){
              return PROJECT_ALREADY_PREFERENCE_ERROR_MSG;
          } 
-    	 if (readerToAdd.getSupervisorProjects().contains(projectToAdd.getId())){
+    	 if (readerToAdd.getSupervisorProjects().contains(projectToAdd.getID())){
          	return PROJECT_SUPERVISED_ERROR_MSG;
          }
  
@@ -340,7 +341,7 @@ public class MCMFModel {
              return READER_ALREADY_ASSIGNED_PROJECT_ERR_MSG;
          } 
          
-    	 if (readerToAdd.getSupervisorProjects().contains(projectToAdd.getId())){
+    	 if (readerToAdd.getSupervisorProjects().contains(projectToAdd.getID())){
          	return PROJECT_SUPERVISED_ERROR_MSG;
          }
          readerToAdd.assignProject(projectToAdd);
@@ -352,7 +353,7 @@ public class MCMFModel {
     	if (readerToAdd.getPreferences().contains(projectToAdd)){
             return PROJECT_ALREADY_PREFERENCE_ERROR_MSG;
         } 
-        if (readerToAdd.getSupervisorProjects().contains(projectToAdd.getId())){
+        if (readerToAdd.getSupervisorProjects().contains(projectToAdd.getID())){
         	return PROJECT_SUPERVISED_ERROR_MSG;
         }
         
@@ -389,8 +390,8 @@ public class MCMFModel {
     public Double getAverageReaderCapacity() {
         int totalCap = 0;
         for (Reader r : readers){
-            if (r.getCapacity() != 0){
-                totalCap += r.getCapacity();
+            if (r.getMarkingTarget() != 0){
+                totalCap += r.getMarkingTarget();
             }
         }
         Double avg = new Double(totalCap);
@@ -408,11 +409,11 @@ public class MCMFModel {
     		return PROJECT_ALREADY_PREFERENCE_ERROR_MSG;
     	}
 		
-		if (readerToAdd.getCapacity() == 0){
+		if (readerToAdd.getMarkingTarget() == 0){
 			return READER_CAPACITY_ZERO_ERR_MSG;
 		}
     	
-    	if (readerToAdd.getSupervisorProjects().contains(projectToAdd.getId())){
+    	if (readerToAdd.getSupervisorProjects().contains(projectToAdd.getID())){
     		return PROJECT_SUPERVISED_ERROR_MSG;
     	}
     	return null;
@@ -423,18 +424,18 @@ public class MCMFModel {
 			return null;
 		}
 		
-		if (readerToAdd.getCapacity() == 0){
+		if (readerToAdd.getMarkingTarget() == 0){
 			return READER_CAPACITY_ZERO_ERR_MSG;
 		}
 		
 		if (readerToAdd.getAssigned().contains(projectToAdd)) {
     		return READER_ALREADY_ASSIGNED_PROJECT_ERR_MSG;
     	}
-		if (readerToAdd.getCapacity() == readerToAdd.getAssigned().size()){
+		if (readerToAdd.getMarkingTarget() == readerToAdd.getAssigned().size()){
 			return READER_AT_MARKING_TARGET_ERR_MSG;
 		}
 		
-    	if (readerToAdd.getSupervisorProjects().contains(projectToAdd.getId())){
+    	if (readerToAdd.getSupervisorProjects().contains(projectToAdd.getID())){
     		return PROJECT_SUPERVISED_ERROR_MSG;
     	}
 		return null;

@@ -1,7 +1,7 @@
-package ford_fulkerson.graph.residual_classes;
+package ford_fulkerson.network.residual_classes;
 
-import ford_fulkerson.graph.Edge;
-import ford_fulkerson.graph.Vertex;
+import ford_fulkerson.network.Edge;
+import ford_fulkerson.network.Vertex;
 
 /**
  * A class which represents a residual edge in a graph. These 

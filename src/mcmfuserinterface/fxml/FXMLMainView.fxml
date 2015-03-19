@@ -46,19 +46,19 @@
                <children>
                   <Pane prefHeight="54.0" prefWidth="129.0" style="-fx-background-color: whitesmoke;" VBox.vgrow="NEVER">
                      <children>
-                        <Label focusTraversable="false" layoutX="3.0" prefHeight="39.0" prefWidth="124.0" text="Least selected projects (&lt;          )" textAlignment="CENTER" textFill="#3c0505" wrapText="true">
+                        <Label focusTraversable="false" layoutX="3.0" prefHeight="38.0" prefWidth="124.0" text="Least selected projects &lt;=        " textAlignment="CENTER" textFill="#3c0505" wrapText="true">
                            <font>
                               <Font size="13.0" />
                            </font>
                         </Label>
-                        <TextField fx:id="projectLowSelectionLimitBox" layoutX="78.0" layoutY="23.0" onAction="#setLowSelectedProjectsThreshold" prefHeight="10.0" prefWidth="26.0" promptText="int" text="4">
+                        <TextField fx:id="projectLowSelectionLimitBox" layoutX="89.0" layoutY="18.0" onKeyReleased="#refreshSideProjectList" onKeyTyped="#onLowSelectedProjectsThresholdChange" prefHeight="25.0" prefWidth="33.0" promptText="int" text="4">
                            <font>
                               <Font size="9.0" />
                            </font>
                         </TextField>
                      </children>
                   </Pane>
-                  <ListView fx:id="lowSelectedList" onMouseMoved="#hide" prefHeight="263.0" prefWidth="129.0" VBox.vgrow="SOMETIMES">
+                  <ListView fx:id="sideProjectListView" onMouseMoved="#hide" prefHeight="263.0" prefWidth="129.0" VBox.vgrow="SOMETIMES">
                      <opaqueInsets>
                         <Insets />
                      </opaqueInsets>

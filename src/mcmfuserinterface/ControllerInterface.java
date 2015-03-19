@@ -20,7 +20,7 @@ import model.Reader;
 public interface ControllerInterface {
     public void refresh();
     public void refreshTable();
-    public void refreshLowSelectedProjectList();
+    public void refreshSideProjectList();
     public String moveProject(Reader readerToAdd, Reader readerToRemoveFrom, Project projectToMove);
     public String addProjectToReader(Reader reader, Project projectToAdd);
     public ContextMenu createContextMenu(Reader reader, Node node);
@@ -31,4 +31,7 @@ public interface ControllerInterface {
 	public void showErrorPopOver(String errorMsg, Node parent);
 	public String canMoveProject(Reader readerToAdd, Project projectToAdd);
 	public String canMoveProject(Reader readerToAdd, Reader readerToRemoveFrom,Project projectToAdd);
+	public String getListItemText(Project item);
+	public String getListCellStyle(Project item);
+
 }

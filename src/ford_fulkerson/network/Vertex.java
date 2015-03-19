@@ -1,23 +1,22 @@
-package ford_fulkerson.graph;
+package ford_fulkerson.network;
 
 import java.util.ArrayList;
 
-import ford_fulkerson.graph.residual_classes.ResidualEdge;
+import ford_fulkerson.network.residual_classes.ResidualEdge;
 
 public class Vertex implements Comparable<Vertex>{
 
 	private static int vertexIdCounter = 2;			// counter to keep track of how many vertices are in the graph, as well as
 													// as used to give each vertex a unique ID
 	private int vertexID;							// this vertex ID, equal to current vertexIdCounter value
-	private int objectID;							// the object this vertex represents (project, reader, etc) ID
-	private Object object;
+	private NetworkObjectInterface object;			//
 	private ArrayList<Edge> outEdges;				// list of outgoing edges
 	private int distanceFromSource;					// the vertex distance from source
 	private boolean reachable;						// is the vertex reachable from source
 	
 	private ResidualEdge path;						// an edge taken to come to this vertex
 	
-	private Vertex(Object objectReference){
+	private Vertex(NetworkObjectInterface objectReference){
 		this.object = objectReference;
 		this.outEdges = new ArrayList<Edge>();
 		this.distanceFromSource = 0;
@@ -26,19 +25,16 @@ public class Vertex implements Comparable<Vertex>{
 	public Vertex(Vertex v){
 		this(v.getObject());
 		this.vertexID = v.getVertexID();
-		this.objectID = v.getObjectID();
 	}
 
 	
-	public Vertex(int id, Object obj){
+	public Vertex(int id, NetworkObjectInterface obj){
 		this(obj);
 		this.vertexID = vertexIdCounter++;
-		this.objectID = id;
 	}
 	
-	public Vertex(int parentID, int vertexID, Object obj){
+	public Vertex(int parentID, int vertexID, NetworkObjectInterface obj){
 		this(obj);
-		this.objectID = parentID;
 		this.vertexID = vertexID;
 	}
 	
@@ -47,7 +43,7 @@ public class Vertex implements Comparable<Vertex>{
 	}
 	
 	public int getObjectID(){
-		return this.objectID;
+		return object.getID();
 	}
 	
 	public static void resetVertexCounter(){
@@ -58,7 +54,7 @@ public class Vertex implements Comparable<Vertex>{
 		return outEdges;
 	}
 
-	public Object getObject(){
+	public NetworkObjectInterface getObject(){
 		return this.object;
 	}
 
@@ -72,7 +68,11 @@ public class Vertex implements Comparable<Vertex>{
 			return false;
 		}
 		Vertex v = (Vertex) o;
-		return this.vertexID  == v.getVertexID() && this.objectID == v.getObjectID();
+		return this.equals(v);
+	}
+	
+	public boolean equals(Vertex v){
+		return this.vertexID  == v.getVertexID() && object.getID() == v.getObjectID();
 	}
 	
 	

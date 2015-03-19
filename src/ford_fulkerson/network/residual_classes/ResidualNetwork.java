@@ -1,22 +1,22 @@
-package ford_fulkerson.graph.residual_classes;
+package ford_fulkerson.network.residual_classes;
 
-import ford_fulkerson.graph.Edge;
-import ford_fulkerson.graph.Graph;
-import ford_fulkerson.graph.Vertex;
+import ford_fulkerson.network.Edge;
+import ford_fulkerson.network.Network;
+import ford_fulkerson.network.Vertex;
 
-public class ResidualGraph extends ford_fulkerson.graph.Graph {
+public class ResidualNetwork extends ford_fulkerson.network.Network {
 
 	/**
 	 * creates a residual graph from the given graph
-	 * @param realGraph
+	 * @param realNetwork
 	 */
-	public ResidualGraph(Graph realGraph, Graph previous){
+	public ResidualNetwork(Network realNetwork, Network previous){
 		
 		// removes the source and sink vertices created by Graph constructor
 		this.vertices.clear(); 
 		
 		// copy vertices
-		for (Vertex v : realGraph.getVertices()){
+		for (Vertex v : realNetwork.getVertices()){
 			this.vertices.add(new ResidualVertex(v));
 		}
 		
@@ -26,7 +26,7 @@ public class ResidualGraph extends ford_fulkerson.graph.Graph {
 				
 		
 		// create residual edges
-		for (Edge edge : realGraph.getEdges()){
+		for (Edge edge : realNetwork.getEdges()){
 			
 			Vertex source = getVertex(edge.getSource());
 			Vertex destination = getVertex(edge.getDestination());
@@ -48,8 +48,8 @@ public class ResidualGraph extends ford_fulkerson.graph.Graph {
 			
 			if (previousEdge != null){
 				
-				int sourceDistance = realGraph.getVertex(e.getSource()).getDistanceFromSource();
-				int destinationDistance = realGraph.getVertex(e.getDestination()).getDistanceFromSource();
+				int sourceDistance = realNetwork.getVertex(e.getSource()).getDistanceFromSource();
+				int destinationDistance = realNetwork.getVertex(e.getDestination()).getDistanceFromSource();
 				
 				// calculate the new edge weight: previousWeight + sourceVertexDistance - destinationVertexDistance
 				int weight = previousEdge.getWeight() + sourceDistance - destinationDistance;

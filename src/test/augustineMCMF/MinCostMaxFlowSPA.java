@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import model.MCMFModel;
 import model.Project;
 import model.Reader;
-import ford_fulkerson.graph.Graph;
-import ford_fulkerson.graph.Vertex;
+import ford_fulkerson.network.Network;
+import ford_fulkerson.network.Vertex;
 
 public class MinCostMaxFlowSPA 
 {
@@ -17,99 +17,99 @@ public class MinCostMaxFlowSPA
 	 * @return
 	 * @throws Exception
 	 */
-	public Network solve(Network network) throws Exception
+	public Augustine_Network solve(Augustine_Network augustine_Network) throws Exception
 	{
 		// now we implement the algorithm..
 		// we're starting with an empty flow
 		// keep looking for paths and augmenting the flow in the network
 		Path path = null;
-		Network resNetwork = generateResidualNetwork(network, network);
+		Augustine_Network resAugustine_Network = generateResidualAugustine_Network(augustine_Network, augustine_Network);
 		
 		// keep looking for augmenting paths and satisfying them
-		while((path = findAugmentingPath(network, resNetwork)) != null)
+		while((path = findAugmentingPath(augustine_Network, resAugustine_Network)) != null)
 		{			
 			
 			// augment the flow along path and report any errors
-			if(!augmentFlow(network, path))
+			if(!augmentFlow(augustine_Network, path))
 			{
 				throw new Exception("Unable to augment the flow along path " + path);
 			}
 			
-			resNetwork = generateResidualNetwork(network, resNetwork);
+			resAugustine_Network = generateResidualAugustine_Network(augustine_Network, resAugustine_Network);
 		}
 		
-		return network;
+		return augustine_Network;
 	}
 
 	/**
 	 * Converts an instance of spa to a network
 	 */
-	public Network generateRandomNetwork() throws Exception
+	public Augustine_Network generateRandomAugustine_Network() throws Exception
 	{
-		Network network = new Network();
+		Augustine_Network augustine_Network = new Augustine_Network();
 		
 		// add some nodes
 		Node n = new Node(1, "n1", null);
-		network.addNode(n);
+		augustine_Network.addNode(n);
 		
 		Node n2 = new Node(2, "n2", null);
-		network.addNode(n2);
+		augustine_Network.addNode(n2);
 		
 		Node n3 = new Node(3, "n3", null);
-		network.addNode(n3);
+		augustine_Network.addNode(n3);
 		
 		Node n4 = new Node(4, "n4", null);
-		network.addNode(n4);
+		augustine_Network.addNode(n4);
 		
 		Node n5 = new Node(5, "n5", null);
-		network.addNode(n5);
+		augustine_Network.addNode(n5);
 		
 		Node s = new Node(6, "s", null);
-		network.addNode(s);
+		augustine_Network.addNode(s);
 		
 		Node t = new Node(7, "t", null);
-		network.addNode(t);
+		augustine_Network.addNode(t);
 		
 		// set the terminal nodes
-		network.setSource(s);
-		network.setSink(t);
+		augustine_Network.setSource(s);
+		augustine_Network.setSink(t);
 		
 		// add some edges
-		network.addEdge(new Edge(s, n, 0, 5, 10));
-		network.addEdge(new Edge(s, n2, 0, 5, 2));
-		network.addEdge(new Edge(s, n3, 0, 5, 7));
+		augustine_Network.addEdge(new Edge(s, n, 0, 5, 10));
+		augustine_Network.addEdge(new Edge(s, n2, 0, 5, 2));
+		augustine_Network.addEdge(new Edge(s, n3, 0, 5, 7));
 		
-		network.addEdge(new Edge(n, n3, 0, 5, 1));
-		network.addEdge(new Edge(n, n4, 0, 2, 4));
-		network.addEdge(new Edge(n, n5, 0, 8, 10));
+		augustine_Network.addEdge(new Edge(n, n3, 0, 5, 1));
+		augustine_Network.addEdge(new Edge(n, n4, 0, 2, 4));
+		augustine_Network.addEdge(new Edge(n, n5, 0, 8, 10));
 		
-		network.addEdge(new Edge(n2, n3, 0, 8, 0));
-		network.addEdge(new Edge(n2, n4, 0, 6, 40));
-		network.addEdge(new Edge(n2, n5, 0, 1, 12));
+		augustine_Network.addEdge(new Edge(n2, n3, 0, 8, 0));
+		augustine_Network.addEdge(new Edge(n2, n4, 0, 6, 40));
+		augustine_Network.addEdge(new Edge(n2, n5, 0, 1, 12));
 		
-		network.addEdge(new Edge(n4, t, 0, 9, 17));
-		network.addEdge(new Edge(n5, t, 0, 10, 24));
-		network.addEdge(new Edge(n3, t, 0, 2, 16));
+		augustine_Network.addEdge(new Edge(n4, t, 0, 9, 17));
+		augustine_Network.addEdge(new Edge(n5, t, 0, 10, 24));
+		augustine_Network.addEdge(new Edge(n3, t, 0, 2, 16));
 		
-		return network;
+		return augustine_Network;
 	}
 
 
 	/**
 	 * Find a greedy maximum augmenting path in the network w.r.t the flow
 	 */
-	public Path findAugmentingPath(Network network, Network resNetwork) throws Exception
+	public Path findAugmentingPath(Augustine_Network augustine_Network, Augustine_Network resAugustine_Network) throws Exception
 	{
 		Path path = new Path();
 		
 		// 1. run dijkstra's algorithm and obtain augmenting path		
 		ArrayList<Node> unvisitedNodes = new ArrayList<Node>();
-		for(Node n : resNetwork.getNodes())
+		for(Node n : resAugustine_Network.getNodes())
 		{
 			unvisitedNodes.add(n);
 		}
 				
-		Node currentNode = resNetwork.getSource();
+		Node currentNode = resAugustine_Network.getSource();
 		currentNode.setDikjstraDistranceInfinity(false);
 		
 		while(!unvisitedNodes.isEmpty())
@@ -158,22 +158,22 @@ public class MinCostMaxFlowSPA
 		}
 		
 		// 2. update the distance values on the nodes in the main network
-		for(Node n : resNetwork.getNodes())
+		for(Node n : resAugustine_Network.getNodes())
 		{
-			network.getNode(n.getName()).setDistance(n.getDistance());
+			augustine_Network.getNode(n.getName()).setDistance(n.getDistance());
 		}
 		
 		// do we have a path? if not, return null
-		if(resNetwork.getSink().isDikjstraDistranceInfinity()){
+		if(resAugustine_Network.getSink().isDikjstraDistranceInfinity()){
 			return null;
 		}
 		
 		// 3. trace the path
-		Node cursorNode = resNetwork.getSink();
+		Node cursorNode = resAugustine_Network.getSink();
 		Path tmpPath = new Path();
 		while(cursorNode != null)
 		{
-			if(cursorNode != resNetwork.getSource())
+			if(cursorNode != resAugustine_Network.getSource())
 				tmpPath.addEdge(cursorNode.getPredEdge(), true);
 			cursorNode = cursorNode.getPredNode();
 		}
@@ -190,68 +190,68 @@ public class MinCostMaxFlowSPA
 
 	/**
 	 * Generates a weighted residual network from the incumbent network and flow...
-	 * @param network
+	 * @param augustine_Network
 	 * @return
 	 */
-	public Network generateResidualNetwork(Network network, Network previousNetwork)
+	public Augustine_Network generateResidualAugustine_Network(Augustine_Network augustine_Network, Augustine_Network previousAugustine_Network)
 	{
 		// generate a residual network
-		Network resNetwork = new Network();
+		Augustine_Network resAugustine_Network = new Augustine_Network();
 		
 		// copy in all the nodes
-		for(Node n : network.getNodes())
+		for(Node n : augustine_Network.getNodes())
 		{
 			// create a new clone node
 			Node cloneNode = new Node(n.getId(), n.getName(), n.getType());
 			cloneNode.setPred(null, null);
 			
 			// add clone to the new network
-			resNetwork.addNode(cloneNode);
+			resAugustine_Network.addNode(cloneNode);
 		}
 		
 		// create the edges
-		for(Edge e : network.getEdges())
+		for(Edge e : augustine_Network.getEdges())
 		{
 			// what's the current flow w.r.t. upper quota
 			if(e.getFlow() < e.getUpperQuota())
 			{
 				// create new edge in the forward direction
-				Edge newEdge = new Edge(resNetwork.getNode(e.getSourceNode().getName()), resNetwork.getNode(e.getDestNode().getName()), e.getUpperQuota()-e.getFlow());
-				resNetwork.addEdge(newEdge);
+				Edge newEdge = new Edge(resAugustine_Network.getNode(e.getSourceNode().getName()), resAugustine_Network.getNode(e.getDestNode().getName()), e.getUpperQuota()-e.getFlow());
+				resAugustine_Network.addEdge(newEdge);
 			}
 			
 			if(e.getFlow() > 0)
 			{
 				// create new edge in the reverse direction
-				Edge newEdge = new Edge(resNetwork.getNode(e.getDestNode().getName()), resNetwork.getNode(e.getSourceNode().getName()), e.getFlow());
-				resNetwork.addEdge(newEdge);
+				Edge newEdge = new Edge(resAugustine_Network.getNode(e.getDestNode().getName()), resAugustine_Network.getNode(e.getSourceNode().getName()), e.getFlow());
+				resAugustine_Network.addEdge(newEdge);
 			}
 		}
 		
 		// modify the edge weights
-		for(Edge e : resNetwork.getEdges())
+		for(Edge e : resAugustine_Network.getEdges())
 		{
-			Edge previousEdge = previousNetwork.getEdge(e.getSourceNode().getName(), e.getDestNode().getName());
+			Edge previousEdge = previousAugustine_Network.getEdge(e.getSourceNode().getName(), e.getDestNode().getName());
 			if(previousEdge != null)
 			{
 				// what is the edge weight?
-				long edgeWeight = network.getNode(e.getSourceNode().getName()).getDistance() + previousEdge.getCost() - network.getNode(e.getDestNode().getName()).getDistance();
+				long edgeWeight = augustine_Network.getNode(e.getSourceNode().getName()).getDistance() + previousEdge.getCost() - augustine_Network.getNode(e.getDestNode().getName()).getDistance();
 				e.setCost(edgeWeight);
 			}
 		}
 		
 		// set network source and sink
-		resNetwork.setSource(resNetwork.getNode(network.getSource().getName()));
-		resNetwork.setSink(resNetwork.getNode(network.getSink().getName()));
+		resAugustine_Network.setSource(resAugustine_Network.getNode(augustine_Network.getSource().getName()));
+		resAugustine_Network.setSink(resAugustine_Network.getNode(augustine_Network.getSink().getName()));
 		
 		
-		return resNetwork;
+		return resAugustine_Network;
 	}
 
 	/**
 	 * Augment a network along a path in the residual network
 	 */
-	public boolean augmentFlow(Network network, Path path) throws Exception
+	public boolean augmentFlow(Augustine_Network augustine_Network, Path path) throws Exception
 	{
 		// loop through the edges in the path
 		for(int i=0; i<path.size(); i++)
@@ -259,7 +259,7 @@ public class MinCostMaxFlowSPA
 			Edge pathEdge = path.getEdge(i);
 			
 			// try to find the corresponding edge in the network
-			Edge networkEdge = network.getEdge(pathEdge.getSourceNode().getName(), pathEdge.getDestNode().getName());
+			Edge networkEdge = augustine_Network.getEdge(pathEdge.getSourceNode().getName(), pathEdge.getDestNode().getName());
 			
 			// did we find a corresponding edge?
 			if(networkEdge != null)
@@ -278,7 +278,7 @@ public class MinCostMaxFlowSPA
 			// otherwise, it must be that the path edge is in the reverse direction. So lets find it
 			else
 			{
-				networkEdge = network.getEdge(pathEdge.getDestNode().getName(), pathEdge.getSourceNode().getName());
+				networkEdge = augustine_Network.getEdge(pathEdge.getDestNode().getName(), pathEdge.getSourceNode().getName());
 				
 				if(networkEdge != null)
 				{
@@ -310,28 +310,28 @@ public class MinCostMaxFlowSPA
 	 * @param graph
 	 * @return
 	 */
-	public Network createNetworkFromGraph(Graph graph){
-		Network network = new Network();
+	public Augustine_Network createAugustine_NetworkFromGraph(Network graph){
+		Augustine_Network augustine_Network = new Augustine_Network();
 		
 		// copy nodes/vertices
 		for (Vertex v: graph.getVertices()){
 			Node node = new Node(v.getVertexID(), (v.getVertexID())+"", null);
-			network.addNode(node);
+			augustine_Network.addNode(node);
 			if (v.getVertexID() == 0){
-				network.setSource(node);
+				augustine_Network.setSource(node);
 			}
 			if (v.getVertexID() == 1){
-				network.setSink(node);
+				augustine_Network.setSink(node);
 			}
 		}
 		
 		// copy edges
-		for (ford_fulkerson.graph.Edge e : graph.getEdges()){
-			Edge edge = new Edge(network.getNode((e.getSource().getVertexID())+""), network.getNode((e.getDestination().getVertexID())+""), 0, e.getCapacity(), e.getWeight());
-			network.addEdge(edge);
+		for (ford_fulkerson.network.Edge e : graph.getEdges()){
+			Edge edge = new Edge(augustine_Network.getNode((e.getSource().getVertexID())+""), augustine_Network.getNode((e.getDestination().getVertexID())+""), 0, e.getCapacity(), e.getWeight());
+			augustine_Network.addEdge(edge);
 		}
 		
-		return network;
+		return augustine_Network;
 	}
 	
 	
@@ -342,40 +342,40 @@ public class MinCostMaxFlowSPA
 	 * @param model
 	 * @return
 	 */
-	public Network createReaderNetworkFromModel(MCMFModel model){
-		Network network = new Network();
+	public Augustine_Network createReaderAugustine_NetworkFromModel(MCMFModel model){
+		Augustine_Network augustine_Network = new Augustine_Network();
 		
-		Vertex source = model.getGraph().source();
+		Vertex source = model.getNetwork().source();
 		Node node = new Node(source.getVertexID(), (source.getVertexID())+"", null);
-		network.addNode(node);
-		network.setSource(node);
+		augustine_Network.addNode(node);
+		augustine_Network.setSource(node);
 		
-		Vertex sink = model.getGraph().sink();
+		Vertex sink = model.getNetwork().sink();
 		node = new Node(sink.getVertexID(), (sink.getVertexID())+"", null);
-		network.addNode(node);
-		network.setSink(node);
+		augustine_Network.addNode(node);
+		augustine_Network.setSink(node);
 		
 		for (Reader reader: model.getReaders()){
 			Vertex v = reader.getVertex();
-			node = new Node(v.getVertexID(), (v.getVertexID())+"", NodeType.LECTURER, reader.getCapacity());
-			network.addNode(node);
+			node = new Node(v.getVertexID(), (v.getVertexID())+"", NodeType.LECTURER, reader.getMarkingTarget());
+			augustine_Network.addNode(node);
 			
 		}
 		
 		for (Project project : model.getProjects()){
 			Vertex v = project.getVertex();
 			node = new Node(v.getVertexID(), (v.getVertexID())+"", NodeType.PROJECT);
-			network.addNode(node);
+			augustine_Network.addNode(node);
 		}
 		
 		// copy edges
-		for (ford_fulkerson.graph.Edge e : model.getGraph().getEdges()){
-			Edge edge = new Edge(network.getNode((e.getSource().getVertexID())+""), network.getNode((e.getDestination().getVertexID())+""), e.getCapacity(), e.getCapacity(), e.getWeight());
-			network.addEdge(edge);
+		for (ford_fulkerson.network.Edge e : model.getNetwork().getEdges()){
+			Edge edge = new Edge(augustine_Network.getNode((e.getSource().getVertexID())+""), augustine_Network.getNode((e.getDestination().getVertexID())+""), e.getCapacity(), e.getCapacity(), e.getWeight());
+			augustine_Network.addEdge(edge);
 		}
 				
 		
-		return network;
+		return augustine_Network;
 	}
 	
 	

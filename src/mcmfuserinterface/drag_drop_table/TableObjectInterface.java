@@ -10,7 +10,7 @@ package mcmfuserinterface.drag_drop_table;
  * @author Eimantas
  */
 public interface TableObjectInterface {
-    
-    @Override
+
     public String toString();
+    public String getName();
 }

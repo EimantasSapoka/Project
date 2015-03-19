@@ -5,13 +5,11 @@
  */
 package mcmfuserinterface.drag_drop_table;
 
-import java.awt.Toolkit;
-
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
+import mcmfuserinterface.DialogUtils;
 import mcmfuserinterface.MainViewController;
 import model.Project;
 import model.Reader;
@@ -37,7 +35,7 @@ public class DragDropLabel extends DragLabel {
        
 
         this.setOnDragEntered(event -> {
-       		 if ( event.getGestureSource() != this ) {
+       		 if ( event.getGestureSource() != this) {
        			 setText("\t" + getText());
        		 }
         });
@@ -65,26 +63,12 @@ public class DragDropLabel extends DragLabel {
             }
             
             if (errorMsg != null) {
-                createErrorDialog(projectToAdd, errorMsg);
+                DialogUtils.createErrorDialog(projectToAdd, errorMsg);
             } 
             
             controller.refresh();
             event.consume();
         });
-    }
-
-    protected void createErrorDialog(Project project, String errorMsg) {
-        final Runnable runnable = (Runnable) Toolkit.getDefaultToolkit().getDesktopProperty("win.sound.exclamation");
-        if (runnable != null) {
-            runnable.run();
-        }
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText("Cannot move");
-        alert.setContentText(errorMsg + "\nProject name: "
-                + project.getName() + ",  ID: " + project.getId());
-        alert.setResizable(true);
-        alert.showAndWait();
     }
 
 }

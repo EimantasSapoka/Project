@@ -1,18 +1,19 @@
-package ford_fulkerson.graph;
+package ford_fulkerson.network;
 
 import java.util.ArrayList;
 
+import test.graph_creator.MockNetworkObject;
 import model.Project;
 import model.Reader;
 
-public class Graph {
+public class Network {
 	
 	private static final int PROJECT_READER_CAPACITY = 1;
 	private static final int READERS_TO_PROJECTS_CONSTANT = 1;
 	public static final int SOURCE_ID = 0;
 	public static final int SINK_ID = 1;
 
-	private int lowerCapacityOffset; 		// the offset used to calculate the lower capacity of edges. 
+	private int lowerCapacityOffset; 			// the offset used to calculate the lower capacity of edges. 
 	
 	protected Vertex source;					// the source vertex reference
 	protected Vertex sink;						// the sink vertex reference
@@ -20,15 +21,15 @@ public class Graph {
 	protected ArrayList<Vertex> vertices;		// all the vertices in the graph
 	protected ArrayList<Edge> edges;			// all the edges in the graph
 	
-	public Graph(){
+	public Network(){
 		
 		this.vertices = new ArrayList<Vertex>();
 		this.edges = new ArrayList<Edge>();
 		
 		Vertex.resetVertexCounter();
 		
-		source = new Vertex(SOURCE_ID, SOURCE_ID, null);
-		sink = new Vertex(SINK_ID, SINK_ID, null);
+		source = new Vertex(SOURCE_ID, SOURCE_ID, new MockNetworkObject(SOURCE_ID));
+		sink = new Vertex(SINK_ID, SINK_ID, new MockNetworkObject(SINK_ID));
 		
 		addVertex(source);
 		addVertex(sink);
@@ -248,7 +249,7 @@ public class Graph {
              addVertex(reader.getVertex());
             
             // if reader has any capacity, create an edge from source to the reader with the capacity
-            if (reader.getCapacity() > 0) {
+            if (reader.getMarkingTarget() > 0) {
                 createSourceReaderEdge(reader);
             }
 
@@ -298,8 +299,8 @@ public class Graph {
     }
 
     public void createSourceReaderEdge(Reader reader) {
-        Edge sourceReaderEdge = new Edge(source,reader.getVertex(), reader.getCapacity());
-	addEdge(sourceReaderEdge);	
+        Edge sourceReaderEdge = new Edge(source,reader.getVertex(), reader.getMarkingTarget());
+        addEdge(sourceReaderEdge);	
     }
 
     

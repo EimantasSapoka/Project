@@ -35,15 +35,16 @@ public class TableCellWithListFactory implements Callback<TableColumn<TableObjec
             @Override
             public void updateItem(final TableObjectInterface object, boolean empty) {
                 if(!empty && object != null){
+                	
                     scrollPane = new DroppableScrollPane(controller);
                     hbox = new HBox();
-                    
                     hbox.setSpacing(10);
                     scrollPane.setContent(hbox);
                     
                     Reader reader = (Reader) object;
                     for (Project project : controller.getReaderList(reader)) {
                         Label label = controller.createLabel(reader, project);
+                        
                         hbox.getChildren().add(label);
                     }
                     hbox.setUserData(object);
