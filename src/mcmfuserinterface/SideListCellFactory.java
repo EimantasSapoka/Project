@@ -1,7 +1,5 @@
 package mcmfuserinterface;
 
-import mcmfuserinterface.drag_drop_table.TableObjectInterface;
-import model.Project;
 import javafx.scene.Node;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -10,6 +8,10 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.util.Callback;
+import mcmfuserinterface.controllers.ControllerInterface;
+import mcmfuserinterface.controllers.MainViewController;
+import mcmfuserinterface.drag_drop_table.TableObjectInterface;
+import model.Project;
 
 public class SideListCellFactory implements Callback<ListView<Project>, ListCell<Project>> {
 

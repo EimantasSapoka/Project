@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import ford_fulkerson.ReaderShortlistException;
-import test.graph_creator.RandomReaderAllocationModel;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.chart.BarChart;
@@ -19,8 +17,8 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Dialog;
@@ -36,6 +34,8 @@ import javafx.scene.layout.VBox;
 import model.MCMFModel;
 import model.Project;
 import model.Reader;
+import test.graph_creator.RandomReaderAllocationModel;
+import ford_fulkerson.ReaderShortlistException;
 
 public class DialogUtils {
     private static final String READER_PREFERENCES_MAX = "readerPreferencesMax";

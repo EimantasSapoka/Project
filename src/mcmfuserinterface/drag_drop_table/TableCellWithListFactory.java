@@ -11,7 +11,8 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.layout.HBox;
 import javafx.util.Callback;
-import mcmfuserinterface.ControllerInterface;
+import mcmfuserinterface.controllers.ControllerInterface;
+import mcmfuserinterface.drag_drop_table.components.DroppableScrollPane;
 import model.Project;
 import model.Reader;
 

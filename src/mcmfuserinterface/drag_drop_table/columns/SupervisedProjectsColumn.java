@@ -8,6 +8,7 @@ import model.Reader;
 
 public class SupervisedProjectsColumn extends TableColumn<TableObjectInterface, TableObjectInterface>{
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public SupervisedProjectsColumn(String name){
         super(name);
         setMinWidth(100);

@@ -17,7 +17,8 @@ import model.Reader;
  */
 public class ReaderNameColumn extends TableColumn<TableObjectInterface, TableObjectInterface> {
     
-    public ReaderNameColumn(String name){
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public ReaderNameColumn(String name){
         super(name);
         setMinWidth(150);
         setMaxWidth(300);

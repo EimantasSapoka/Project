@@ -3,10 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mcmfuserinterface;
+package mcmfuserinterface.controllers;
 
 import java.util.Collection;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -33,5 +34,7 @@ public interface ControllerInterface {
 	public String canMoveProject(Reader readerToAdd, Reader readerToRemoveFrom,Project projectToAdd);
 	public String getListItemText(Project item);
 	public String getListCellStyle(Project item);
+	public SimpleStringProperty getTableRowStyleProperty(Reader reader);
+	public void hideErrorPopOver(); 
 
 }

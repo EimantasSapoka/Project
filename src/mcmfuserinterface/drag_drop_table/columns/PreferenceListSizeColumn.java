@@ -20,7 +20,8 @@ import model.Reader;
  */
 public class PreferenceListSizeColumn extends TableColumn<TableObjectInterface, TableObjectInterface>{
     
-    public PreferenceListSizeColumn(String name){
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	public PreferenceListSizeColumn(String name){
         super(name);
         setMinWidth(40);
         setPrefWidth(40);

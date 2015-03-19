@@ -3,20 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mcmfuserinterface;
+package mcmfuserinterface.controllers;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
 import java.util.ResourceBundle;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -24,20 +21,18 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableView;
-import javafx.scene.control.Tooltip;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
-import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import mcmfuserinterface.DialogUtils;
+import mcmfuserinterface.SideListCellFactory;
 import mcmfuserinterface.drag_drop_table.TableObjectInterface;
+import mcmfuserinterface.drag_drop_table.TableRowFactory;
 import model.MCMFModel;
 import model.Project;
 import model.Reader;
@@ -123,20 +118,22 @@ public abstract class ViewController implements Initializable, ControllerInterfa
         
        
         table.setItems(items);
-        setTableRowFactory();
+        table.setRowFactory(new TableRowFactory(this));
         refreshTable();
     }
     
     
     public void showErrorPopOver(String errorMsg, Node parent){
-    	errorPopOver = new PopOver();
-		Label popText = new Label(errorMsg);
-		popText.setTextFill(Color.BLACK);
-        popText.setPadding(new Insets(10, 10, 10, 10));
-        errorPopOver.setContentNode(popText);
-        errorPopOver.setArrowLocation(ArrowLocation.RIGHT_CENTER);
-        errorPopOver.show(parent);
+		((Label) errorPopOver.getContentNode()).setText(errorMsg);
+        
+		if (!errorPopOver.isShowing() || parent != errorPopOver.getOwnerNode()){
+    		 errorPopOver.show(parent);
+    	}
 	}
+    
+    public void hideErrorPopOver(){
+    	errorPopOver.hide();
+    }
     
     /******************************* OVERRIDE METHODS ******************/
     
@@ -145,6 +142,11 @@ public abstract class ViewController implements Initializable, ControllerInterfa
     public void initialize(URL url, ResourceBundle rb) {
     	DESKTOP_DIRECTORY = System.getProperty("user.home") + File.separator + "Desktop" + File.separator;
     	errorPopOver = new PopOver();
+    	Label popText = new Label();
+		popText.setTextFill(Color.BLACK);
+        popText.setPadding(new Insets(10, 10, 10, 10));
+        errorPopOver.setContentNode(popText);
+        errorPopOver.setArrowLocation(ArrowLocation.RIGHT_CENTER);
         createDragLabel();
         initFileChooser();
         initialize();      
@@ -306,19 +308,38 @@ public abstract class ViewController implements Initializable, ControllerInterfa
      */
     @FXML 
     protected void hide(MouseEvent event){
-    	anchorPaneDragDone(null);
+    	if (dragLabel.isVisible()){
+    		anchorPaneDragDone(null);
+    	}
     }
     
     
     
     /********************* ABSTRACT METHODS **************************/
     
-    
+    /**
+     * creates view specific output. 
+     * @return
+     */
     protected abstract String createOutput();
+    
+    /**
+     * depending on table view, checks if the reader is complete. 
+     * @param reader
+     * @return
+     */
     protected abstract boolean isReaderListComplete(Reader reader);
+    
+    /**
+     * initializes each controller specific items
+     */
     protected abstract void initialize();
-    protected abstract void setTableRowFactory();
+    
+    /**
+     * creates and adds table specific columns
+     */
     protected abstract void createTableColumns();
+    
     /**
      * creates and returns a list of projects to be added to the side list
      */

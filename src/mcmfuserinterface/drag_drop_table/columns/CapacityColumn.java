@@ -16,7 +16,8 @@ import model.Reader;
  */
 public class CapacityColumn extends TableColumn<TableObjectInterface, TableObjectInterface>{
     
-    public CapacityColumn(String name){
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public CapacityColumn(String name){
         super(name);
         setMinWidth(30);
         setPrefWidth(45);

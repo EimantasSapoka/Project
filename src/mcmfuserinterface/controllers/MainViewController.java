@@ -3,19 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mcmfuserinterface;
+package mcmfuserinterface.controllers;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Optional;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -28,27 +26,22 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
-import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import mcmfuserinterface.drag_drop_table.DragDropLabel;
-import mcmfuserinterface.drag_drop_table.ListContextMenu;
-import mcmfuserinterface.drag_drop_table.TableObjectInterface;
+import mcmfuserinterface.DialogUtils;
+import mcmfuserinterface.UserInterface;
 import mcmfuserinterface.drag_drop_table.columns.CapacityColumn;
 import mcmfuserinterface.drag_drop_table.columns.ListColumn;
 import mcmfuserinterface.drag_drop_table.columns.PreferenceListSizeColumn;
 import mcmfuserinterface.drag_drop_table.columns.ReaderNameColumn;
 import mcmfuserinterface.drag_drop_table.columns.SupervisedProjectsColumn;
+import mcmfuserinterface.drag_drop_table.components.DragDropLabel;
+import mcmfuserinterface.drag_drop_table.components.ListContextMenu;
 import model.MCMFModel;
 import model.Project;
 import model.Reader;
@@ -87,7 +80,7 @@ public class MainViewController extends ViewController {
         if (!resultsStage.isShowing()){
             Parent myPane = null;
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("fxml/FXMLResultsView.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/mcmfuserinterface/fxml/FXMLResultsView.fxml"));
                 myPane = (Parent) loader.load();
                 resultsController = (ResultsViewController) loader.getController();
                 resultsController.setModel(model);
@@ -104,59 +97,7 @@ public class MainViewController extends ViewController {
             resultsController.refresh();
         }
     }    
-  
-
-  
-
-    /**
-     * creates the table row factory which adds colors to the rows
-     */
-    @Override
-    protected void setTableRowFactory() {
-        table.setRowFactory(param -> {
-                TableRow<TableObjectInterface> row = new TableRow<TableObjectInterface>(){
-                    @Override
-                    protected void updateItem(TableObjectInterface item, boolean empty) {
-                        super.updateItem(item, empty); 
-                        setUserData(item);
-                        if (item != null){
-                            
-                            final Reader reader = (Reader) item;
-                            reader.getPreferenceCountProperty().addListener((observable, oldValue, newValue)-> {
-                                    if (getUserData()!= null){
-                                        int cap = ((Reader) getUserData()).getMarkingTarget();
-                                        int numPref = Integer.parseInt(newValue);
-                                        if (reader.equals(getUserData())){
-                                            if (numPref < cap){
-                                                setStyle("-fx-background-color: red;");
-                                            } else if (numPref < cap*2){
-                                                setStyle("-fx-background-color: orange;");
-                                            } else {
-                                                setStyle("");
-                                            }
-                                        } 
-                                    } else {
-                                        setStyle("");
-                                    }
-                                });
-                            int cap = reader.getMarkingTarget();
-                            int numPref = reader.getPreferences().size();
-
-                            if (numPref < cap){
-                                setStyle("-fx-background-color: red;");
-                            } else if (numPref < cap*2){
-                                setStyle("-fx-background-color: orange;");
-                            } else {
-                                setStyle("");
-                            }
-                        } else {
-                            setStyle("");
-                        }
-                    }
-                };
-                return row;
-            });
-    }
+ 
     
     @FXML
     @Override
@@ -189,7 +130,9 @@ public class MainViewController extends ViewController {
     @Override
     protected void anchorPaneDragOver(DragEvent dragEvent) {
         super.anchorPaneDragOver(dragEvent);
-        trashBin.setVisible(true);
+        if (dragEvent.getTransferMode() == TransferMode.MOVE){
+        	trashBin.setVisible(true);
+        }
     }
 
     @FXML
@@ -458,7 +401,6 @@ public class MainViewController extends ViewController {
 	
 	@Override
 	public String canMoveProject(Reader readerToAdd, Reader readerToRemoveFrom, Project projectToAdd){
-		errorPopOver.hide();
 		return model.canAddPreference(readerToAdd, readerToRemoveFrom, projectToAdd);
 	}
 
@@ -490,5 +432,12 @@ public class MainViewController extends ViewController {
     	return output;
     	
     }
+
+
+	@Override
+	public SimpleStringProperty getTableRowStyleProperty(Reader reader) {
+		return reader.getReaderPreferenceShortlistStyleProperty();
+	}
+
         
 }

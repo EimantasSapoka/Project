@@ -3,12 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mcmfuserinterface;
+package mcmfuserinterface.controllers;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -18,17 +19,16 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableRow;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
-import mcmfuserinterface.drag_drop_table.DragLabel;
-import mcmfuserinterface.drag_drop_table.ListContextMenu;
-import mcmfuserinterface.drag_drop_table.PopLabel;
-import mcmfuserinterface.drag_drop_table.TableObjectInterface;
+import mcmfuserinterface.DialogUtils;
 import mcmfuserinterface.drag_drop_table.columns.AssignedProjectsCountColumn;
 import mcmfuserinterface.drag_drop_table.columns.CapacityColumn;
 import mcmfuserinterface.drag_drop_table.columns.ListColumn;
 import mcmfuserinterface.drag_drop_table.columns.ReaderNameColumn;
+import mcmfuserinterface.drag_drop_table.components.DragLabel;
+import mcmfuserinterface.drag_drop_table.components.ListContextMenu;
+import mcmfuserinterface.drag_drop_table.components.PopLabel;
 import model.MCMFModel;
 import model.Project;
 import model.Reader;
@@ -46,135 +46,21 @@ public class ResultsViewController extends ViewController{
     private  BarChart<String,Number> barChart;
     
     
-    
-    @Override
-    public void initialize(){
-    	
-    }
-    
-    @Override
-    protected String createOutput() {
-        Optional<List<String>> result =  DialogUtils.createParameterDialogWindow();
-        if (result.isPresent() && result.get() != null){
-            List<String> parameters = result.get();
-            return createOutputText(parameters);
-        }
-        return null;
-    }
-
-    private String createOutputText(List<String> parameters) {
-        String resultString = "";
-        for (Reader reader : model.getReaders()){
-            if (parameters.contains("ids")){
-                resultString += reader.getID() + ", ";
-            }
-            if(parameters.contains("names")){
-                resultString += reader.getName() +", ";
-            }
-            if(parameters.contains("cap")){
-                resultString += reader.getAssigned().size()+"/"+reader.getMarkingTarget()+", ";
-            }
-            if (parameters.contains("supervised")){
-                for (Project project: reader.getSupervisorProjects()){
-                    resultString+= project.getID() + " ";
-                }
-                resultString += ", ";
-            }
-            for (Project project : reader.getAssigned()){
-                resultString += project.getID()+" ";
-            }
-            resultString+="\n";
-        }
-        return resultString;
-    }
-
-
-    
-    @FXML
-    private void showPreferencesToggle(){
-        refreshTable();
-    }
-    
     protected void setModel(MCMFModel model) {
         this.model = model;
         createTableFromModel();
         createSideList();
     }
+
     
-    @Override
-    protected void createTableColumns() {
-        table.getColumns().add(new ReaderNameColumn("Reader name"));
-        table.getColumns().add(new CapacityColumn("Target"));
-        table.getColumns().add(new AssignedProjectsCountColumn("#Assigned"));
-        table.getColumns().add(new ListColumn("Projects Assigned", this));
-    }
+    /******************* FXML METHODS *******************/
     
     @FXML
     private void showInfo(){
         DialogUtils.showInformationDialog(barChart,model);
     }
-
-	
-
-     /**
-     * creates the table row factory which adds colors to the rows
-     */
-    @Override
-    protected void setTableRowFactory() {
-        table.setRowFactory(param -> {
-                TableRow<TableObjectInterface> row = new TableRow<TableObjectInterface>(){
-                    @Override
-                    protected void updateItem(TableObjectInterface item, boolean empty) {
-                        super.updateItem(item, empty); 
-                        setUserData(item);
-                        if (item != null){
-                            
-                            final Reader reader = (Reader) item;
-                            reader.getAssignedCountProperty().addListener( (observable, oldValue,  newValue) -> {
-                                    if (getUserData()!= null){
-                                        int cap = ((Reader) getUserData()).getMarkingTarget();
-                                        int assignedCount = Integer.parseInt(newValue);
-                                        if (reader.equals(getUserData())){
-                                            if (cap - 1 > assignedCount){
-                                                setStyle("-fx-background-color: red;");
-                                            } else if (cap > assignedCount){
-                                                setStyle("-fx-background-color: orange;");
-                                            } else {
-                                                setStyle("");
-                                            }
-                                        } 
-                                    } else {
-                                        setStyle("");
-                                    }
-                                });
-                            int cap = ((Reader) getUserData()).getMarkingTarget();
-                            int assignedCount = reader.getAssigned().size();
-                            if (reader.equals(getUserData())){
-                                if (cap - 1 > assignedCount){
-                                    setStyle("-fx-background-color: red;");
-                                } else if (cap > assignedCount){
-                                    setStyle("-fx-background-color: orange;");
-                                } else {
-                                    setStyle("");
-                                }
-                            } 
-                        } else {
-                            setStyle("");
-                        }
-                    }
-                };
-                return row;
-            });
-    }
     
-    @Override
-    public void refreshSideProjectList(){
-        ObservableList<Project> unselectedProjectList = FXCollections.observableArrayList();
-        unselectedProjectList.addAll(model.getUnselectedProjects());
-        sideProjectListView.setItems(unselectedProjectList);
-    }
-   
-	@FXML
+    @FXML
 	protected void onSideListDragOver(DragEvent event) {
 		event.acceptTransferModes(TransferMode.MOVE);
 	}
@@ -191,6 +77,79 @@ public class ResultsViewController extends ViewController{
 		}
 	}
 
+    /***************** OVERRIDE METHODS ****************/
+
+    
+    @Override
+    public void initialize(){
+    	
+    }
+    
+    
+    @Override
+    protected void createTableColumns() {
+        table.getColumns().add(new ReaderNameColumn("Reader name"));
+        table.getColumns().add(new CapacityColumn("Target"));
+        table.getColumns().add(new AssignedProjectsCountColumn("#Assigned"));
+        table.getColumns().add(new ListColumn("Projects Assigned", this));
+    }
+    
+    @Override
+    protected String createOutput() {
+        Optional<List<String>> result =  DialogUtils.createParameterDialogWindow();
+        if (result.isPresent() && result.get() != null){
+            List<String> parameters = result.get();
+            return createOutputText(parameters);
+        }
+        return null;
+    }
+
+    	/**
+    	 * helper method which generates the output text to be 
+    	 * exported depending on the parameters provided
+    	 * @param parameters
+    	 * @return
+    	 */
+	    private String createOutputText(List<String> parameters) {
+	        String resultString = "";
+	        for (Reader reader : model.getReaders()){
+	            if (parameters.contains("ids")){
+	                resultString += reader.getID() + ", ";
+	            }
+	            if(parameters.contains("names")){
+	                resultString += reader.getName() +", ";
+	            }
+	            if(parameters.contains("cap")){
+	                resultString += reader.getAssigned().size()+"/"+reader.getMarkingTarget()+", ";
+	            }
+	            if (parameters.contains("supervised")){
+	                for (Project project: reader.getSupervisorProjects()){
+	                    resultString+= project.getID() + " ";
+	                }
+	                resultString += ", ";
+	            }
+	            for (Project project : reader.getAssigned()){
+	                resultString += project.getID()+" ";
+	            }
+	            resultString+="\n";
+	        }
+	        return resultString;
+	    }
+
+
+    
+    @FXML
+    private void showPreferencesToggle(){
+        refreshTable();
+    }
+    
+    @Override
+    public void refreshSideProjectList(){
+        ObservableList<Project> unselectedProjectList = FXCollections.observableArrayList();
+        unselectedProjectList.addAll(model.getUnselectedProjects());
+        sideProjectListView.setItems(unselectedProjectList);
+    }
+   
     @Override
     public String moveProject(Reader readerToAdd, Reader readerToRemoveFrom, Project projectToMove) {
         return model.moveAssignedProject(readerToAdd, readerToRemoveFrom, projectToMove);    
@@ -262,7 +221,6 @@ public class ResultsViewController extends ViewController{
 
 	@Override
 	public String canMoveProject(Reader readerToAdd, Reader readerToRemoveFrom,Project projectToAdd) {
-		errorPopOver.hide();
 		return model.canAddAssignment(readerToAdd, readerToRemoveFrom, projectToAdd);
 	}
 
@@ -286,5 +244,11 @@ public class ResultsViewController extends ViewController{
 	@Override
 	public String getListCellStyle(Project item){
 		return "-fx-background-color: red;";
+	}
+
+
+	@Override
+	public SimpleStringProperty getTableRowStyleProperty(Reader reader) {
+		return reader.getReaderAssignedShortlistStyleProperty();
 	}
 }

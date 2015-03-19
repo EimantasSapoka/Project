@@ -8,8 +8,8 @@ import model.Reader;
 import org.junit.Before;
 import org.junit.Test;
 
-import test.augustineMCMF.MinCostMaxFlowSPA;
 import test.augustineMCMF.Augustine_Network;
+import test.augustineMCMF.MinCostMaxFlowSPA;
 import test.graph_creator.RandomArbitraryModel;
 import test.graph_creator.RandomReaderAllocationModel;
 import ford_fulkerson.MinCostMaxFlowAlgorithm;

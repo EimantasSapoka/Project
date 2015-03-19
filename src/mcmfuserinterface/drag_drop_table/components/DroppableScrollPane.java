@@ -3,14 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mcmfuserinterface.drag_drop_table;
+package mcmfuserinterface.drag_drop_table.components;
 
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
-import mcmfuserinterface.ControllerInterface;
 import mcmfuserinterface.DialogUtils;
+import mcmfuserinterface.controllers.ControllerInterface;
 import model.Project;
 import model.Reader;
 
@@ -28,6 +28,8 @@ public class DroppableScrollPane extends ScrollPane {
         setOnDragOver(event -> {
         	if (dropAccepted){
         		event.acceptTransferModes(TransferMode.ANY);
+        	} else {
+        		event.acceptTransferModes(TransferMode.NONE);
         	}
         });
         
@@ -53,6 +55,7 @@ public class DroppableScrollPane extends ScrollPane {
 	       	if ( errorMsg == null){
 	       		event.acceptTransferModes(TransferMode.ANY);
 	       		dropAccepted = true;
+	       		controller.hideErrorPopOver();
 	       	} else {
 	       		dropAccepted = false;
 	       		controller.showErrorPopOver(errorMsg, this);
@@ -60,6 +63,7 @@ public class DroppableScrollPane extends ScrollPane {
 	       	}
         });
         
+       
 
         setOnDragDropped(event -> {
         	Node hbox = getContent();

@@ -7,7 +7,7 @@ package mcmfuserinterface.drag_drop_table.columns;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.scene.control.TableColumn;
-import mcmfuserinterface.ControllerInterface;
+import mcmfuserinterface.controllers.ControllerInterface;
 import mcmfuserinterface.drag_drop_table.TableCellWithListFactory;
 import mcmfuserinterface.drag_drop_table.TableObjectInterface;
 
@@ -17,7 +17,8 @@ import mcmfuserinterface.drag_drop_table.TableObjectInterface;
  */
 public class ListColumn  extends TableColumn<TableObjectInterface, TableObjectInterface>{
     
-    public ListColumn(String name, ControllerInterface contr){
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public ListColumn(String name, ControllerInterface contr){
         super(name);
         setMinWidth(350);
         setPrefWidth(450);

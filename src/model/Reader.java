@@ -3,8 +3,6 @@ package model;
 import java.util.ArrayList;
 
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import mcmfuserinterface.drag_drop_table.TableObjectInterface;
 import ford_fulkerson.network.Edge;
 import ford_fulkerson.network.NetworkObjectInterface;
@@ -22,7 +20,9 @@ public class Reader  implements TableObjectInterface, NetworkObjectInterface{
 	
 	private final SimpleStringProperty preferenceCountProperty;
     private final SimpleStringProperty assignedCountProperty;
-  
+    private final SimpleStringProperty readerPreferenceShortlistStyleProperty;
+    private final SimpleStringProperty readerAssignedShortlistStyleProperty;
+
 	
 	public Reader(int id, int capacity){
 		this.id = id;
@@ -32,8 +32,36 @@ public class Reader  implements TableObjectInterface, NetworkObjectInterface{
 		this.preferences = new ArrayList<Project>();
 		this.name = String.valueOf(id);
 		
+		// UI specific parameters
+		
 		this.preferenceCountProperty = new SimpleStringProperty("0"); 
 		this.assignedCountProperty = new SimpleStringProperty("0");
+		this.readerPreferenceShortlistStyleProperty = new SimpleStringProperty("");
+		this.readerAssignedShortlistStyleProperty = new SimpleStringProperty("");
+		
+		preferenceCountProperty.addListener((observable, oldValue, newValue) ->{
+			int num = Integer.parseInt(newValue);
+			if (num < markingTarget){
+				readerPreferenceShortlistStyleProperty.set("-fx-background-color: red;");
+            } else if (num < markingTarget*2){
+            	readerPreferenceShortlistStyleProperty.set("-fx-background-color: orange;");
+            } else {
+            	readerPreferenceShortlistStyleProperty.set("");
+            }
+		});
+		
+		assignedCountProperty.addListener((observable, oldValue, newValue) ->{
+			int num = Integer.parseInt(newValue);
+			 if (markingTarget - 1 > num){
+				 readerAssignedShortlistStyleProperty.set("-fx-background-color: red;");
+             } else if (markingTarget > num){
+            	 readerAssignedShortlistStyleProperty.set("-fx-background-color: orange;");
+             } else {
+            	 readerAssignedShortlistStyleProperty.set("");
+             }
+		});
+		
+		
 	}
     
     public Reader(String readerName, int id, int capacity){
@@ -207,5 +235,15 @@ public class Reader  implements TableObjectInterface, NetworkObjectInterface{
     
     public SimpleStringProperty getAssignedCountProperty(){
         return this.assignedCountProperty;
-    }    
+    }
+
+	public SimpleStringProperty getReaderPreferenceShortlistStyleProperty() {
+		return readerPreferenceShortlistStyleProperty;
+	}
+
+	public SimpleStringProperty getReaderAssignedShortlistStyleProperty() {
+		return readerAssignedShortlistStyleProperty;
+	}    
+    
+    
 }

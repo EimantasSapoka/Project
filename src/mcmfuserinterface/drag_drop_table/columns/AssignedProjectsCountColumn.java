@@ -20,7 +20,8 @@ import model.Reader;
  */
 public class AssignedProjectsCountColumn extends TableColumn<TableObjectInterface, TableObjectInterface> {
 
-    public AssignedProjectsCountColumn(String name) {
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	public AssignedProjectsCountColumn(String name) {
         super(name);
 
         setMinWidth(40);
