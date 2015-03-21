@@ -23,6 +23,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
@@ -101,13 +102,17 @@ public class DialogUtils {
     * @param ex
     * @return 
     */
-   public static boolean showErrorWarningDialog(ReaderShortlistException ex) {
-       boolean runAlgorithm;
-       runAlgorithm = false;
-       Alert alert = new Alert(AlertType.CONFIRMATION);
+   public static boolean showErrorWarningDialog(ReaderShortlistException ex) {       
        ButtonType proceed = new ButtonType("Proceed anyway");
        ButtonType cancel = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
+       
+       ScrollPane pane = new ScrollPane();
+       pane.setContent(new Label(ex.getMessage()));
+       
+       Alert alert = new Alert(AlertType.CONFIRMATION);
        alert.getButtonTypes().setAll(proceed, cancel);
+       alert.getDialogPane().setContent(pane);
+       
        if (ex.isErrorMessage()){
            alert.setTitle("Error");
            alert.setHeaderText("There are errors in data.\n"
@@ -118,14 +123,36 @@ public class DialogUtils {
            alert.setHeaderText("There are warnings in data.\nResulting "
                    + "assignment may not be the optimal. ");
        }
-       alert.getDialogPane().setContent(new Label(ex.getMessage()));
+
        Optional<ButtonType> result = alert.showAndWait();
        if (result.get() == proceed){
-           runAlgorithm = true;
+           return true;
+       } else {
+    	   return false;
        }
-       return runAlgorithm;
    }
 	
+   
+   public static boolean showProjectReaderDialog(String info){
+	   ButtonType ok = new ButtonType("Ok", ButtonData.OK_DONE);
+	   ButtonType export = new ButtonType("Export");
+	   
+	   ScrollPane pane = new ScrollPane();
+       pane.setContent(new Label(info));
+	   
+	   Alert alert = new Alert(AlertType.INFORMATION);
+	   alert.getButtonTypes().setAll(export, ok);
+	   alert.getDialogPane().setContent(pane);
+	   alert.setTitle("Projects reader view");
+	   alert.setHeaderText("List of projects and the reader they were assigned to" );
+	   
+	   Optional<ButtonType> result = alert.showAndWait();
+       if (result.get() == export){
+           return true;
+       } else {
+    	   return false;
+       }
+   }
    
    
    /** 

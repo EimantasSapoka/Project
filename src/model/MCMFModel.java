@@ -8,6 +8,7 @@ package model;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import ford_fulkerson.ReaderShortlistException;
@@ -439,6 +440,37 @@ public class MCMFModel {
     		return PROJECT_SUPERVISED_ERROR_MSG;
     	}
 		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	public String getProjectReaderInfo() {
+		StringBuilder result = new StringBuilder();
+		result.append(String.format("%-50s%s\n\n","Project name", "| Rank , Reader assigned to" ));
+		List<Project> projectsSortedByID = (List<Project>) projects.clone();
+		
+		// sort projects by name.
+		Collections.sort(projectsSortedByID, new Comparator<Project>(){
+			@Override
+			public int compare(Project p1, Project p2) {
+				return p1.getName().compareTo(p2.getName());
+			}
+		});
+		
+		for (Project project : projectsSortedByID){
+			result.append(String.format("%-50s",project.getName()));
+			
+			Reader assignedReader = project.getAssignedReader();
+			
+			if (assignedReader == null){
+				result.append("| Not assigned\n");
+			} else {
+				int rank = assignedReader.getPreferences().indexOf(project);
+				rank = rank ==-1? assignedReader.getPreferences().size()+1: rank+1;
+				result.append(String.format("| %-5s, %s\n", rank+"", assignedReader.getName()));
+			}
+		}
+		
+		return result.toString();
 	}
 
 }

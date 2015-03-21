@@ -21,7 +21,7 @@ import ford_fulkerson.network.Network;
 
 public class Constraints_Test {
 	
-	private static final int TEST_COUNT = 100;
+	private static final int TEST_COUNT = 1000;
 	MCMFModel arbitraryGraph,readerGraph;
 	
 	/**
@@ -31,8 +31,7 @@ public class Constraints_Test {
 	@Test
 	public void testReaderGraph(){
 		for (int i=0; i<TEST_COUNT; i++){
-
-			readerGraph = new RandomReaderAllocationModel();
+			readerGraph = new RandomReaderAllocationModel(i%50+1, i%400+1);
             try {
                 readerGraph.createNetwork();
             } catch (ReaderShortlistException ex) {
@@ -84,7 +83,7 @@ public class Constraints_Test {
 	@Test
 	public void testArbitraryGraph() throws ReaderShortlistException{
 		for (int i = 0; i< TEST_COUNT ; i++){
-			arbitraryGraph = new RandomArbitraryModel();
+			arbitraryGraph = new RandomArbitraryModel(i%50+1, i%400+1);
 			MinCostMaxFlowAlgorithm.runLoadBalancedAlgorithm(arbitraryGraph);
 			networkConstraintsTests(arbitraryGraph.getNetwork());
 		}

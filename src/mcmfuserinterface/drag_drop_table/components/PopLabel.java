@@ -27,7 +27,7 @@ public class PopLabel extends Label {
         this.getStyleClass().add("myLabel");
         
         pop = new PopOver();
-        popText = new Label();
+        popText = new Label(msg);
 
         this.setOnContextMenuRequested(event -> {
                     popText.setTextFill(Color.BLACK);

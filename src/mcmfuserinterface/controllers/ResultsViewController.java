@@ -76,6 +76,15 @@ public class ResultsViewController extends ViewController{
 			refresh();
 		}
 	}
+	
+	@FXML
+	protected void showProjectReaderView(){
+		String readerProjectInfo = model.getProjectReaderInfo();
+		boolean shouldExport = DialogUtils.showProjectReaderDialog(readerProjectInfo);
+		if (shouldExport){
+			this.saveTextToFile(readerProjectInfo);
+		}
+	}
 
     /***************** OVERRIDE METHODS ****************/
 

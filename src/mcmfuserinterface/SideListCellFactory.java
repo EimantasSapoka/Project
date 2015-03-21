@@ -11,6 +11,7 @@ import javafx.util.Callback;
 import mcmfuserinterface.controllers.ControllerInterface;
 import mcmfuserinterface.controllers.MainViewController;
 import mcmfuserinterface.drag_drop_table.TableObjectInterface;
+import mcmfuserinterface.drag_drop_table.components.PopLabel;
 import model.Project;
 
 public class SideListCellFactory implements Callback<ListView<Project>, ListCell<Project>> {
@@ -32,9 +33,13 @@ public class SideListCellFactory implements Callback<ListView<Project>, ListCell
                      setUserData(item);
                      setTooltip(new Tooltip(item.getName()));
                      setStyle(controller.getListCellStyle(item));
-                     setText(controller.getListItemText(item));
+                     PopLabel label = new PopLabel(controller.getListItemText(item));
+                     label.setPopText("Name: " + item.getName() +
+                    		 		  "\nID: " +item.getID()+
+                    		 		  "\nTimes selected: " + item.getSelectedCount());
+                     setGraphic(label);
                  }else {
-                	 setText("");
+                	 setGraphic(null);
                 	 setTooltip(null);
                      setUserData(null);
                      setVisible(false);

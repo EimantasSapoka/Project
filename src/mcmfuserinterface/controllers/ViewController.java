@@ -183,21 +183,30 @@ public abstract class ViewController implements Initializable, ControllerInterfa
     @FXML
     public void export(){
         String output = createOutput();
-        if (output != null){  
-            fileChooser.setTitle("Save file");
-            File file = fileChooser.showSaveDialog(table.getScene().getWindow());
-            if (file != null) {
-                try {
-                    PrintWriter writer = new PrintWriter(file, "UTF-8");
-                    writer.print(output);
-                    writer.close();
-                } catch (IOException ex) {
-                    DialogUtils.createExceptionDialog(ex);
-                }
-            }
-        }
-        
+        saveTextToFile(output);
     }
+
+    /**
+     * saves output text into a user selected file.
+     * @param output
+     */
+	protected void saveTextToFile(String output) {
+		if (output != null) {
+			
+			fileChooser.setTitle("Save file");
+			File file = fileChooser.showSaveDialog(table.getScene().getWindow());
+			
+			if (file != null) {
+				try {
+					PrintWriter writer = new PrintWriter(file, "UTF-8");
+					writer.print(output);
+					writer.close();
+				} catch (IOException ex) {
+					DialogUtils.createExceptionDialog(ex);
+				}
+			}
+		}
+	}
     
     /**
      * changes between showing and hiding readers with zero capacity
@@ -308,9 +317,7 @@ public abstract class ViewController implements Initializable, ControllerInterfa
      */
     @FXML 
     protected void hide(MouseEvent event){
-    	if (dragLabel.isVisible()){
-    		anchorPaneDragDone(null);
-    	}
+    	anchorPaneDragDone(null);
     }
     
     

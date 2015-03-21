@@ -23,6 +23,7 @@
                               <CheckMenuItem fx:id="completeListReaderCheckBox" mnemonicParsing="false" onAction="#toggleShowReadersWithCompleteLists" selected="true" text="Show readers with complete lists" />
                               <CheckMenuItem fx:id="preferencesCheckBox" mnemonicParsing="false" onAction="#showPreferencesToggle" text="Show preferences" />
                               <MenuItem mnemonicParsing="false" onAction="#showInfo" text="Matching information" />
+                              <MenuItem mnemonicParsing="false" onAction="#showProjectReaderView" text="Show Project-Reader view" />
                            </items>
                         </Menu>
                     </menus>
