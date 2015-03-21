@@ -6,6 +6,8 @@
 package mcmfuserinterface.controllers;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -192,6 +194,23 @@ public class ResultsViewController extends ViewController{
             }
             return list;      
         } else {
+            Collections.sort(reader.getAssigned(), new Comparator<Project>(){
+
+				@Override
+				public int compare(Project arg0, Project arg1) {
+					int indexFirst = reader.getPreferences().indexOf(arg0);
+					int indexSecond = reader.getPreferences().indexOf(arg1);
+					
+					if (indexFirst == -1){
+						return 1;
+					}
+					if (indexSecond == -1){
+						return -1;
+					}
+					return indexFirst - indexSecond;
+				} 
+            
+            });
             return reader.getAssigned();
         }
     }
@@ -213,6 +232,15 @@ public class ResultsViewController extends ViewController{
             }
         } else {
             label = new PopLabel(project.getID() + "");
+        }
+        
+        int indexOfPreference = reader.getPreferences().indexOf(project);
+		if (indexOfPreference == -1){
+			label.getStyleClass().remove("topChoice");
+        } else if (indexOfPreference  < reader.getMarkingTarget()) {
+        	label.getStyleClass().add("topChoice");
+        } else {
+			label.getStyleClass().remove("topChoice");
         }
 
         label.setPopText("Name: " + project.getName()
