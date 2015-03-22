@@ -2,9 +2,9 @@ package test.augustineMCMF;
 
 import java.util.ArrayList;
 
-import model.MCMFModel;
-import model.Project;
-import model.Reader;
+import ford_fulkerson.model.MCMFModel;
+import ford_fulkerson.model.Project;
+import ford_fulkerson.model.Reader;
 import ford_fulkerson.network.Network;
 import ford_fulkerson.network.Vertex;
 

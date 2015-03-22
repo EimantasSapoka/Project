@@ -3,9 +3,9 @@ package ford_fulkerson;
 import java.util.ArrayList;
 import java.util.List;
 
-import model.MCMFModel;
-import model.Project;
-import model.Reader;
+import ford_fulkerson.model.MCMFModel;
+import ford_fulkerson.model.Project;
+import ford_fulkerson.model.Reader;
 import ford_fulkerson.network.Edge;
 import ford_fulkerson.network.Network;
 import ford_fulkerson.network.Vertex;

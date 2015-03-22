@@ -1,4 +1,4 @@
-package model;
+package ford_fulkerson.model;
 
 import java.util.ArrayList;
 

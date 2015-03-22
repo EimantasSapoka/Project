@@ -31,14 +31,15 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import mcmfuserinterface.DialogUtils;
 import mcmfuserinterface.SideListCellFactory;
+import mcmfuserinterface.UserInterfaceModel;
 import mcmfuserinterface.drag_drop_table.TableObjectInterface;
 import mcmfuserinterface.drag_drop_table.TableRowFactory;
-import model.MCMFModel;
-import model.Project;
-import model.Reader;
 
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.PopOver.ArrowLocation;
+
+import ford_fulkerson.model.Project;
+import ford_fulkerson.model.Reader;
 
 /**
  *
@@ -48,7 +49,7 @@ public abstract class ViewController implements Initializable, ControllerInterfa
 	
 	public static String DESKTOP_DIRECTORY;
 
-    protected MCMFModel model;
+    protected UserInterfaceModel model;
     protected Label dragLabel;
     protected PopOver errorPopOver;
     protected int scroll = 10;

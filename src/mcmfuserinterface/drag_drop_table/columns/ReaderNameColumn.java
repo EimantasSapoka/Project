@@ -5,10 +5,10 @@
  */
 package mcmfuserinterface.drag_drop_table.columns;
 
+import ford_fulkerson.model.Reader;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.scene.control.TableColumn;
 import mcmfuserinterface.drag_drop_table.TableObjectInterface;
-import model.Reader;
 
 /**
  *

@@ -32,11 +32,11 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import model.MCMFModel;
-import model.Project;
-import model.Reader;
 import test.graph_creator.RandomReaderAllocationModel;
 import ford_fulkerson.ReaderShortlistException;
+import ford_fulkerson.model.MCMFModel;
+import ford_fulkerson.model.Project;
+import ford_fulkerson.model.Reader;
 
 public class DialogUtils {
     private static final String READER_PREFERENCES_MAX = "readerPreferencesMax";
@@ -161,7 +161,7 @@ public class DialogUtils {
     * model instance. 
     * @return
     */
-	public static MCMFModel createRandomInstanceCreatorDialog(){
+	public static UserInterfaceModel createRandomInstanceCreatorDialog(){
 		
 		Dialog<Map<String, Integer>> dialog = new Dialog<>();
         dialog.setTitle("Create random instance");
@@ -259,11 +259,12 @@ public class DialogUtils {
         	int preferenceMin = input.containsKey(READER_PREFERENCES_MIN)? input.get(READER_PREFERENCES_MIN):0;
         	int preferenceMax = input.containsKey(READER_PREFERENCES_MAX)? input.get(READER_PREFERENCES_MAX):0;
         	
-            return new RandomReaderAllocationModel(
+            return new UserInterfaceModel(
+            		new RandomReaderAllocationModel(
             		input.get(READER_COUNT), 
             		input.get(PROJECT_COUNT), 
             		targetMin, targetMax, 
-            		preferenceMin, preferenceMax);
+            		preferenceMin, preferenceMax));
            
         } else {
         	return null;
@@ -325,7 +326,7 @@ public class DialogUtils {
 	  * @param barChart
 	  * @param model
 	  */
-	 public static void showInformationDialog(BarChart<String, Number> barChart, MCMFModel model) {
+	 public static void showInformationDialog(BarChart<String, Number> barChart, UserInterfaceModel model) {
 			
 			Alert info = new Alert(Alert.AlertType.INFORMATION);
 	        info.setHeaderText("Information on assignments:");

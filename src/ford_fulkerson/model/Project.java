@@ -1,4 +1,4 @@
-package model;
+package ford_fulkerson.model;
 
 import mcmfuserinterface.drag_drop_table.TableObjectInterface;
 import ford_fulkerson.network.NetworkObjectInterface;
@@ -93,6 +93,7 @@ public class Project implements Comparable<Project>, TableObjectInterface, Netwo
         }
         return this.id == project.getID() && this.vertex.equals(project.getVertex());
     }
+    
 }
 
     

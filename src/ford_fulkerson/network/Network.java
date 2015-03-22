@@ -2,8 +2,8 @@ package ford_fulkerson.network;
 
 import java.util.ArrayList;
 
-import model.Project;
-import model.Reader;
+import ford_fulkerson.model.Project;
+import ford_fulkerson.model.Reader;
 import test.graph_creator.MockNetworkObject;
 
 public class Network {

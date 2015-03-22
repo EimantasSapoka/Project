@@ -3,9 +3,9 @@ package test.graph_creator;
 import java.util.ArrayList;
 import java.util.Random;
 
-import model.MCMFModel;
-import model.Project;
-import model.Reader;
+import ford_fulkerson.model.MCMFModel;
+import ford_fulkerson.model.Project;
+import ford_fulkerson.model.Reader;
 
 /**
  * class which creates a random reader allocation graph. Used for testing.
@@ -58,7 +58,7 @@ public class RandomReaderAllocationModel extends MCMFModel{
 		projectList = new ArrayList<Project>(PROJECT_COUNT);
 		
 		for (int i=0; i<PROJECT_COUNT; i++){
-            Project project = new Project("Project " + i, i + READER_COUNT, rand.nextInt(readerCount)+1 );
+            Project project = new Project("Project " + (i + READER_COUNT), i + READER_COUNT, rand.nextInt(readerCount)+1 );
             projectList.add(project);
             this.addProject(project);
 		}

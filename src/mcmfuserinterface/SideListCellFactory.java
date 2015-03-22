@@ -1,5 +1,6 @@
 package mcmfuserinterface;
 
+import ford_fulkerson.model.Project;
 import javafx.scene.Node;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -12,7 +13,6 @@ import mcmfuserinterface.controllers.ControllerInterface;
 import mcmfuserinterface.controllers.MainViewController;
 import mcmfuserinterface.drag_drop_table.TableObjectInterface;
 import mcmfuserinterface.drag_drop_table.components.PopLabel;
-import model.Project;
 
 public class SideListCellFactory implements Callback<ListView<Project>, ListCell<Project>> {
 

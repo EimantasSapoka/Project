@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import ford_fulkerson.model.Project;
+import ford_fulkerson.model.Reader;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceDialog;
@@ -16,8 +18,6 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.HBox;
 import mcmfuserinterface.controllers.ControllerInterface;
-import model.Project;
-import model.Reader;
 
 /**
  *

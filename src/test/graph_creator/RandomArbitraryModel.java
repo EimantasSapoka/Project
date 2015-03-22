@@ -3,8 +3,8 @@ package test.graph_creator;
 import java.util.ArrayList;
 import java.util.Random;
 
-import model.MCMFModel;
 import ford_fulkerson.ReaderShortlistException;
+import ford_fulkerson.model.MCMFModel;
 import ford_fulkerson.network.Edge;
 import ford_fulkerson.network.Network;
 import ford_fulkerson.network.Vertex;

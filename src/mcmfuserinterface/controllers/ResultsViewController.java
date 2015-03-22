@@ -11,6 +11,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import ford_fulkerson.model.Project;
+import ford_fulkerson.model.Reader;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -24,16 +26,15 @@ import javafx.scene.control.Label;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
 import mcmfuserinterface.DialogUtils;
+import mcmfuserinterface.UserInterfaceModel;
 import mcmfuserinterface.drag_drop_table.columns.AssignedProjectsCountColumn;
 import mcmfuserinterface.drag_drop_table.columns.CapacityColumn;
 import mcmfuserinterface.drag_drop_table.columns.ListColumn;
 import mcmfuserinterface.drag_drop_table.columns.ReaderNameColumn;
+import mcmfuserinterface.drag_drop_table.columns.SupervisedProjectsColumn;
 import mcmfuserinterface.drag_drop_table.components.DragLabel;
 import mcmfuserinterface.drag_drop_table.components.ListContextMenu;
 import mcmfuserinterface.drag_drop_table.components.PopLabel;
-import model.MCMFModel;
-import model.Project;
-import model.Reader;
 
 /**
  *
@@ -48,7 +49,7 @@ public class ResultsViewController extends ViewController{
     private  BarChart<String,Number> barChart;
     
     
-    protected void setModel(MCMFModel model) {
+    protected void setModel(UserInterfaceModel model) {
         this.model = model;
         createTableFromModel();
         createSideList();
@@ -103,6 +104,7 @@ public class ResultsViewController extends ViewController{
         table.getColumns().add(new CapacityColumn("Target"));
         table.getColumns().add(new AssignedProjectsCountColumn("#Assigned"));
         table.getColumns().add(new ListColumn("Projects Assigned", this));
+        table.getColumns().add(new SupervisedProjectsColumn("Supervised Projects"));
     }
     
     @Override
@@ -194,6 +196,11 @@ public class ResultsViewController extends ViewController{
             }
             return list;      
         } else {
+        	/*
+        	 *  sort the assigned projects in order of their preference. 
+        	 *  Does add a bit of computation to the resulting table, but 
+        	 *  makes it look nicer as well.
+        	 */
             Collections.sort(reader.getAssigned(), new Comparator<Project>(){
 
 				@Override

@@ -35,6 +35,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import mcmfuserinterface.DialogUtils;
 import mcmfuserinterface.UserInterface;
+import mcmfuserinterface.UserInterfaceModel;
 import mcmfuserinterface.drag_drop_table.columns.CapacityColumn;
 import mcmfuserinterface.drag_drop_table.columns.ListColumn;
 import mcmfuserinterface.drag_drop_table.columns.PreferenceListSizeColumn;
@@ -42,9 +43,6 @@ import mcmfuserinterface.drag_drop_table.columns.ReaderNameColumn;
 import mcmfuserinterface.drag_drop_table.columns.SupervisedProjectsColumn;
 import mcmfuserinterface.drag_drop_table.components.DragDropLabel;
 import mcmfuserinterface.drag_drop_table.components.ListContextMenu;
-import model.MCMFModel;
-import model.Project;
-import model.Reader;
 
 import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.GlyphFont;
@@ -52,6 +50,8 @@ import org.controlsfx.glyphfont.GlyphFontRegistry;
 
 import ford_fulkerson.MinCostMaxFlowAlgorithm;
 import ford_fulkerson.ReaderShortlistException;
+import ford_fulkerson.model.Project;
+import ford_fulkerson.model.Reader;
 
 /**
  *
@@ -180,7 +180,7 @@ public class MainViewController extends ViewController {
      */
     @FXML
     private void createRandomInstance(){
-        MCMFModel randomModel = DialogUtils.createRandomInstanceCreatorDialog();
+        UserInterfaceModel randomModel = DialogUtils.createRandomInstanceCreatorDialog();
         if (randomModel != null){
         	model = randomModel;
         	createTableFromModel();
@@ -211,7 +211,7 @@ public class MainViewController extends ViewController {
         File file = fileChooser.showOpenDialog(menuBar.getScene().getWindow());
         if (file != null) {
             try {
-                model = new MCMFModel(file);
+                model = new UserInterfaceModel(file);
                 createTableFromModel();
                 createSideList();
             } catch (Exception ex){

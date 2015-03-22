@@ -1,9 +1,6 @@
 package test;
 
 import static org.junit.Assert.assertTrue;
-import model.MCMFModel;
-import model.Project;
-import model.Reader;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -14,6 +11,9 @@ import test.graph_creator.RandomArbitraryModel;
 import test.graph_creator.RandomReaderAllocationModel;
 import ford_fulkerson.MinCostMaxFlowAlgorithm;
 import ford_fulkerson.ReaderShortlistException;
+import ford_fulkerson.model.MCMFModel;
+import ford_fulkerson.model.Project;
+import ford_fulkerson.model.Reader;
 
 public class CorrectnessTest {
 

@@ -7,12 +7,12 @@ package mcmfuserinterface.controllers;
 
 import java.util.Collection;
 
+import ford_fulkerson.model.Project;
+import ford_fulkerson.model.Reader;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
-import model.Project;
-import model.Reader;
 
 /**
  *

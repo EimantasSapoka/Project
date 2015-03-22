@@ -1,10 +1,10 @@
 package mcmfuserinterface.drag_drop_table;
 
+import ford_fulkerson.model.Reader;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
 import mcmfuserinterface.controllers.ControllerInterface;
-import model.Reader;
 
 public class TableRowFactory implements Callback<TableView<TableObjectInterface>, TableRow<TableObjectInterface>>{
 	private final ControllerInterface controller;

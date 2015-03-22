@@ -6,9 +6,9 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import model.MCMFModel;
-import model.Project;
-import model.Reader;
+import ford_fulkerson.model.MCMFModel;
+import ford_fulkerson.model.Project;
+import ford_fulkerson.model.Reader;
 
 /**
  * a text scanner class which takes a text file input and generates a graph from
