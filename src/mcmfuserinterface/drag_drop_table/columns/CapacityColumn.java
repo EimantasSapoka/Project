@@ -6,27 +6,25 @@
 package mcmfuserinterface.drag_drop_table.columns;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TableColumn;
-import javafx.util.Callback;
-import mcmfuserinterface.drag_drop_table.TableObjectInterface;
-import model.Reader;
+import ford_fulkerson.model.Reader;
 
 /**
  *
  * @author Eimantas
  */
-public class CapacityColumn extends TableColumn<TableObjectInterface, TableObjectInterface>{
+public class CapacityColumn extends TableColumn<Reader, Integer>{
     
-    public CapacityColumn(String name){
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public CapacityColumn(String name){
         super(name);
         setMinWidth(30);
-        setPrefWidth(50);
+        setPrefWidth(45);
         setMaxWidth(60);
         
         setCellValueFactory(features -> {
               Reader reader = (Reader) features.getValue();
-              return new ReadOnlyObjectWrapper(reader.getCapacity());
+              return new ReadOnlyObjectWrapper(reader.getMarkingTarget());
         });
         
     }

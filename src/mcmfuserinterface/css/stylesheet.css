@@ -1,0 +1,40 @@
+.bordered {
+   -fx-border-color: black;
+}
+.myLabel{
+    -fx-font-size: 15px;
+    -fx-label-padding: 3;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.shadow {
+	-fx-effect: dropshadow(gaussian  , black , 5 , 0.2 , 10 ,10 );
+}
+
+.highlighted {
+    -fx-font-size: 20px;
+    -fx-text-fill: #3333CC !important;
+}
+
+.invisible{
+	visibility: hidden;
+}
+
+.topChoice {
+	-fx-text-fill: #33CC33;
+}
+
+.HBox {
+    -fx-halignment: center
+}
+
+.table-row-cell:filled:selected { 
+  -fx-background: -fx-control-inner-background ;
+  -fx-background-color: -fx-table-cell-border-color, -fx-background ;
+  -fx-background-insets: 0, 0 0 1 0 ;
+  -fx-table-cell-border-color: derive(-fx-color, 5%);
+}
+.table-row-cell:odd:filled:selected {
+  -fx-background: -fx-control-inner-background-alt ;
+}

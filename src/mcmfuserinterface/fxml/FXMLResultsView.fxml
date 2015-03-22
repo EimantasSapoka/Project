@@ -9,18 +9,29 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" fx:id="anchorPane" onDragDetected="#anchorPaneDragDetected" onDragDone="#anchorPaneDragDone" onDragOver="#anchorPaneDragOver" prefHeight="500.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mcmfuserinterface.FXMLResultsViewController">
+<AnchorPane id="AnchorPane" fx:id="anchorPane" onDragDone="#anchorPaneDragDone" onDragOver="#anchorPaneDragOver" onMouseMoved="#hide" prefHeight="500.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mcmfuserinterface.controllers.ResultsViewController">
    <children>
       <BorderPane layoutX="-72.0" layoutY="-27.0" prefHeight="200.0" prefWidth="320.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <top>
-            <HBox />
+            <HBox>
+               <children>
+                  <MenuBar HBox.hgrow="ALWAYS">
+                    <menus>
+                        <Menu mnemonicParsing="false" text="View">
+                           <items>
+                              <CheckMenuItem fx:id="zeroCapacityReaderCheckbox" mnemonicParsing="false" onAction="#toggleShowZeroCapacityReaders" selected="true" text="Show Readers with zero capacity" />
+                              <CheckMenuItem fx:id="completeListReaderCheckBox" mnemonicParsing="false" onAction="#toggleShowReadersWithCompleteLists" selected="true" text="Show readers with complete lists" />
+                              <CheckMenuItem fx:id="preferencesCheckBox" mnemonicParsing="false" onAction="#showPreferencesToggle" text="Show preferences" />
+                              <MenuItem mnemonicParsing="false" onAction="#showInfo" text="Matching information" />
+                              <MenuItem mnemonicParsing="false" onAction="#showProjectReaderView" text="Show Project-Reader view" />
+                           </items>
+                        </Menu>
+                    </menus>
+                  </MenuBar>
+               </children></HBox>
          </top>
          <center>
-            <TableView fx:id="table" prefHeight="407.0" prefWidth="644.0" BorderPane.alignment="CENTER">
-               <columnResizePolicy>
-                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-               </columnResizePolicy>
-            </TableView>
+            <TableView fx:id="table" onMouseMoved="#hide" prefHeight="407.0" prefWidth="644.0" BorderPane.alignment="CENTER" />
          </center>
          <right>
             <VBox prefHeight="408.0" prefWidth="129.0" BorderPane.alignment="CENTER">
@@ -34,30 +45,17 @@
                         </Label>
                      </children>
                   </Pane>
-                  <ListView fx:id="unselectedList" prefHeight="366.0" prefWidth="133.0" VBox.vgrow="ALWAYS" />
+                  <ListView fx:id="sideProjectListView" onDragDropped="#onSideListDragDropped" onDragOver="#onSideListDragOver" onMouseMoved="#hide" prefHeight="339.0" prefWidth="129.0" VBox.vgrow="ALWAYS" />
+                  <Pane prefHeight="99.0" prefWidth="129.0">
+                     <children>
+                        <Button layoutX="12.0" layoutY="14.0" mnemonicParsing="false" onAction="#export" prefHeight="25.0" prefWidth="103.0" text="Export" />
+                        <Button fx:id="cancelButton" layoutX="11.0" layoutY="60.0" mnemonicParsing="false" onAction="#closeWindow" prefHeight="25.0" prefWidth="105.0" text="Cancel" />
+                        <Separator layoutX="3.0" layoutY="49.0" prefHeight="3.0" prefWidth="119.0" />
+                     </children>
+                  </Pane>
                </children>
             </VBox>
          </right>
-         <bottom>
-            <HBox prefHeight="67.0" prefWidth="800.0" BorderPane.alignment="CENTER">
-               <children>
-                  <Pane prefHeight="67.0" prefWidth="463.0" HBox.hgrow="SOMETIMES">
-                     <children>
-                        <CheckBox fx:id="zeroCapacityReaderCheckbox" layoutX="14.0" layoutY="25.0" mnemonicParsing="false" onAction="#toggleShowZeroCapacityReaders" selected="true" text="Show Readers with zero capacity" />
-                        <Label fx:id="trashBin" layoutX="35.0" layoutY="9.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="39.0" />
-                     </children>
-                  </Pane>
-                  <Pane prefHeight="67.0" prefWidth="825.0" HBox.hgrow="NEVER">
-                     <children>
-                        <Button layoutX="369.0" layoutY="21.0" mnemonicParsing="false" onAction="#export" prefHeight="25.0" prefWidth="103.0" text="Export" />
-                        <Button fx:id="cancelButton" layoutX="507.0" layoutY="21.0" mnemonicParsing="false" onAction="#closeWindow" prefHeight="25.0" prefWidth="57.0" text="Cancel" />
-                        <Button fx:id="infoButton" layoutX="226.0" layoutY="21.0" mnemonicParsing="false" onAction="#showInfo" text="Info" />
-                        <CheckBox fx:id="preferencesCheckBox" layoutY="25.0" mnemonicParsing="false" onAction="#showPreferencesToggle" prefHeight="17.0" prefWidth="161.0" text="Show preferences" />
-                     </children>
-                  </Pane>
-               </children>
-            </HBox>
-         </bottom>
       </BorderPane>
    </children>
 </AnchorPane>

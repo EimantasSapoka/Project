@@ -5,25 +5,24 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
 
 import test.graph_creator.RandomArbitraryModel;
 import test.graph_creator.RandomReaderAllocationModel;
-import ford_fulkerson.Algorithm;
+import ford_fulkerson.MinCostMaxFlowAlgorithm;
 import ford_fulkerson.ReaderShortlistException;
-import ford_fulkerson.graph.Edge;
-import ford_fulkerson.graph.Graph;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import model.MCMFModel;
-import model.Project;
-import model.Reader;
+import ford_fulkerson.model.MCMFModel;
+import ford_fulkerson.model.Project;
+import ford_fulkerson.model.Reader;
+import ford_fulkerson.network.Edge;
+import ford_fulkerson.network.Network;
 
 public class Constraints_Test {
 	
-	private static final int TEST_COUNT = 100;
-	MCMFModel arbitraryGraph,readerGraph;;
+	private static final int TEST_COUNT = 1000;
+	MCMFModel arbitraryGraph,readerGraph;
 	
 	/**
 	 * checks that the constraints hold after running the algorithm on the 
@@ -32,14 +31,13 @@ public class Constraints_Test {
 	@Test
 	public void testReaderGraph(){
 		for (int i=0; i<TEST_COUNT; i++){
-
-			readerGraph = new RandomReaderAllocationModel();
-                        try {
-                            readerGraph.createGraph();
-                        } catch (ReaderShortlistException ex) {
-                            System.out.println(ex.getMessage());
-                        }
-			Algorithm.runLoadBalancedAlgorithm(readerGraph);
+			readerGraph = new RandomReaderAllocationModel(i%50+1, i%400+1);
+            try {
+                readerGraph.createNetwork();
+            } catch (ReaderShortlistException ex) {
+                // we don't really care for any reader shortlists. So do nothing.
+            }
+			MinCostMaxFlowAlgorithm.runLoadBalancedAlgorithm(readerGraph);
 			checkReaderConstraints(readerGraph);
 		}
 	}
@@ -59,7 +57,7 @@ public class Constraints_Test {
 		
 		for (Reader r: model.getReaders()){
 			assigned = 0;
-			capacity = r.getCapacity();
+			capacity = r.getMarkingTarget();
 			for (Edge e : r.getVertex().getOutEdges()){
 				if (e.getFlow() > 0){
 					assigned ++;
@@ -83,17 +81,11 @@ public class Constraints_Test {
 	}
 		
 	@Test
-	public void testArbitraryGraph(){
+	public void testArbitraryGraph() throws ReaderShortlistException{
 		for (int i = 0; i< TEST_COUNT ; i++){
-			arbitraryGraph = new RandomArbitraryModel();
-                        MCMFModel model = new MCMFModel();
-                        try {
-                            arbitraryGraph.createGraph();
-                        } catch (ReaderShortlistException ex) {
-                            System.out.println(ex.getMessage());
-                        }
-			Algorithm.runLoadBalancedAlgorithm(arbitraryGraph);
-			graphConstraintsTests(arbitraryGraph.getGraph());
+			arbitraryGraph = new RandomArbitraryModel(i%50+1, i%400+1);
+			MinCostMaxFlowAlgorithm.runLoadBalancedAlgorithm(arbitraryGraph);
+			networkConstraintsTests(arbitraryGraph.getNetwork());
 		}
 	}
 
@@ -102,12 +94,12 @@ public class Constraints_Test {
 	/**
 	 * checks if the project id is in the reader's preference list
 	 * @param projectID
-	 * @param preferences
+	 * @param list
 	 * @return
 	 */
-	private static boolean projectInList(int projectID, ArrayList<Project> preferences){
-		for (Project p: preferences){
-			if (p.getId() == projectID){
+	private static boolean projectInList(int projectID, List<Project> list){
+		for (Project p: list){
+			if (p.getID() == projectID){
 				return true;
 			}
 		}
@@ -118,23 +110,23 @@ public class Constraints_Test {
 	 * method which loops through graph's edges and checks
 	 * that each edge's flow does not exceed capacity and
 	 * flow into the graph is equal to flow out of the graph.
-	 * @param graph
+	 * @param network
 	 */
-	public static void graphConstraintsTests(Graph graph) {
+	public static void networkConstraintsTests(Network network) {
 		int flowIn = 0;
 		int flowOut = 0;
 		int capacityIn = 0;
 		int capacityOut = 0;
 		
-		for (Edge e : graph.getEdges()){
+		for (Edge e : network.getEdges()){
 			// checks that the flow is equal or less to the capacity
 			assertTrue(e.getFlow() <= e.getCapacity());
 			
-			if (e.getParent().equals(graph.source())){
+			if (e.getSource().equals(network.source())){
 				flowIn += e.getFlow();
 				capacityIn += e.getCapacity();
 			}
-			if (e.getDestination().equals(graph.sink())){
+			if (e.getDestination().equals(network.sink())){
 				flowOut += e.getFlow();
 				capacityOut += e.getCapacity();
 			}
