@@ -6,7 +6,6 @@
 package mcmfuserinterface.controllers;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.Optional;
 
@@ -237,7 +236,6 @@ public class MainViewController extends ViewController {
             Optional<ButtonType> result = confirmation.showAndWait();
             if (result.get() == ButtonType.OK){
                 model.extendPreferenceLists();
-                refresh();
             }
         }
     }
@@ -270,8 +268,7 @@ public class MainViewController extends ViewController {
             Reader readerToRemoveFrom = (Reader) sourceHbox.getUserData();
 
             model.removeProjectFromReaderPreferences(readerToRemoveFrom, projectToRemove);
-
-            refresh();
+            hideScreenFloats();
         }
     }
     
@@ -361,9 +358,9 @@ public class MainViewController extends ViewController {
         return menu;
     }
     
-    @Override
-    public Collection<Project> getReaderList(Reader reader) {
-        return reader.getPreferences();
+	@Override
+    public ObservableList<Project> getObservableList(Reader reader) {
+        return (ObservableList<Project>) reader.getPreferences();
     }
 
     @Override

@@ -5,16 +5,15 @@
  */
 package mcmfuserinterface.drag_drop_table.columns;
 
-import ford_fulkerson.model.Reader;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.scene.control.TableColumn;
-import mcmfuserinterface.drag_drop_table.TableObjectInterface;
+import ford_fulkerson.model.Reader;
 
 /**
  *
  * @author Eimantas
  */
-public class CapacityColumn extends TableColumn<TableObjectInterface, TableObjectInterface>{
+public class CapacityColumn extends TableColumn<Reader, Integer>{
     
     @SuppressWarnings({ "rawtypes", "unchecked" })
 	public CapacityColumn(String name){

@@ -5,17 +5,16 @@
  */
 package mcmfuserinterface.drag_drop_table.columns;
 
-import ford_fulkerson.model.Reader;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.scene.control.TableColumn;
-import mcmfuserinterface.drag_drop_table.TableObjectInterface;
+import ford_fulkerson.model.Reader;
 
 /**
  *
  * @author Eimantas
- * @param <TableObjectInterface>
+ * @param <Reader>
  */
-public class ReaderNameColumn extends TableColumn<TableObjectInterface, TableObjectInterface> {
+public class ReaderNameColumn extends TableColumn<Reader, Reader> {
     
     @SuppressWarnings({ "rawtypes", "unchecked" })
 	public ReaderNameColumn(String name){

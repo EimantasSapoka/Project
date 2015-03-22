@@ -1,25 +1,28 @@
 package ford_fulkerson.model;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
-import mcmfuserinterface.drag_drop_table.TableObjectInterface;
+import javafx.collections.FXCollections;
 import ford_fulkerson.network.Edge;
 import ford_fulkerson.network.NetworkObjectInterface;
 import ford_fulkerson.network.Vertex;
 
-public class Reader  implements TableObjectInterface, NetworkObjectInterface{
+public class Reader  implements NetworkObjectInterface{
 	
 	private final int id;								// reader id
 	private final Vertex vertex;						// it's vertex
 	private final int markingTarget;							// it's project preference capacity
 	private final ArrayList<Project> supervisorProjects;		// list of already assigned projects
-	private ArrayList<Project> preferences;				// list of project preferences
-    private ArrayList<Project> assigned;                // list of assigned projects
+	private List<Project> preferences;				// list of project preferences
+    private List<Project> assigned;                // list of assigned projects
 	private String name;								// reader name
 	
-	private final SimpleStringProperty preferenceCountProperty;
-    private final SimpleStringProperty assignedCountProperty;
+	private final IntegerProperty preferenceCountProperty;
+    private final IntegerProperty assignedCountProperty;
     private final SimpleStringProperty readerPreferenceShortlistStyleProperty;
     private final SimpleStringProperty readerAssignedShortlistStyleProperty;
 
@@ -29,18 +32,18 @@ public class Reader  implements TableObjectInterface, NetworkObjectInterface{
 		this.vertex = new Vertex(id, this);
 		this.markingTarget = capacity;
 		this.supervisorProjects = new ArrayList<Project>();
-		this.preferences = new ArrayList<Project>();
+		this.preferences = FXCollections.observableArrayList();
 		this.name = String.valueOf(id);
 		
-		// UI specific parameters
 		
-		this.preferenceCountProperty = new SimpleStringProperty("0"); 
-		this.assignedCountProperty = new SimpleStringProperty("0");
+		// UI specific parameters
+		this.preferenceCountProperty = new SimpleIntegerProperty(0); 
+		this.assignedCountProperty = new SimpleIntegerProperty(0);
 		this.readerPreferenceShortlistStyleProperty = new SimpleStringProperty("");
 		this.readerAssignedShortlistStyleProperty = new SimpleStringProperty("");
 		
 		preferenceCountProperty.addListener((observable, oldValue, newValue) ->{
-			int num = Integer.parseInt(newValue);
+			int num = (int) newValue;
 			if (num < markingTarget){
 				readerPreferenceShortlistStyleProperty.set("-fx-background-color: red;");
             } else if (num < markingTarget*2){
@@ -51,7 +54,7 @@ public class Reader  implements TableObjectInterface, NetworkObjectInterface{
 		});
 		
 		assignedCountProperty.addListener((observable, oldValue, newValue) ->{
-			int num = Integer.parseInt(newValue);
+			int num = (int) newValue;
 			 if (markingTarget - 1 > num){
 				 readerAssignedShortlistStyleProperty.set("-fx-background-color: red;");
              } else if (markingTarget > num){
@@ -100,7 +103,7 @@ public class Reader  implements TableObjectInterface, NetworkObjectInterface{
         } else {
             project.select();
 			this.preferences.add(indexToPlace, project);
-			this.preferenceCountProperty.set(preferences.size()+"");
+			this.preferenceCountProperty.set(preferences.size());
             return true;
         }
     }
@@ -113,7 +116,7 @@ public class Reader  implements TableObjectInterface, NetworkObjectInterface{
 		return markingTarget;
 	}
 
-	public ArrayList<Project> getSupervisorProjects() {
+	public List<Project> getSupervisorProjects() {
 		return supervisorProjects;
 	}
 
@@ -121,7 +124,7 @@ public class Reader  implements TableObjectInterface, NetworkObjectInterface{
 	 * returns shallow copy of readers preferences
 	 * @return
 	 */
-	public ArrayList<Project> getPreferences() {
+	public List<Project> getPreferences() {
 		return preferences;
 	}
 	
@@ -136,8 +139,8 @@ public class Reader  implements TableObjectInterface, NetworkObjectInterface{
     *
     * @return
     */
-   private ArrayList<Project> getAssignedProjectsFromGraph() {
-       ArrayList<Project> temp = new ArrayList<Project>();
+   private List<Project> getAssignedProjectsFromGraph() {
+       List<Project> temp = FXCollections.observableArrayList();
        for (Edge edge : this.vertex.getOutEdges()) {
             if (edge.getFlow() > 0) {
                 Project project = (Project) edge.getDestination().getObject();
@@ -148,11 +151,11 @@ public class Reader  implements TableObjectInterface, NetworkObjectInterface{
        return temp;
    }
    
-   public ArrayList<Project> getAssigned(){
+   public List<Project> getAssigned(){
        if (assigned == null){
            assigned = getAssignedProjectsFromGraph();
        }
-       this.assignedCountProperty.set(assigned.size()+"");
+       this.assignedCountProperty.set(assigned.size());
        return assigned;
    }
 	
@@ -178,7 +181,7 @@ public class Reader  implements TableObjectInterface, NetworkObjectInterface{
     public void removePreference(Project project) {
         project.unselect();
         this.preferences.remove(project);
-        this.preferenceCountProperty.set(preferences.size()+"");
+        this.preferenceCountProperty.set(preferences.size());
     }
 
 
@@ -204,7 +207,7 @@ public class Reader  implements TableObjectInterface, NetworkObjectInterface{
         } else {
             projectToMove.assignToReader(this);
             this.assigned.add(indexToPlace, projectToMove);
-            this.assignedCountProperty.set(assigned.size()+"");
+            this.assignedCountProperty.set(assigned.size());
             return true;
         }
     }
@@ -212,7 +215,7 @@ public class Reader  implements TableObjectInterface, NetworkObjectInterface{
     public boolean removeAssignedProject(Project p){
         boolean success = this.assigned.remove(p);
         p.assignToReader(null);
-        this.assignedCountProperty.set(assigned.size()+"");
+        this.assignedCountProperty.set(assigned.size());
         return success;
     }
     
@@ -222,18 +225,18 @@ public class Reader  implements TableObjectInterface, NetworkObjectInterface{
                 p.assignToReader(null);
             }
             this.assigned = null;
-            this.assignedCountProperty.set("0");
+            this.assignedCountProperty.set(0);
         }
     }   
     
     
     /******************** OBSERVABLE ITEMS METHODS *******************/
     
-    public SimpleStringProperty getPreferenceCountProperty(){
+    public IntegerProperty getPreferenceCountProperty(){
     	return this.preferenceCountProperty;
     }
     
-    public SimpleStringProperty getAssignedCountProperty(){
+    public IntegerProperty getAssignedCountProperty(){
         return this.assignedCountProperty;
     }
 

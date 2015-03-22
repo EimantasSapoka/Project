@@ -5,14 +5,11 @@
  */
 package mcmfuserinterface.controllers;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import ford_fulkerson.model.Project;
-import ford_fulkerson.model.Reader;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -35,6 +32,8 @@ import mcmfuserinterface.drag_drop_table.columns.SupervisedProjectsColumn;
 import mcmfuserinterface.drag_drop_table.components.DragLabel;
 import mcmfuserinterface.drag_drop_table.components.ListContextMenu;
 import mcmfuserinterface.drag_drop_table.components.PopLabel;
+import ford_fulkerson.model.Project;
+import ford_fulkerson.model.Reader;
 
 /**
  *
@@ -76,7 +75,7 @@ public class ResultsViewController extends ViewController{
 			Reader readerToRemoveFrom = (Reader) sourceLabel.getParent().getUserData();
 
 			removeProjectFromReader(readerToRemoveFrom, projectToMove);
-			refresh();
+			refreshSideProjectList();
 		}
 	}
 	
@@ -124,29 +123,37 @@ public class ResultsViewController extends ViewController{
     	 * @return
     	 */
 	    private String createOutputText(List<String> parameters) {
-	        String resultString = "";
+	        StringBuilder resultString = new StringBuilder();
+	        List<Project> unassignedProjects = model.getUnselectedProjects();
+			if (!unassignedProjects.isEmpty()){
+	        	resultString.append("UNASSIGNED PROJECTS: \n");
+	        	for (Project p: unassignedProjects){
+	        		resultString.append(String.format("\tID: %d \tName: %s\n", p.getID(), p.getName()));
+	        	}
+	        	resultString.append("\n");
+	        }
 	        for (Reader reader : model.getReaders()){
 	            if (parameters.contains("ids")){
-	                resultString += reader.getID() + ", ";
+	                resultString.append(reader.getID() + ", ");
 	            }
 	            if(parameters.contains("names")){
-	                resultString += reader.getName() +", ";
+	                resultString.append(reader.getName() +", ");
 	            }
 	            if(parameters.contains("cap")){
-	                resultString += reader.getAssigned().size()+"/"+reader.getMarkingTarget()+", ";
+	                resultString.append(reader.getAssigned().size()+"/"+reader.getMarkingTarget()+", ");
 	            }
 	            if (parameters.contains("supervised")){
 	                for (Project project: reader.getSupervisorProjects()){
-	                    resultString+= project.getID() + " ";
+	                    resultString.append(project.getID() + " ");
 	                }
-	                resultString += ", ";
+	                resultString.append(", ");
 	            }
 	            for (Project project : reader.getAssigned()){
-	                resultString += project.getID()+" ";
+	                resultString.append(project.getID()+" ");
 	            }
-	            resultString+="\n";
+	            resultString.append("\n");
 	        }
-	        return resultString;
+	        return resultString.toString();
 	    }
 
 
@@ -184,11 +191,16 @@ public class ResultsViewController extends ViewController{
     }
     
     @Override
-    @SuppressWarnings("unchecked")
-    public Collection<Project> getReaderList(Reader reader) {
+    public ObservableList<Project> getObservableList(Reader reader){
+    	return (ObservableList<Project>) reader.getAssigned();
+    }
+    
+    
+    public ObservableList<Project> getDisplayList(Reader reader) {
         if (preferencesCheckBox.isSelected()){
             
-			List<Project> list = (List<Project>) reader.getPreferences().clone();
+			ObservableList<Project> list = FXCollections.observableArrayList();
+			list.addAll(reader.getPreferences());
             for (Project project : reader.getAssigned()){
                 if (!list.contains(project)){
                     list.add(project);
@@ -218,7 +230,7 @@ public class ResultsViewController extends ViewController{
 				} 
             
             });
-            return reader.getAssigned();
+            return (ObservableList<Project>) reader.getAssigned();
         }
     }
 

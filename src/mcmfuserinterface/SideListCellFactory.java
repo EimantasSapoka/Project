@@ -1,6 +1,5 @@
 package mcmfuserinterface;
 
-import ford_fulkerson.model.Project;
 import javafx.scene.Node;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -11,8 +10,8 @@ import javafx.scene.input.TransferMode;
 import javafx.util.Callback;
 import mcmfuserinterface.controllers.ControllerInterface;
 import mcmfuserinterface.controllers.MainViewController;
-import mcmfuserinterface.drag_drop_table.TableObjectInterface;
 import mcmfuserinterface.drag_drop_table.components.PopLabel;
+import ford_fulkerson.model.Project;
 
 public class SideListCellFactory implements Callback<ListView<Project>, ListCell<Project>> {
 
@@ -50,12 +49,12 @@ public class SideListCellFactory implements Callback<ListView<Project>, ListCell
          if (controller instanceof MainViewController){
         	 listCell.setOnMouseClicked(event -> {
 	             ((MainViewController) controller).setHighlightedProject((Project)((Node)event.getSource()).getUserData());
-	             controller.refresh();
+	             controller.refreshTable();
         	 });
          }
          
          listCell.setOnDragDetected(event ->{
-         		TableObjectInterface data = (TableObjectInterface) listCell.getUserData();
+         		Project data = (Project) listCell.getUserData();
                  if (data == null){
                      return;
                  }

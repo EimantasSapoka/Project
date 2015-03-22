@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javafx.collections.FXCollections;
 import ford_fulkerson.ReaderShortlistException;
 import ford_fulkerson.TextScanner;
 import ford_fulkerson.network.Network;
@@ -21,8 +22,8 @@ import ford_fulkerson.network.Network;
  */
 public class MCMFModel {
 	
-	protected ArrayList<Reader> readers;		// readers list
-    protected ArrayList<Project> projects;		// projects list
+	protected List<Reader> readers;		// readers list
+    protected List<Project> projects;		// projects list
     protected Network network;					// the network
 
     public MCMFModel(File file) throws Exception {
@@ -31,8 +32,8 @@ public class MCMFModel {
     }
     
     public MCMFModel(){
-        this.readers = new ArrayList<Reader>();
-        this.projects = new ArrayList<Project>();
+        this.readers = FXCollections.observableArrayList();
+        this.projects = FXCollections.observableArrayList();
     }
 
 
@@ -107,11 +108,11 @@ public class MCMFModel {
      *
      * @return
      */
-    public ArrayList<Project> getProjects() {
+    public List<Project> getProjects() {
         return this.projects;
     }
 
-    public ArrayList<Reader> getReaders() {
+    public List<Reader> getReaders() {
         return this.readers;
     }
 
@@ -233,12 +234,12 @@ public class MCMFModel {
     /**
      * method which extends readers preference lists to 2x their capacities
      */
-    @SuppressWarnings("unchecked")
     public void extendPreferenceLists() {
         for (Reader r : this.readers) {
 
-            ArrayList<Project> preferences = r.getPreferences();
-            ArrayList<Project> projectList = (ArrayList<Project>) this.projects.clone();
+           List<Project> preferences = r.getPreferences();
+           List<Project> projectList = new ArrayList<Project>();
+           projectList.addAll(projects);
 
             while (preferences.size() < 2 * r.getMarkingTarget() && !projectList.isEmpty()) {
 
@@ -280,29 +281,6 @@ public class MCMFModel {
             }
         }
         return null;
-    }
-
-   
-    
-   
-
-    /**
-     * gets unselected projects
-     * @return 
-     */
-    @SuppressWarnings("unchecked")
-	public List<Project> getUnselectedProjects() {
-        ArrayList<Project> unassigned = (ArrayList<Project>) projects.clone();
-        
-        for (Reader reader : readers){
-            for (Project project : reader.getAssigned()){
-                if (unassigned.contains(project)){
-                    unassigned.remove(project);
-                }
-            }
-        }
-       
-        return unassigned;
     }
 
 

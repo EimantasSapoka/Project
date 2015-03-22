@@ -6,7 +6,7 @@ import javafx.scene.control.TableView;
 import javafx.util.Callback;
 import mcmfuserinterface.controllers.ControllerInterface;
 
-public class TableRowFactory implements Callback<TableView<TableObjectInterface>, TableRow<TableObjectInterface>>{
+public class TableRowFactory implements Callback<TableView<Reader>, TableRow<Reader>>{
 	private final ControllerInterface controller;
 	
 	public TableRowFactory(final ControllerInterface contr){
@@ -14,10 +14,10 @@ public class TableRowFactory implements Callback<TableView<TableObjectInterface>
 	}
 	
 	@Override
-	public TableRow<TableObjectInterface> call(TableView<TableObjectInterface> arg0) {
-		TableRow<TableObjectInterface> row = new TableRow<TableObjectInterface>(){
+	public TableRow<Reader> call(TableView<Reader> arg0) {
+		TableRow<Reader> row = new TableRow<Reader>(){
             @Override
-            protected void updateItem(TableObjectInterface item, boolean empty) {
+            protected void updateItem(Reader item, boolean empty) {
                 super.updateItem(item, empty); 
                 setUserData(item);
                 if (item != null){

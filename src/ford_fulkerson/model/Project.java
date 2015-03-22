@@ -1,10 +1,9 @@
 package ford_fulkerson.model;
 
-import mcmfuserinterface.drag_drop_table.TableObjectInterface;
 import ford_fulkerson.network.NetworkObjectInterface;
 import ford_fulkerson.network.Vertex;
 
-public class Project implements Comparable<Project>, TableObjectInterface, NetworkObjectInterface {
+public class Project implements Comparable<Project>, NetworkObjectInterface {
 	private final int id;			// project id
 	private final Vertex vertex;	// vertex associated with the project
 	private int timesSelected;		// number of times the project had been added to a pref list. 

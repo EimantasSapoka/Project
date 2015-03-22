@@ -46,14 +46,14 @@ public class ListContextMenu extends ContextMenu {
     public void includeRemoveButton() {
         MenuItem remove = new MenuItem("Remove..");
         remove.setOnAction(e -> {
-            if (controller.getReaderList(reader).isEmpty()) {
+            if (controller.getObservableList(reader).isEmpty()) {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setContentText("Reader does not have any preferences");
                 alert.showAndWait();
                 return;
             }
             List<Project> choices = new ArrayList<Project>();
-            choices.addAll(controller.getReaderList(reader));
+            choices.addAll(controller.getObservableList(reader));
             ChoiceDialog<Project> dialog = new ChoiceDialog<>(choices.get(0), choices);
             dialog.setTitle("Choose a project to remove");
             dialog.setContentText("Choose project (ID):");
@@ -89,7 +89,7 @@ public class ListContextMenu extends ContextMenu {
 
             List<Project> choices = new ArrayList<Project>();
             choices.addAll(controller.getProjects());
-            choices.removeAll(controller.getReaderList(reader));
+            choices.removeAll(controller.getObservableList(reader));
             for (int i = 0; i< choices.size(); i++){
             	if(reader.getSupervisorProjects().contains(choices.get(i).getID())){
             		choices.remove(i--);
@@ -109,7 +109,6 @@ public class ListContextMenu extends ContextMenu {
             Optional<Project> result = dialog.showAndWait();
             if (result.isPresent()) {
                 controller.addProjectToReader(reader, result.get());
-                controller.refresh();
             }
         });
         getItems().add(add);

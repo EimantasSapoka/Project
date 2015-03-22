@@ -5,25 +5,27 @@
  */
 package mcmfuserinterface.drag_drop_table.columns;
 
-import ford_fulkerson.model.Project;
-import ford_fulkerson.model.Reader;
-import javafx.beans.property.ReadOnlyObjectWrapper;
+import java.util.List;
+
+import javafx.beans.property.SimpleListProperty;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.layout.HBox;
 import mcmfuserinterface.controllers.ControllerInterface;
-import mcmfuserinterface.drag_drop_table.TableObjectInterface;
+import mcmfuserinterface.controllers.ResultsViewController;
 import mcmfuserinterface.drag_drop_table.components.DroppableScrollPane;
+import ford_fulkerson.model.Project;
+import ford_fulkerson.model.Reader;
 
 /**
  *
  * @author Eimantas
  */
-public class ListColumn  extends TableColumn<TableObjectInterface, TableObjectInterface>{
+public class ListColumn  extends TableColumn<Reader, ObservableList<Project>>{
     
-    @SuppressWarnings({ "rawtypes", "unchecked" })
 	public ListColumn(String name, ControllerInterface controller){
         super(name);
         setMinWidth(350);
@@ -31,33 +33,49 @@ public class ListColumn  extends TableColumn<TableObjectInterface, TableObjectIn
         setMaxWidth(2000);
         
         setCellValueFactory(features -> {
-              return new ReadOnlyObjectWrapper(features.getValue());
+			ObservableList<Project> readerList = controller.getObservableList(features.getValue());
+			return  new SimpleListProperty<Project>(readerList);
         });
         
+        
+        
         setCellFactory( item ->{
-        	return new TableCell<TableObjectInterface, TableObjectInterface>() {
+        	return new TableCell<Reader,ObservableList<Project>>() {
+        		
                 @Override
-                public void updateItem(final TableObjectInterface object, boolean empty) {
-                    if(!empty && object != null){
-                    	
-                    	HBox hbox = new HBox();
-                        hbox.setSpacing(10);
-                        hbox.setUserData(object);
-                        
-                        Reader reader = (Reader) object;
-                        for (Project project : controller.getReaderList(reader)) {
-                            Label label = controller.createLabel(reader, project);
-                            hbox.getChildren().add(label);
-                        }
-                        
-                        ScrollPane scrollPane = new DroppableScrollPane(controller);
-                        scrollPane.setContent(hbox);
-                        scrollPane.setContextMenu(controller.createContextMenu((Reader)object,hbox));
-                        
-                        this.setGraphic(scrollPane);
-                    } else {
-                        setGraphic(null);
+                public void updateItem(final ObservableList<Project> list, boolean empty) {
+                	Reader reader = (Reader) getTableRow().getUserData();
+                	
+                    if(empty && list == null || reader == null){
+                    	setGraphic(null);
+                    	return;
                     }
+                    HBox hbox = new HBox();
+        			hbox.setSpacing(10);
+                	hbox.setUserData(reader);
+                	
+                	ScrollPane scrollPane = new DroppableScrollPane(controller);
+                    scrollPane.setContent(hbox);
+        			scrollPane.setContextMenu(controller.createContextMenu(reader,hbox));
+                    
+        			List<Project> listToDisplay = list;
+        			
+        			/*
+        			 *  workaround due to the fact that the results view can display different lists -
+        			 *  one just assignments, the other assignments with preferences mixed. Although 
+        			 *  ugly, improves performance significantly!
+        			 */
+        			
+        			if (controller instanceof ResultsViewController){
+        				listToDisplay = ((ResultsViewController) controller).getDisplayList(reader);
+        			}
+        			
+					for (Project project : listToDisplay) {
+                        Label label = controller.createLabel(reader, project);
+                        hbox.getChildren().add(label);
+                    }
+                    
+                    this.setGraphic(scrollPane);
                 }
             };
         });

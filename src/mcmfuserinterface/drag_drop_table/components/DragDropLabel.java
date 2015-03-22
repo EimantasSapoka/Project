@@ -28,7 +28,7 @@ public class DragDropLabel extends DragLabel {
                 if (event.getButton() == MouseButton.PRIMARY) {
                     if (controller instanceof MainViewController){
                         ((MainViewController) controller).setHighlightedProject((Project)this.getUserData());
-                        controller.refresh();
+                        controller.refreshTable();
                     }
                 }
         });
@@ -66,7 +66,6 @@ public class DragDropLabel extends DragLabel {
                 DialogUtils.createErrorDialog(projectToAdd, errorMsg);
             } 
             
-            controller.refresh();
             event.consume();
         });
     }

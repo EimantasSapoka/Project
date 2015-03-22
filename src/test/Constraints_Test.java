@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -93,11 +94,11 @@ public class Constraints_Test {
 	/**
 	 * checks if the project id is in the reader's preference list
 	 * @param projectID
-	 * @param preferences
+	 * @param list
 	 * @return
 	 */
-	private static boolean projectInList(int projectID, ArrayList<Project> preferences){
-		for (Project p: preferences){
+	private static boolean projectInList(int projectID, List<Project> list){
+		for (Project p: list){
 			if (p.getID() == projectID){
 				return true;
 			}

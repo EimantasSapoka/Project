@@ -32,7 +32,6 @@ import javafx.stage.Stage;
 import mcmfuserinterface.DialogUtils;
 import mcmfuserinterface.SideListCellFactory;
 import mcmfuserinterface.UserInterfaceModel;
-import mcmfuserinterface.drag_drop_table.TableObjectInterface;
 import mcmfuserinterface.drag_drop_table.TableRowFactory;
 
 import org.controlsfx.control.PopOver;
@@ -57,7 +56,7 @@ public abstract class ViewController implements Initializable, ControllerInterfa
     protected FileChooser fileChooser;
     
     @FXML     protected AnchorPane anchorPane;
-    @FXML     protected TableView<TableObjectInterface> table;
+    @FXML     protected TableView<Reader> table;
     @FXML     protected CheckMenuItem zeroCapacityReaderCheckbox;
     @FXML     protected CheckMenuItem completeListReaderCheckBox;
     @FXML     protected ListView<Project> sideProjectListView;
@@ -111,7 +110,7 @@ public abstract class ViewController implements Initializable, ControllerInterfa
             createTableColumns();
         }
         
-        ObservableList<TableObjectInterface> items = FXCollections.observableArrayList();
+        ObservableList<Reader> items = FXCollections.observableArrayList();
         items.addAll(model.getReaders());
         
         this.zeroCapacityReaderCheckbox.setSelected(true);
@@ -157,9 +156,14 @@ public abstract class ViewController implements Initializable, ControllerInterfa
     public void refresh(){
         refreshTable();
         refreshSideProjectList();
-        this.dragLabel.setVisible(false);
-        this.errorPopOver.hide();
+        hideScreenFloats();
     }
+    
+    @Override
+	public void hideScreenFloats() {
+		this.dragLabel.setVisible(false);
+        this.errorPopOver.hide();
+	}
     
     @Override
     public void refreshTable() {
@@ -215,7 +219,7 @@ public abstract class ViewController implements Initializable, ControllerInterfa
     @FXML
     protected void toggleShowZeroCapacityReaders() {
         if (model != null && completeListReaderCheckBox.isSelected()){
-            ObservableList<TableObjectInterface> items = FXCollections.observableArrayList();
+            ObservableList<Reader> items = FXCollections.observableArrayList();
             if (zeroCapacityReaderCheckbox.isSelected()){
                 items.addAll(model.getReaders());
             } else {
@@ -233,7 +237,7 @@ public abstract class ViewController implements Initializable, ControllerInterfa
     @FXML
     protected void toggleShowReadersWithCompleteLists(){
     	if (model != null ){
-    		 ObservableList<TableObjectInterface> items = FXCollections.observableArrayList();
+    		 ObservableList<Reader> items = FXCollections.observableArrayList();
              if (completeListReaderCheckBox.isSelected()){
             	 if (zeroCapacityReaderCheckbox.isSelected()){
 	                 items.addAll(model.getReaders());
@@ -252,7 +256,7 @@ public abstract class ViewController implements Initializable, ControllerInterfa
     	 * helper method which adds non zero capacity readers to the items list
     	 * @param items
     	 */
-		private void addNonZeroCapacityReaders(ObservableList<TableObjectInterface> items) {
+		private void addNonZeroCapacityReaders(ObservableList<Reader> items) {
 			for (Reader r : model.getReaders()){
 			    if (!(r.getMarkingTarget() == 0)){
 			        items.add(r);
@@ -264,7 +268,7 @@ public abstract class ViewController implements Initializable, ControllerInterfa
 		 * helper method which adds all incomplete readers to the items list
 		 * @param items
 		 */
-	    private void addIncompleteReaders(ObservableList<TableObjectInterface> items){
+	    private void addIncompleteReaders(ObservableList<Reader> items){
 	    	for (Reader r : model.getReaders()){
 			    if (!isReaderListComplete(r)){
 			        items.add(r);
@@ -285,7 +289,6 @@ public abstract class ViewController implements Initializable, ControllerInterfa
 		    	
         if (!dragLabel.isVisible()) {
             dragLabel.setVisible(true);
-            dragLabel.toFront();
             Project project = (Project) ((Node) dragEvent.getGestureSource()).getUserData();
             dragLabel.setText(project.getID() + "");
         }
@@ -308,8 +311,8 @@ public abstract class ViewController implements Initializable, ControllerInterfa
 
     @FXML
     protected void anchorPaneDragDone(DragEvent event) {
-    	errorPopOver.hide();
-        dragLabel.setVisible(false);
+    	hideScreenFloats();
+    	refreshSideProjectList();
     }
     
     /**
@@ -318,7 +321,7 @@ public abstract class ViewController implements Initializable, ControllerInterfa
      */
     @FXML 
     protected void hide(MouseEvent event){
-    	anchorPaneDragDone(null);
+    	hideScreenFloats();
     }
     
     

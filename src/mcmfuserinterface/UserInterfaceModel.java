@@ -1,6 +1,7 @@
 package mcmfuserinterface;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -161,11 +162,11 @@ public class UserInterfaceModel extends MCMFModel {
 	}
 
 	
-	@SuppressWarnings("unchecked")
 	public String getProjectReaderInfo() {
 		StringBuilder result = new StringBuilder();
 		result.append(String.format("%-50s%s\n\n","Project name", "| Rank , Reader assigned to" ));
-		List<Project> projectsSortedByID = (List<Project>) getProjects().clone();
+		List<Project> projectsSortedByID = new ArrayList<Project>();
+		projectsSortedByID.addAll(getProjects());
 		
 		// sort projects by name.
 		Collections.sort(projectsSortedByID, new Comparator<Project>(){
@@ -203,6 +204,26 @@ public class UserInterfaceModel extends MCMFModel {
         return avg/readers.size();
     }
 	
+	
+
+    /**
+     * gets unselected projects
+     * @return 
+     */
+	public List<Project> getUnselectedProjects() {
+        List<Project> unassigned = new ArrayList<Project>();
+        unassigned.addAll(projects);
+        
+        for (Reader reader : readers){
+            for (Project project : reader.getAssigned()){
+                if (unassigned.contains(project)){
+                    unassigned.remove(project);
+                }
+            }
+        }
+       
+        return unassigned;
+    }
 	
 
 
