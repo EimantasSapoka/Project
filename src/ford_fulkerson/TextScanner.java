@@ -66,7 +66,6 @@ public class TextScanner {
                 int readerID = Integer.parseInt(readerInfo[0].trim());
                 String readerName = readerInfo[1].trim();
                 int readerCapacity = Integer.parseInt(readerInfo[2].trim());
-                
                 createReader(model, readerName, readerID, readerCapacity, readerInfo);
             }
         } catch (Exception ex) {

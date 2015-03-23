@@ -17,7 +17,7 @@ import ford_fulkerson.model.Reader;
 
 public class CorrectnessTest {
 
-	private static final int TEST_COUNT = 1000;
+	private static final int TEST_COUNT = 100;
 	MinCostMaxFlowSPA alg;
 	
 	@Before 

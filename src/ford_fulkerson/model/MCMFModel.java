@@ -135,12 +135,16 @@ public class MCMFModel {
      */
     public boolean isLoadBalanced() {
         for (Reader reader : this.readers) {
-        	
+        	if (reader.getMarkingTarget() == 0){
+        		continue;
+        	}
         	int readerCapacityGap = reader.getMarkingTarget() + network.getLowerCapacityOffset() - reader.getAssigned().size();
         	readerCapacityGap = readerCapacityGap < 0? 0:readerCapacityGap;
         	
             for (Reader otherReader : readers){
-            	
+            	if (otherReader.getMarkingTarget() == 0){
+            		continue;
+            	}
             	int otherReaderCapacityGap = otherReader.getMarkingTarget() + network.getLowerCapacityOffset() - otherReader.getAssigned().size();
             	otherReaderCapacityGap = otherReaderCapacityGap < 0? 0:otherReaderCapacityGap;
             	
