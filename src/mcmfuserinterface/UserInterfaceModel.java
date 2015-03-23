@@ -70,10 +70,15 @@ public class UserInterfaceModel extends MCMFModel {
     	if (readerToAdd.equals(readerToRemoveFrom)){
             return null; // just so it wouldn't throw an error window
         }
+    	
+    	if (readerToAdd.getMarkingTarget() == 0){
+   		 	return READER_CAPACITY_ZERO_ERR_MSG;
+		}
+    	
         if (readerToAdd.getAssigned().contains(projectToMove)){
         	return READER_ALREADY_ASSIGNED_PROJECT_ERR_MSG;
         }
-        if (readerToAdd.getAssigned().size() == readerToAdd.getMarkingTarget()) {
+        if (readerToAdd.getAssigned().size() <= readerToAdd.getMarkingTarget()) {
             return READER_AT_MARKING_TARGET_ERR_MSG;
         }
         if (readerToAdd.getSupervisorProjects().contains(projectToMove)){
@@ -105,6 +110,14 @@ public class UserInterfaceModel extends MCMFModel {
     	 if (readerToAdd.getSupervisorProjects().contains(projectToAdd)){
          	return PROJECT_SUPERVISED_ERROR_MSG;
          }
+    	 
+    	 if (readerToAdd.getMarkingTarget() == 0){
+    		 return READER_CAPACITY_ZERO_ERR_MSG;
+ 		 }
+ 		
+ 		 if (readerToAdd.getMarkingTarget() <= readerToAdd.getAssigned().size()){
+ 			return READER_AT_MARKING_TARGET_ERR_MSG;
+ 		 }
          readerToAdd.assignProject(projectToAdd);
          return null;
      }
@@ -151,7 +164,7 @@ public class UserInterfaceModel extends MCMFModel {
 		if (readerToAdd.getAssigned().contains(projectToAdd)) {
     		return READER_ALREADY_ASSIGNED_PROJECT_ERR_MSG;
     	}
-		if (readerToAdd.getMarkingTarget() == readerToAdd.getAssigned().size()){
+		if (readerToAdd.getMarkingTarget() <= readerToAdd.getAssigned().size()){
 			return READER_AT_MARKING_TARGET_ERR_MSG;
 		}
 		

@@ -61,6 +61,25 @@ public abstract class ViewController implements Initializable, ControllerInterfa
     @FXML     protected CheckMenuItem completeListReaderCheckBox;
     @FXML     protected ListView<Project> sideProjectListView;
     
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+    	DESKTOP_DIRECTORY = System.getProperty("user.home") + File.separator + "Desktop" + File.separator;
+    	initPopOver();
+        createDragLabel();
+        initFileChooser();
+        table.setEditable(true);
+        initialize();      
+    }
+
+	private void initPopOver() {
+		errorPopOver = new PopOver();
+    	Label popText = new Label();
+		popText.setTextFill(Color.BLACK);
+        popText.setPadding(new Insets(10, 10, 10, 10));
+        errorPopOver.setContentNode(popText);
+        errorPopOver.setArrowLocation(ArrowLocation.RIGHT_CENTER);
+	}
+    
 	/**
 	 * creates side list controller specified list of projects
 	 */
@@ -138,19 +157,7 @@ public abstract class ViewController implements Initializable, ControllerInterfa
     /******************************* OVERRIDE METHODS ******************/
     
     
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-    	DESKTOP_DIRECTORY = System.getProperty("user.home") + File.separator + "Desktop" + File.separator;
-    	errorPopOver = new PopOver();
-    	Label popText = new Label();
-		popText.setTextFill(Color.BLACK);
-        popText.setPadding(new Insets(10, 10, 10, 10));
-        errorPopOver.setContentNode(popText);
-        errorPopOver.setArrowLocation(ArrowLocation.RIGHT_CENTER);
-        createDragLabel();
-        initFileChooser();
-        initialize();      
-    }
+   
      
     @Override
     public void refresh(){

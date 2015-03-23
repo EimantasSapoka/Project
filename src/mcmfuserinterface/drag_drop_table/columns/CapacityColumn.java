@@ -6,14 +6,16 @@
 package mcmfuserinterface.drag_drop_table.columns;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.event.EventHandler;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.cell.TextFieldTableCell;
 import ford_fulkerson.model.Reader;
 
 /**
  *
  * @author Eimantas
  */
-public class CapacityColumn extends TableColumn<Reader, Integer>{
+public class CapacityColumn extends TableColumn<Reader, String>{
     
     @SuppressWarnings({ "rawtypes", "unchecked" })
 	public CapacityColumn(String name){
@@ -23,9 +25,28 @@ public class CapacityColumn extends TableColumn<Reader, Integer>{
         setMaxWidth(60);
         
         setCellValueFactory(features -> {
+        	setEditable(true);
               Reader reader = (Reader) features.getValue();
-              return new ReadOnlyObjectWrapper(reader.getMarkingTarget());
+              return new ReadOnlyObjectWrapper(reader.getMarkingTarget()+"");
         });
+        
+        setCellFactory(TextFieldTableCell.forTableColumn());
+        setOnEditCommit(
+            new EventHandler<CellEditEvent<Reader, String>>() {
+                @Override
+                public void handle(CellEditEvent<Reader, String> t) {
+                	String newValue = t.getNewValue();
+                	
+					if (newValue.matches("\\d{1,2}")){
+                		int newMarkingTarget = Integer.parseInt(newValue);
+                		t.getRowValue().setMarkingTarget(newMarkingTarget);
+                	}
+					
+                	t.getTableColumn().setVisible(false);
+                	t.getTableColumn().setVisible(true);
+                }
+            }
+        );
         
     }
     

@@ -15,7 +15,7 @@ public class Reader  implements NetworkObjectInterface{
 	
 	private final int id;								// reader id
 	private final Vertex vertex;						// it's vertex
-	private final int markingTarget;							// it's project preference capacity
+	private int markingTarget;							// it's project preference capacity
 	private final ArrayList<Project> supervisorProjects;		// list of already assigned projects
 	private List<Project> preferences;				// list of project preferences
     private List<Project> assigned;                // list of assigned projects
@@ -246,6 +246,16 @@ public class Reader  implements NetworkObjectInterface{
 
 	public SimpleStringProperty getReaderAssignedShortlistStyleProperty() {
 		return readerAssignedShortlistStyleProperty;
+	}
+
+	public void setMarkingTarget(Integer newValue) {
+		this.markingTarget = newValue;
+		
+		// to repaint the rows invoke their listeners by changing value
+		this.preferenceCountProperty.set(preferenceCountProperty.get()+1);
+		this.assignedCountProperty.set(assignedCountProperty.get()+1);
+		this.preferenceCountProperty.set(preferenceCountProperty.get()-1);
+		this.assignedCountProperty.set(assignedCountProperty.get()-1);
 	}    
     
     
