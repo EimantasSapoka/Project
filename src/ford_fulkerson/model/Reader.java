@@ -30,7 +30,7 @@ public class Reader  implements NetworkObjectInterface{
 	public Reader(int id, int capacity){
 		this.id = id;
 		this.vertex = new Vertex(id, this);
-		this.markingTarget = capacity;
+		this.markingTarget = capacity < 0? 0:capacity;
 		this.supervisorProjects = new ArrayList<Project>();
 		this.preferences = FXCollections.observableArrayList();
 		this.name = String.valueOf(id);
@@ -99,6 +99,7 @@ public class Reader  implements NetworkObjectInterface{
 	    if (	markingTarget == 0 || 
 	    		preferences.contains(project) ||
 	    		supervisorProjects.contains(project.getID()) ){
+
         	return false;
         } else {
             project.select();
@@ -190,6 +191,9 @@ public class Reader  implements NetworkObjectInterface{
     }
     
     public boolean assignProject(Project p){
+        if (assigned == null){
+            assigned = getAssignedProjectsFromGraph();
+        }
         return assignProject(assigned.size(), p);
     } 
     
@@ -202,7 +206,7 @@ public class Reader  implements NetworkObjectInterface{
     public boolean assignProject(int indexToPlace, Project projectToMove) {
         if (	this.markingTarget == assigned.size() || 
         		assigned.contains(projectToMove) || 
-        		supervisorProjects.contains(projectToMove.getID()) ){
+        		supervisorProjects.contains(projectToMove) ){
             return false;
         } else {
             projectToMove.assignToReader(this);

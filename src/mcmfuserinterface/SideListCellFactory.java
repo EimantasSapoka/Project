@@ -8,16 +8,16 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.util.Callback;
-import mcmfuserinterface.controllers.ControllerInterface;
+import mcmfuserinterface.controllers.TableControllerInterface;
 import mcmfuserinterface.controllers.MainViewController;
 import mcmfuserinterface.drag_drop_table.components.PopLabel;
 import ford_fulkerson.model.Project;
 
 public class SideListCellFactory implements Callback<ListView<Project>, ListCell<Project>> {
 
-	private final ControllerInterface controller;
+	private final TableControllerInterface controller;
 	    
-    public SideListCellFactory(ControllerInterface controller) {
+    public SideListCellFactory(TableControllerInterface controller) {
         this.controller = controller;
     }
 	

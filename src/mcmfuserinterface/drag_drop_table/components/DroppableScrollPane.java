@@ -12,7 +12,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import mcmfuserinterface.DialogUtils;
-import mcmfuserinterface.controllers.ControllerInterface;
+import mcmfuserinterface.controllers.TableControllerInterface;
 
 /**
  *
@@ -22,7 +22,7 @@ public class DroppableScrollPane extends ScrollPane {
 	
 	private boolean dropAccepted;
 
-    public DroppableScrollPane(final ControllerInterface controller) {
+    public DroppableScrollPane(final TableControllerInterface controller) {
         super();
 
         setOnDragOver(event -> {

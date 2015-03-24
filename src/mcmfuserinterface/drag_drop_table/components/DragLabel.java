@@ -11,7 +11,7 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
-import mcmfuserinterface.controllers.ControllerInterface;
+import mcmfuserinterface.controllers.TableControllerInterface;
 
 /**
  *
@@ -19,7 +19,7 @@ import mcmfuserinterface.controllers.ControllerInterface;
  */
 public class DragLabel extends PopLabel {
 
-    public DragLabel(final Project project, final ControllerInterface controller) {
+    public DragLabel(final Project project, final TableControllerInterface controller) {
         super(project.getID() + "");
 
         this.setUserData(project);

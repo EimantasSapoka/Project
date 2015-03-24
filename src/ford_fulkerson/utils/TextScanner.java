@@ -1,4 +1,4 @@
-package ford_fulkerson;
+package ford_fulkerson.utils;
 
 import java.io.BufferedReader;
 import java.io.File;

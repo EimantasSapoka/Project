@@ -14,7 +14,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.layout.HBox;
-import mcmfuserinterface.controllers.ControllerInterface;
+import mcmfuserinterface.controllers.TableControllerInterface;
 import mcmfuserinterface.controllers.ResultsViewController;
 import mcmfuserinterface.drag_drop_table.components.DroppableScrollPane;
 import ford_fulkerson.model.Project;
@@ -26,7 +26,7 @@ import ford_fulkerson.model.Reader;
  */
 public class ListColumn  extends TableColumn<Reader, ObservableList<Project>>{
     
-	public ListColumn(String name, ControllerInterface controller){
+	public ListColumn(String name, TableControllerInterface controller){
         super(name);
         setMinWidth(350);
         setPrefWidth(450);

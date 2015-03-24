@@ -44,7 +44,7 @@ import ford_fulkerson.model.Reader;
  *
  * @author Eimantas
  */
-public abstract class ViewController implements Initializable, ControllerInterface {
+public abstract class ViewController implements Initializable, TableControllerInterface {
 	
 	public static String DESKTOP_DIRECTORY;
 

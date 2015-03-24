@@ -17,7 +17,7 @@ import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.HBox;
-import mcmfuserinterface.controllers.ControllerInterface;
+import mcmfuserinterface.controllers.TableControllerInterface;
 
 /**
  *
@@ -26,10 +26,10 @@ import mcmfuserinterface.controllers.ControllerInterface;
 public class ListContextMenu extends ContextMenu {
 
     final private Reader reader;
-    final private ControllerInterface controller;
+    final private TableControllerInterface controller;
     final private HBox hbox;
 
-    public ListContextMenu(final Reader reader, final ControllerInterface controller, final Node container) {
+    public ListContextMenu(final Reader reader, final TableControllerInterface controller, final Node container) {
         super();
 
         this.reader = reader;
@@ -95,7 +95,9 @@ public class ListContextMenu extends ContextMenu {
             		choices.remove(i--);
             	}
             }
-            choices.sort(null);
+            choices.sort((project1,project2) ->{
+				return project1.getID()-project2.getID();
+            });
             if (choices.isEmpty()){
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setContentText("Reader has no projects he can get added");

@@ -12,8 +12,8 @@ import java.util.List;
 
 import javafx.collections.FXCollections;
 import ford_fulkerson.ReaderShortlistException;
-import ford_fulkerson.TextScanner;
 import ford_fulkerson.network.Network;
+import ford_fulkerson.utils.TextScanner;
 
 /**
  * A class containing information needed to run

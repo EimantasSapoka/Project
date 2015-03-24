@@ -19,7 +19,7 @@ import ford_fulkerson.model.Reader;
  *
  * @author Eimantas
  */
-public interface ControllerInterface {
+public interface TableControllerInterface {
 	public void hideScreenFloats();
     public void refresh();
     public void refreshTable();

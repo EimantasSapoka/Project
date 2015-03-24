@@ -25,118 +25,149 @@ public class UserInterfaceModel extends MCMFModel {
 	private static final String PROJECT_SUPERVISED_ERROR_MSG = "Project is already supervised by this reader";
 	
 	 
+	/**
+	 * creates a user interface model from a given MCMF model instance
+	 * @param model
+	 */
     public UserInterfaceModel(MCMFModel model) {
     	this.projects = model.getProjects();
     	this.readers = model.getReaders();
     	this.network = model.getNetwork();
     }
 
+    /**
+     * creates the user interface model from a given file
+     * @param file
+     * @throws Exception
+     */
 	public UserInterfaceModel(File file) throws Exception {
 		super(file);
 	}
 
-	public String movePreference(Reader readerToAdd, Reader readerToRemoveFrom, Project projectToMove, Project projectToPlaceBefore) {
-        
-    	if (readerToAdd.getPreferences().contains(projectToMove) && !readerToAdd.equals(readerToRemoveFrom)) {
-    		return PROJECT_ALREADY_PREFERENCE_ERROR_MSG;
-    	}
-    	
-    	if (readerToAdd.getSupervisorProjects().contains(projectToMove)){
-    		return PROJECT_SUPERVISED_ERROR_MSG;
-    	}
-    	if (projectToMove.equals(projectToPlaceBefore) ){
-        	return null; // do not take action, as no change needed, but do not report an error
-        }
-    		
-        readerToRemoveFrom.removePreference(projectToMove);
-        int indexToPlace = readerToAdd.getPreferences().indexOf(projectToPlaceBefore);
-        if (indexToPlace == -1){
-        	readerToAdd.addPreference(projectToMove);
-        } else {
-        	readerToAdd.addPreference(indexToPlace, projectToMove);
-        }
-        return null; 
-    }
-
+	/**
+	 * moves preference from a one reader and adds it to the other's end of preference list
+	 * @param readerToAdd
+	 * @param readerToRemoveFrom
+	 * @param projectToMove
+	 * @return error message if not allowed, null if allowed
+	 */
     public String movePreference(Reader readerToAdd, Reader readerToRemoveFrom, Project projectToMove) {
     	return movePreference(readerToAdd, readerToRemoveFrom, projectToMove, null);
     }
     
+    /**
+     * removes a preference from a readers preference list
+     * @param readerToRemoveFrom
+     * @param projectToRemove
+     */
     public void removeProjectFromReaderPreferences(Reader readerToRemoveFrom, Project projectToRemove) {
         readerToRemoveFrom.removePreference(projectToRemove);
     }
     
-    public String moveAssignedProject(Reader readerToAdd, Reader readerToRemoveFrom, Project projectToMove){
-    	if (readerToAdd.equals(readerToRemoveFrom)){
-            return null; // just so it wouldn't throw an error window
-        }
+    /**
+     * if allowed, moves a preference from one reader and places it
+     * in the other's preference list before another project
+     * @param readerToAdd
+     * @param readerToRemoveFrom
+     * @param projectToMove the project which will be moved
+     * @param projectToPlaceBefore the project before which the moved project
+     * will be placed. 
+     * @return error message if not allowed, null if allowed
+     */
+    public String movePreference(Reader readerToAdd, Reader readerToRemoveFrom, 
+    							Project projectToMove, Project projectToPlaceBefore) {
     	
-    	if (readerToAdd.getMarkingTarget() == 0){
-   		 	return READER_CAPACITY_ZERO_ERR_MSG;
-		}
-    	
-        if (readerToAdd.getAssigned().contains(projectToMove)){
-        	return READER_ALREADY_ASSIGNED_PROJECT_ERR_MSG;
-        }
-        if (readerToAdd.getAssigned().size() <= readerToAdd.getMarkingTarget()) {
-            return READER_AT_MARKING_TARGET_ERR_MSG;
-        }
-        if (readerToAdd.getSupervisorProjects().contains(projectToMove)){
-    		return PROJECT_SUPERVISED_ERROR_MSG;
-    	}
-        
-        readerToRemoveFrom.removeAssignedProject(projectToMove);
-        readerToAdd.assignProject(projectToMove);
-        return null;
+        String canAddPreference = canAddPreference(readerToAdd, readerToRemoveFrom, projectToMove);
+   	    
+	   	if (canAddPreference != null){
+	   		 return canAddPreference;
+	   	} else {
+	        removeProjectFromReaderPreferences(readerToRemoveFrom, projectToMove);
+	        addProjectToReaderPreferences(readerToAdd, projectToMove, projectToPlaceBefore);
+	        return null;
+	   	}
     }
     
-    public String addProjectToReaderPreferences(Reader readerToAdd, Project projectToAdd){
-    	 if (readerToAdd.getPreferences().contains(projectToAdd)){
-             return PROJECT_ALREADY_PREFERENCE_ERROR_MSG;
-         } 
-    	 if (readerToAdd.getSupervisorProjects().contains(projectToAdd)){
-         	return PROJECT_SUPERVISED_ERROR_MSG;
-         }
- 
-         readerToAdd.addPreference(projectToAdd);
-         return null;
-    }
-     
-     public String assignProjectToReader(Reader readerToAdd, Project projectToAdd) {
-    	 if (readerToAdd.getAssigned().contains(projectToAdd)){
-             return READER_ALREADY_ASSIGNED_PROJECT_ERR_MSG;
-         } 
-         
-    	 if (readerToAdd.getSupervisorProjects().contains(projectToAdd)){
-         	return PROJECT_SUPERVISED_ERROR_MSG;
-         }
+    /**
+     * if allowed, removes an assignment from one reader and assigns it to the other
+     * @param readerToAdd
+     * @param readerToRemoveFrom
+     * @param projectToMove
+     * @return error message if not allowed, null if allowed
+     */
+    public String moveAssignedProject(Reader readerToAdd, Reader readerToRemoveFrom, Project projectToMove){
+    	String canAssign = canAddAssignment(readerToAdd, readerToRemoveFrom, projectToMove);
     	 
-    	 if (readerToAdd.getMarkingTarget() == 0){
-    		 return READER_CAPACITY_ZERO_ERR_MSG;
- 		 }
- 		
- 		 if (readerToAdd.getMarkingTarget() <= readerToAdd.getAssigned().size()){
- 			return READER_AT_MARKING_TARGET_ERR_MSG;
- 		 }
-         readerToAdd.assignProject(projectToAdd);
-         return null;
+    	 if (canAssign != null){
+    		 return canAssign;
+    	 } else {
+    		 readerToRemoveFrom.removeAssignedProject(projectToMove);
+	         assignProjectToReader(readerToAdd, projectToMove);
+	         return null;
+    	 }
+    }
+    
+   
+     /**
+      * assigns a project to reader
+      * @param readerToAdd
+      * @param projectToAdd
+      * @return error message if not allowed, null if allowed
+      */
+     public String assignProjectToReader(Reader readerToAdd, Project projectToAdd) {
+    	 String canAssign = canAddAssignment(readerToAdd, null, projectToAdd);
+    	 
+    	 if (canAssign != null){
+    		 return canAssign;
+    	 } else {
+	         readerToAdd.assignProject(projectToAdd);
+	         return null;
+    	 }
      }
     
-    
+     /**
+      * adds a preference to reader
+      * @param readerToAdd
+      * @param projectToAdd
+      * @return error message if not allowed, null if allowed
+      */
+    public String addProjectToReaderPreferences(Reader readerToAdd, Project projectToAdd){
+    	 return addProjectToReaderPreferences(readerToAdd, projectToAdd, null);
+    }
+     
+    /**
+     * adds a preference to reader before another project
+     * @param readerToAdd
+     * @param projectToAdd
+     * @param projectToAddBefore project to add the preferece before
+     * @return error message if not allowed, null if allowed
+     */
     public String addProjectToReaderPreferences(Reader readerToAdd, Project projectToAdd, Project projectToAddBefore){
-    	if (readerToAdd.getPreferences().contains(projectToAdd)){
-            return PROJECT_ALREADY_PREFERENCE_ERROR_MSG;
-        } 
-        if (readerToAdd.getSupervisorProjects().contains(projectToAdd)){
-        	return PROJECT_SUPERVISED_ERROR_MSG;
-        }
-        
+    	String canAddPreference = canAddPreference(readerToAdd, null, projectToAdd);
+   	    
+	   	if (canAddPreference != null){
+	   		 return canAddPreference;
+	   	} 
+       
         int indexToPlace = readerToAdd.getPreferences().indexOf(projectToAddBefore);
-        readerToAdd.addPreference(indexToPlace, projectToAdd);
+        
+        if (indexToPlace == -1){
+	         readerToAdd.addPreference(projectToAdd);
+        } else {
+        	 readerToAdd.addPreference(indexToPlace, projectToAdd);
+        }
+       
         return null;
         
     }
     
+    /**
+     * checks if adding a given project is allowed to the given reader. 
+     * @param readerToAdd
+     * @param readerToRemoveFrom
+     * @param projectToAdd
+     * @return error message if not allowed, null if allowed
+     */
     public String canAddPreference(Reader readerToAdd, Reader readerToRemoveFrom, Project projectToAdd) {
 		if (readerToAdd.getPreferences().contains(projectToAdd) && !readerToAdd.equals(readerToRemoveFrom)) {
     		return PROJECT_ALREADY_PREFERENCE_ERROR_MSG;
@@ -152,6 +183,13 @@ public class UserInterfaceModel extends MCMFModel {
     	return null;
 	}
 
+    /** 
+     * checks if assigning a given project is allowed to the given reader
+     * @param readerToAdd
+     * @param readerToRemoveFrom
+     * @param projectToAdd
+     * @return error message if not allowed, null if allowed
+     */
 	public String canAddAssignment(Reader readerToAdd,Reader readerToRemoveFrom, Project projectToAdd) {
 		if (readerToAdd.equals(readerToRemoveFrom)){
 			return null;
@@ -174,7 +212,11 @@ public class UserInterfaceModel extends MCMFModel {
 		return null;
 	}
 
-	
+	/**
+	 * returns a string listing all projects, who they were assigned to 
+	 * and the project rank in that person's preference list. 
+	 * @return
+	 */
 	public String getProjectReaderInfo() {
 		StringBuilder result = new StringBuilder();
 		result.append(String.format("%-50s%s\n\n","Project name", "| Rank , Reader assigned to" ));
@@ -206,6 +248,10 @@ public class UserInterfaceModel extends MCMFModel {
 		return result.toString();
 	}
 	
+	/**
+	 * returns the average reader capacity.
+	 * @return
+	 */
 	public Double getAverageReaderCapacity() {
         int totalCap = 0;
         for (Reader r : readers){

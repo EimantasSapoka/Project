@@ -25,7 +25,7 @@ public class CapacityColumn extends TableColumn<Reader, String>{
         setMaxWidth(60);
         
         setCellValueFactory(features -> {
-        	setEditable(true);
+        	  setEditable(true);
               Reader reader = (Reader) features.getValue();
               return new ReadOnlyObjectWrapper(reader.getMarkingTarget()+"");
         });
@@ -42,8 +42,11 @@ public class CapacityColumn extends TableColumn<Reader, String>{
                 		t.getRowValue().setMarkingTarget(newMarkingTarget);
                 	}
 					
-                	t.getTableColumn().setVisible(false);
-                	t.getTableColumn().setVisible(true);
+					setCellValueFactory(features -> {
+			        	  setEditable(true);
+			              Reader reader = (Reader) features.getValue();
+			              return new ReadOnlyObjectWrapper(reader.getMarkingTarget()+"");
+			        });
                 }
             }
         );

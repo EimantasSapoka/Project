@@ -1,4 +1,4 @@
-package ford_fulkerson;
+package ford_fulkerson.utils;
 
 /**
  * exception class to denote the input provided by the user is invalid

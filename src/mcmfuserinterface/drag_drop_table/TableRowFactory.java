@@ -4,12 +4,12 @@ import ford_fulkerson.model.Reader;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
-import mcmfuserinterface.controllers.ControllerInterface;
+import mcmfuserinterface.controllers.TableControllerInterface;
 
 public class TableRowFactory implements Callback<TableView<Reader>, TableRow<Reader>>{
-	private final ControllerInterface controller;
+	private final TableControllerInterface controller;
 	
-	public TableRowFactory(final ControllerInterface contr){
+	public TableRowFactory(final TableControllerInterface contr){
 		this.controller = contr;
 	}
 	

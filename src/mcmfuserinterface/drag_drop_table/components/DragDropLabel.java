@@ -25,7 +25,7 @@ public class DragDropLabel extends DragLabel {
         super(project, controller);
         
         this.setOnMouseClicked(event -> {
-                if (event.getButton() == MouseButton.PRIMARY) {
+                if (event.getButton() == MouseButton.PRIMARY || event.getButton() == MouseButton.MIDDLE) {
                     if (controller instanceof MainViewController){
                         ((MainViewController) controller).setHighlightedProject((Project)this.getUserData());
                         controller.refreshTable();

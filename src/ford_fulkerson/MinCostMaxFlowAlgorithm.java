@@ -113,10 +113,11 @@ public class MinCostMaxFlowAlgorithm {
 	 * find the shortest path from source to sink. 
 	 * @param realNetwork
 	 */
-	public static ArrayList<ResidualEdge> dijkstra(Network realNetwork, ResidualNetwork residualNetwork){	
+	public static List<ResidualEdge> dijkstra(Network realNetwork, ResidualNetwork residualNetwork){	
 		
-		@SuppressWarnings("unchecked")
-		ArrayList<Vertex> unvisitedVertices = (ArrayList<Vertex>) residualNetwork.getVertices().clone(); // list of all vertices
+		List<Vertex> unvisitedVertices = new ArrayList<Vertex>();
+		unvisitedVertices.addAll(residualNetwork.getVertices());	// list of all vertices
+		
 		Vertex current = residualNetwork.source();
 		current.setDistanceFromSource(0); // set source distance from itself to be 0
 		
@@ -165,7 +166,7 @@ public class MinCostMaxFlowAlgorithm {
 
 
 	/**
-	 * traverses the path backwards and for every edge
+	 * traverses the path and for every edge
 	 * updates its capacity/flow with the maxFlow value.
 	 * @param graph
 	 * @param maxFlow 
@@ -199,9 +200,9 @@ public class MinCostMaxFlowAlgorithm {
 	 * @param network
 	 * @return
 	 */
-	private static ArrayList<ResidualEdge> getPathArray(Network network) {
+	private static List<ResidualEdge> getPathArray(Network network) {
 		Vertex vertex = network.sink();
-		ArrayList<ResidualEdge> path = new ArrayList<ResidualEdge>();
+		List<ResidualEdge> path = new ArrayList<ResidualEdge>();
 		ResidualEdge edge;
 
 		while (! vertex.equals(network.source())){
