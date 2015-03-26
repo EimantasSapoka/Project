@@ -6,7 +6,6 @@
 package mcmfuserinterface.controllers;
 
 import java.io.File;
-import java.util.Comparator;
 import java.util.Optional;
 
 import javafx.beans.property.SimpleStringProperty;
@@ -88,7 +87,7 @@ public class MainViewController extends TableViewController {
             String css = UserInterface.class.getResource("css/stylesheet.css").toExternalForm();
             scene.getStylesheets().add(css);
             resultsStage.setScene(scene);
-            
+
             resultsStage.show();
         } catch (Exception ex) {
         	DialogUtils.createExceptionDialog(ex);
@@ -312,6 +311,9 @@ public class MainViewController extends TableViewController {
     }
     
    
+    /**
+     * gets a list of projects to put into the side list
+     */
     @Override
     protected ObservableList<Project> getSideListProjects(){
     	ObservableList<Project> lowSelectedProjectList = FXCollections.observableArrayList();
@@ -324,20 +326,20 @@ public class MainViewController extends TableViewController {
 	       }
 	    } 
         
-        SortedList<Project> sortedLowSelectedProjectList = new SortedList<Project>(lowSelectedProjectList, new Comparator<Project>() {
-	        @Override
-	        public int compare(Project o1, Project o2) {
-	            return o1.getSelectedCount() - o2.getSelectedCount();
-	        }
+        // sort the project by least selected first
+        SortedList<Project> sortedLowSelectedProjectList = new SortedList<Project>(lowSelectedProjectList, (p1,p2) ->{
+	            return p1.getSelectedCount() - p2.getSelectedCount();
         });
     	
     	return sortedLowSelectedProjectList.sorted();
     }
     
+    
     @Override
     public String getListItemText(Project item){
     	return item.getID() + "\t\t("+item.getSelectedCount()+")";
     }
+    
     
     @Override
 	public String getListCellStyle(Project item){
@@ -387,6 +389,10 @@ public class MainViewController extends TableViewController {
         reader.removePreference(project);
     }
 
+    /**
+     * creates a label which is used in this view's table.
+     * it accounts for highlighted projects.
+     */
     @Override
     public Label createLabel(Reader reader, Project project) {
         DragDropLabel label =  new DragDropLabel(project,this);

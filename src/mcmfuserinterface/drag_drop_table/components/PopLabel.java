@@ -13,7 +13,8 @@ import javafx.scene.paint.Color;
 import org.controlsfx.control.PopOver;
 
 /**
- *
+ * a label class which has a popover with the information about
+ * the object when clicked. 
  * @author Eimantas
  */
 public class PopLabel extends Label {

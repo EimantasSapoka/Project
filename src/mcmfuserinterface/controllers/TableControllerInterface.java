@@ -16,7 +16,9 @@ import ford_fulkerson.model.Project;
 import ford_fulkerson.model.Reader;
 
 /**
- *
+ * Interface, which is implemented by controllers which have a table. 
+ * provides all methods required to manipulate/create/modify a table and
+ * its view. 
  * @author Eimantas
  */
 public interface TableControllerInterface {

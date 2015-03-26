@@ -6,7 +6,6 @@
 package mcmfuserinterface.controllers;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,7 +34,7 @@ import ford_fulkerson.model.Project;
 import ford_fulkerson.model.Reader;
 
 /**
- *
+ * A results view controller class. 
  * @author Eimantas
  */
 public class ResultsViewController extends TableViewController{
@@ -112,45 +111,45 @@ public class ResultsViewController extends TableViewController{
         return null;
     }
 
-    	/**
-    	 * helper method which generates the output text to be 
-    	 * exported depending on the parameters provided
-    	 * @param parameters
-    	 * @return
-    	 */
-	    private String createOutputText(List<String> parameters) {
-	        StringBuilder resultString = new StringBuilder();
-	        List<Project> unassignedProjects = model.getUnselectedProjects();
-			if (!unassignedProjects.isEmpty()){
-	        	resultString.append("UNASSIGNED PROJECTS: \n");
-	        	for (Project p: unassignedProjects){
-	        		resultString.append(String.format("\tID: %d \tName: %s\n", p.getID(), p.getName()));
-	        	}
-	        	resultString.append("\n");
-	        }
-	        for (Reader reader : model.getReaders()){
-	            if (parameters.contains("ids")){
-	                resultString.append(reader.getID() + ", ");
-	            }
-	            if(parameters.contains("names")){
-	                resultString.append(reader.getName() +", ");
-	            }
-	            if(parameters.contains("cap")){
-	                resultString.append(reader.getAssigned().size()+"/"+reader.getReaderTarget()+", ");
-	            }
-	            if (parameters.contains("supervised")){
-	                for (Project project: reader.getSupervisorProjects()){
-	                    resultString.append(project.getID() + " ");
-	                }
-	                resultString.append(", ");
-	            }
-	            for (Project project : reader.getAssigned()){
-	                resultString.append(project.getID()+" ");
-	            }
-	            resultString.append("\n");
-	        }
-	        return resultString.toString();
-	    }
+	/**
+	 * helper method which generates the output text to be 
+	 * exported depending on the parameters provided
+	 * @param parameters
+	 * @return
+	 */
+    private String createOutputText(List<String> parameters) {
+        StringBuilder resultString = new StringBuilder();
+        List<Project> unassignedProjects = model.getUnselectedProjects();
+		if (!unassignedProjects.isEmpty()){
+        	resultString.append("UNASSIGNED PROJECTS: \n");
+        	for (Project p: unassignedProjects){
+        		resultString.append(String.format("\tID: %d \tName: %s\n", p.getID(), p.getName()));
+        	}
+        	resultString.append("\n");
+        }
+        for (Reader reader : model.getReaders()){
+            if (parameters.contains("ids")){
+                resultString.append(reader.getID() + ", ");
+            }
+            if(parameters.contains("names")){
+                resultString.append(reader.getName() +", ");
+            }
+            if(parameters.contains("cap")){
+                resultString.append(reader.getAssigned().size()+"/"+reader.getReaderTarget()+", ");
+            }
+            if (parameters.contains("supervised")){
+                for (Project project: reader.getSupervisorProjects()){
+                    resultString.append(project.getID() + " ");
+                }
+                resultString.append(", ");
+            }
+            for (Project project : reader.getAssigned()){
+                resultString.append(project.getID()+" ");
+            }
+            resultString.append("\n");
+        }
+        return resultString.toString();
+    }
 
 
     
@@ -186,12 +185,19 @@ public class ResultsViewController extends TableViewController{
         return menu;
     }
     
+    /**
+     * gets the list which is observed in the table
+     */
     @Override
     public ObservableList<Project> getObservableList(Reader reader){
     	return (ObservableList<Project>) reader.getAssigned();
     }
     
-    
+    /**
+     * gets the list which is displayed in the table.
+     * @param reader
+     * @return
+     */
     public ObservableList<Project> getDisplayList(Reader reader) {
         if (preferencesCheckBox.isSelected()){
             
@@ -209,12 +215,9 @@ public class ResultsViewController extends TableViewController{
         	 *  Does add a bit of computation to the resulting table, but 
         	 *  makes it look nicer as well.
         	 */
-            Collections.sort(reader.getAssigned(), new Comparator<Project>(){
-
-				@Override
-				public int compare(Project arg0, Project arg1) {
-					int indexFirst = reader.getPreferences().indexOf(arg0);
-					int indexSecond = reader.getPreferences().indexOf(arg1);
+            Collections.sort(reader.getAssigned(), (p0, p1) ->{
+					int indexFirst = reader.getPreferences().indexOf(p0);
+					int indexSecond = reader.getPreferences().indexOf(p1);
 					
 					if (indexFirst == -1){
 						return 1;
@@ -223,9 +226,8 @@ public class ResultsViewController extends TableViewController{
 						return -1;
 					}
 					return indexFirst - indexSecond;
-				} 
-            
             });
+            
             return (ObservableList<Project>) reader.getAssigned();
         }
     }
@@ -235,6 +237,10 @@ public class ResultsViewController extends TableViewController{
         reader.removeAssignedProject(project);
     }
 
+    /**
+     * creates a label in the reader's list. 
+     * does so depending on weather show preferences feature is enabled. 
+     */
     @Override
     public Label createLabel(Reader reader, Project project) {
         Reader assignedReader = project.getAssignedReader();

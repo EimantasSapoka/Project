@@ -19,9 +19,16 @@ import ford_fulkerson.model.Reader;
 import ford_fulkerson.network.Edge;
 import ford_fulkerson.network.Network;
 
+/**
+ * a class which creates random networks and reader instances, 
+ * solves them and checks that the resulting allocations
+ * conform to the network constraints.
+ * @author Eimantas
+ *
+ */
 public class Constraints_Test {
 	
-	private static final int TEST_COUNT = 1000;
+	private static final int TEST_COUNT = 9001; // IT'S OVER 9000!!!!
 	MCMFModel arbitraryGraph,readerGraph;
 	
 	/**

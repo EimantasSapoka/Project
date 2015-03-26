@@ -1,17 +1,11 @@
 package ford_fulkerson.network;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import test.graph_creator.MockNetworkObject;
 import ford_fulkerson.model.Project;
 import ford_fulkerson.model.Reader;
+import test.graph_creator.MockNetworkObject;
 
-/**
- * class representing a network. holds vertices and edges. 
- * @author Eimantas
- *
- */
 public class Network {
 	
 	private static final int PROJECT_READER_CAPACITY = 1;
@@ -19,16 +13,14 @@ public class Network {
 	public static final int SOURCE_ID = 0;
 	public static final int SINK_ID = 1;
 
+	private int lowerCapacityOffset; 			// the offset used to calculate the lower capacity of edges. 
+	
 	protected Vertex source;					// the source vertex reference
 	protected Vertex sink;						// the sink vertex reference
 	
 	protected ArrayList<Vertex> vertices;		// all the vertices in the graph
 	protected ArrayList<Edge> edges;			// all the edges in the graph
 	
-	/**
-	 * default constructor. creates source and sink vertices
-	 * and adds them to vertices list. 
-	 */
 	public Network(){
 		
 		this.vertices = new ArrayList<Vertex>();
@@ -36,12 +28,13 @@ public class Network {
 		
 		Vertex.resetVertexCounter();
 		
-		// source and sink nodes with mock objects.
 		source = new Vertex(SOURCE_ID, new MockNetworkObject(SOURCE_ID));
 		sink = new Vertex(SINK_ID, new MockNetworkObject(SINK_ID));
 		
 		addVertex(source);
 		addVertex(sink);
+		
+		this.lowerCapacityOffset = 0;
 	}
 	
 	
@@ -57,24 +50,35 @@ public class Network {
 		}
 	}
 	
+	public int getLowerCapacityOffset(){
+		return this.lowerCapacityOffset;
+	}
+	
+	public void increaseCapacityOffset(){
+		if (this.lowerCapacityOffset < 0){
+			this.lowerCapacityOffset++;
+		}
+		for (Edge e : this.source.getOutEdges()){
+			e.increaseCapacity();
+		}
+	}
+	
+	public void decreaseCapacityOffset(){
+		this.lowerCapacityOffset--;
+		for (Edge e : this.source.getOutEdges()){
+			e.decreaseCapacity();
+		}
+	}
+	
 	public void addVertex(Vertex vertex){
 		if (!vertices.contains(vertex)){
 			vertices.add(vertex);
 		}
 	}
 
-	/**
-	 * returns a new list with network instances
-	 * in it. Not a complete deep copy - if the vertices
-	 * are modified, they will be modified in the network as well.
-	 * But removing vertices from the returned list
-	 * will not remove them from the network. Same with adding.
-	 * @return
-	 */
-	public List<Vertex> getVertices() {
-		List<Vertex> result = new ArrayList<Vertex>();
-		result.addAll(vertices);
-		return result;
+	@SuppressWarnings("unchecked")
+	public ArrayList<Vertex> getVertices() {
+		return (ArrayList<Vertex>) vertices.clone();
 	}
 
 	public ArrayList<Edge> getEdges() {
@@ -143,7 +147,7 @@ public class Network {
 	/**
 	 * gets the edge of this graph identical to given another edge
 	 * @param e
-	 * @return edge in this network equal to e or null if not present.
+	 * @return
 	 */
 	public Edge getEdge(Edge edge){
 		for (Edge e: this.edges){
@@ -154,7 +158,13 @@ public class Network {
 		return null;
 	}
 	
+	
+	
+	public void setVertices(ArrayList<Vertex> vertices){
+		this.vertices = vertices;
+	}
 
+	
 	/**
 	 * returns the total capacity of edges going to the sink
 	 * @return
@@ -230,26 +240,40 @@ public class Network {
             addEdge(projectSinkEdge);
 	}
         
-    /**
-     * adds a reader to the graph. adds its vertex and creates
-     * source -> reader and reader -> preference edges..
-     * @param reader 
-     */
-    public void addReader(Reader reader) {
-         addVertex(reader.getVertex());
-        
-        // if reader has any capacity, create an edge from source to the reader with the capacity
-        if (reader.getReaderTarget() > 0) {
-            createSourceReaderEdge(reader);
-        }
-
-        int preference = 1; // the initial preference weight
-        for (Project project : reader.getPreferences()) {
+        /**
+         * adds a reader to the graph. adds its vertex and creates
+         * source -> reader and reader -> preference edges..
+         * @param reader 
+         */
+        public void addReader(Reader reader) {
+             addVertex(reader.getVertex());
             
-            createReaderProjectEdge(reader, project, preference);
-            preference++;
-        } 
-    }
+            // if reader has any capacity, create an edge from source to the reader with the capacity
+            if (reader.getReaderTarget() > 0) {
+                createSourceReaderEdge(reader);
+            }
+
+            int preference = 1; // the initial preference weight
+            for (Project project : reader.getPreferences()) {
+                
+                createReaderProjectEdge(reader, project, preference);
+                preference++;
+            } 
+        }
+	
+	
+	/**
+	 * method which resets the graph - removes all flow from edges.
+	 */
+	public void reset() {
+		for (Edge e : edges){
+			e.setFlow(0);
+		}
+		for (Vertex v: vertices){
+			v.setDistanceFromSource(0);
+		}
+		
+	}
 	
 
 	/**

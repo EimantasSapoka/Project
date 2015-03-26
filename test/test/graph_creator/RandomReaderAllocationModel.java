@@ -1,6 +1,7 @@
 package test.graph_creator;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import ford_fulkerson.model.MCMFModel;
@@ -93,10 +94,10 @@ public class RandomReaderAllocationModel extends MCMFModel{
 	 * Also, preference list is random as well.
      * @return 
 	 */
-	@SuppressWarnings("unchecked")
 	public final Reader generateReader(){
             
-		ArrayList<Project> projectPreferenceList = (ArrayList<Project>) projectList.clone();
+		List<Project> projectPreferenceList = new ArrayList<Project>();
+		projectPreferenceList.addAll(projectList);
          
         int readerCapacityMin = targetMin == 0? 2:targetMin;
         int readerCapacityMax = targetMax == 0? (PROJECT_COUNT/READER_COUNT)*2 : (targetMax-readerCapacityMin);

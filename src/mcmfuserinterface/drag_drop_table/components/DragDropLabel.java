@@ -15,7 +15,9 @@ import ford_fulkerson.model.Project;
 import ford_fulkerson.model.Reader;
 
 /**
- *
+ * a label which supports dragging and dropping. It has a 
+ * controller reference, which it calls out to modify the 
+ * model. Depending on the controller, it behaves differently. 
  * @author Eimantas
  */
 public class DragDropLabel extends DragLabel {
@@ -53,12 +55,13 @@ public class DragDropLabel extends DragLabel {
             
             String errorMsg;
             
+            // if move - that is from one list to another - move the project
             if (event.getTransferMode() == TransferMode.MOVE) {
                 HBox sourceHbox = (HBox) sourceNode.getParent();
                 Reader readerToRemoveFrom = (Reader) sourceHbox.getUserData();
                 
                 errorMsg = controller.moveProject(readerToAdd, readerToRemoveFrom, projectToAdd, projectToPlaceBefore);
-            } else {
+            } else { // if not move - that is from the side list to the table - add the project instead
                 errorMsg = controller.addProjectToReader(readerToAdd, projectToAdd, projectToPlaceBefore);
             }
             

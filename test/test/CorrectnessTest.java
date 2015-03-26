@@ -17,7 +17,7 @@ import ford_fulkerson.model.Reader;
 
 public class CorrectnessTest {
 
-	private static final int TEST_COUNT = 200;
+	private static final int TEST_COUNT = 5000;
 	MinCostMaxFlowSPA alg;
 	
 	@Before 
@@ -25,6 +25,13 @@ public class CorrectnessTest {
 		alg = new MinCostMaxFlowSPA();
 	}
 	
+	/**
+	 * a test which sets up a reader preferences instance which would
+	 * be not load balanced using a regular MCMF algorithm and solves 
+	 * it using the load balanced variant of the algorithm and checks 
+	 * that the resulting allocation is load balanced.
+	 * @throws Exception
+	 */
 	@Test
 	public void presetReaderAllocationLoadBalancingTest() throws Exception{
 		
@@ -77,6 +84,7 @@ public class CorrectnessTest {
 		augustine_Network = alg.solve(augustine_Network);
 		
 		assertTrue(model.isLoadBalanced() && !augustine_Network.isLoadBalanced());
+		// prettiest test you've ever seen...
 	}
 	
 	

@@ -1,6 +1,5 @@
 package test.graph_creator;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -11,7 +10,9 @@ import ford_fulkerson.network.Network;
 import ford_fulkerson.network.Vertex;
 
 /**
- * class which creates a random arbitrary graph
+ * class which creates a random arbitrary graph.
+ * Creates a network with random number of vertices 
+ * and randomly assigns edges between them. 
  * @author Eimantas
  *
  */

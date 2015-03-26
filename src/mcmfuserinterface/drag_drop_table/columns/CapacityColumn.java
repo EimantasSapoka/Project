@@ -12,7 +12,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import ford_fulkerson.model.Reader;
 
 /**
- *
+ * a capacity column, which is editable. 
  * @author Eimantas
  */
 public class CapacityColumn extends TableColumn<Reader, String>{
@@ -31,22 +31,20 @@ public class CapacityColumn extends TableColumn<Reader, String>{
         });
         
         setCellFactory(TextFieldTableCell.forTableColumn());
+        
         setOnEditCommit(
             new EventHandler<CellEditEvent<Reader, String>>() {
                 @Override
                 public void handle(CellEditEvent<Reader, String> t) {
                 	String newValue = t.getNewValue();
-                	
+                	// if new value is not a two digit integer, do not modify anything
 					if (newValue.matches("\\d{1,2}")){
                 		int newMarkingTarget = Integer.parseInt(newValue);
                 		t.getRowValue().setReaderTarget(newMarkingTarget);
                 	}
-					
-					setCellValueFactory(features -> {
-			        	  setEditable(true);
-			              Reader reader = (Reader) features.getValue();
-			              return new ReadOnlyObjectWrapper(reader.getReaderTarget()+"");
-			        });
+					// refresh table 
+					t.getTableColumn().setVisible(false);
+					t.getTableColumn().setVisible(true);
                 }
             }
         );

@@ -13,6 +13,12 @@ import mcmfuserinterface.controllers.TableControllerInterface;
 import mcmfuserinterface.drag_drop_table.components.PopLabel;
 import ford_fulkerson.model.Project;
 
+/**
+ * A cell factory which changes the way side list cells are presented. 
+ * Adds drag and drop fuctionality to them.
+ * @author Eimantas
+ *
+ */
 public class SideListCellFactory implements Callback<ListView<Project>, ListCell<Project>> {
 
 	private final TableControllerInterface controller;

@@ -14,7 +14,7 @@ import mcmfuserinterface.controllers.TableControllerInterface;
 import ford_fulkerson.model.Project;
 
 /**
- *
+ * a label which can be dragged, but cannot be dropped before.
  * @author Eimantas
  */
 public class DragLabel extends PopLabel {

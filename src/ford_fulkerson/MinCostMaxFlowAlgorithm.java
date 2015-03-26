@@ -51,40 +51,29 @@ public class MinCostMaxFlowAlgorithm {
 	
 	private static void loadBalance(MCMFModel model) {
         Network network = model.getNetwork();
-        
-        int iterations = 0;
-        
 		while( !model.isLoadBalanced()){
-			iterations++;
-			model.clearReaderAssignedProjectLists();
-			model.decreaseReaderTargets();
-			
-			try {
-				// creates a new network from the modified model
-				model.createNetwork();
-			} catch (ReaderShortlistException e) {
-				// squashed exception. Don't need to report 
-				// short lists while load balancing.
-			}
+			network.reset();
+			model.reset();
+			network.decreaseCapacityOffset();
 			solveNetwork(network);
 		}
 
-		while (iterations != 0){
-			iterations--;
-			model.increaseReaderTargets();
-			model.clearReaderAssignedProjectLists();
+		while (network.getLowerCapacityOffset() != 0){
+			System.out.println("incriesing offset");
+			network.increaseCapacityOffset();
+			model.reset();
 			solveNetwork(network);
 		}
 	}
 
 	/**
 	 * if the graph's flow is not saturating, it means a project
-	 * had not been selected. Find those projects and add them to 
-	 * readers', who have not yet reached their reader target, preference lists.
+	 * had not been assigned. Find those projects and add them to 
+	 * readers', who have not yet reached their capacity limit, preference lists.
 	 * Run the algorithm again and since it is min cost, max flow, the 
 	 * reader who had the smallest preference list will most likely take the project. 
 	 */
-	public static void addUnselectedProjectsToReaderPreferences(MCMFModel model) throws ReaderShortlistException {
+	public static void assignUnassignedProjects(MCMFModel model) throws ReaderShortlistException {
 		
 		if (!model.getNetwork().isSaturatingFlow()){
 			
@@ -168,7 +157,7 @@ public class MinCostMaxFlowAlgorithm {
 			}
 		}
 		
-		if ( residualNetwork.sink().getPath() == null){
+		if ( residualNetwork.sink().getPath() == null ){
 			return null;
 		} else {
 			return getPathArray(residualNetwork);
@@ -207,8 +196,8 @@ public class MinCostMaxFlowAlgorithm {
 	
 
 	/**
-	 * method to traverse the graph backwards from the sink and return the path as a
-	 * list of edges from source to sink
+	 * method to traverse the graph backwards from the sink and return the path as an 
+	 * arraylist of edges from source to sink
 	 * @param network
 	 * @return
 	 */

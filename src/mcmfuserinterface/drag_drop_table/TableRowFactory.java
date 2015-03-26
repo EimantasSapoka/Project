@@ -6,6 +6,12 @@ import javafx.util.Callback;
 import mcmfuserinterface.controllers.TableControllerInterface;
 import ford_fulkerson.model.Reader;
 
+/**
+ * class which modifies how a table row is created.
+ * mostly by modifying its backroung colour.
+ * @author Eimantas
+ *
+ */
 public class TableRowFactory implements Callback<TableView<Reader>, TableRow<Reader>>{
 	private final TableControllerInterface controller;
 	

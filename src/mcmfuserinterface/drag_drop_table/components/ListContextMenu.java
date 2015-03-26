@@ -20,7 +20,9 @@ import ford_fulkerson.model.Project;
 import ford_fulkerson.model.Reader;
 
 /**
- *
+ * a context menu class which represents a context menu 
+ * which appears when the user right-clicks on the droppable 
+ * scroll pane. 
  * @author Eimantas
  */
 public class ListContextMenu extends ContextMenu {

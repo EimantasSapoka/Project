@@ -9,6 +9,12 @@ import org.junit.Test;
 import ford_fulkerson.model.Project;
 import ford_fulkerson.model.Reader;
 
+/**
+ * a suite of tests to check that methods in the reader 
+ * class perform as expected.
+ * @author Eimantas
+ *
+ */
 public class ReaderTest {
 	
 	Reader reader1,reader2,reader3;

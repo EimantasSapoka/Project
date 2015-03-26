@@ -15,7 +15,9 @@ import ford_fulkerson.model.Project;
 import ford_fulkerson.model.Reader;
 
 /**
- *
+ * a scroll pane which holds draggable/droppable labels. 
+ * if dropped in it, it has events which modify reader's list
+ * depending on which controller is passed. 
  * @author Eimantas
  */
 public class DroppableScrollPane extends ScrollPane {
