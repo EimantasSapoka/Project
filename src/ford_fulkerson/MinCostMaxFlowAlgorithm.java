@@ -59,7 +59,6 @@ public class MinCostMaxFlowAlgorithm {
 		}
 
 		while (network.getLowerCapacityOffset() != 0){
-			System.out.println("incriesing offset");
 			network.increaseCapacityOffset();
 			model.reset();
 			solveNetwork(network);
