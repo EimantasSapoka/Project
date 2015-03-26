@@ -1,0 +1,28 @@
+20,7
+1, Project one , 2
+2, Project two , 2
+3, Project three, 1
+4, Project four , 2
+5, Project five , 3
+6, Project six, 1
+7, Project seven , 2
+8, Project eight , 3
+9, Project nine, 1
+10, Project ten, 3
+11, Project eleven , 4
+12, Project twelve , 4
+13, Project thirteen, 6
+14, Project fourteen , 1
+15, Project fifteen , 2
+16, Project sixteen, 5
+17, Project seventeen , 4
+18, Project eighteen , 6
+19, Project nineteen, 5
+20, Project twenty, 2
+1, Reader one ,5, 1 2 5 4 15 7 8 19 10 
+2, Reader two ,3, 5 8 
+3, Reader three ,3, 7  9 19   18  1  2  4
+4, Reader four ,4, 1 13 3 5  8 9 10
+5, Reader five ,4, 5 12 20 6 15 18 1
+6, Reader six ,3, 17  15    8  11  19  14
+7, Reader seven,0
