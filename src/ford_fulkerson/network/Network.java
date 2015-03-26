@@ -6,6 +6,13 @@ import ford_fulkerson.model.Project;
 import ford_fulkerson.model.Reader;
 import test.graph_creator.MockNetworkObject;
 
+/**
+ * class which represents a network.
+ * has a list of vertices, edges, source and sink.
+ * also has a reader target offset. 
+ * @author Eimantas
+ *
+ */
 public class Network {
 	
 	private static final int PROJECT_READER_CAPACITY = 1;
@@ -13,7 +20,7 @@ public class Network {
 	public static final int SOURCE_ID = 0;
 	public static final int SINK_ID = 1;
 
-	private int lowerCapacityOffset; 			// the offset used to calculate the lower capacity of edges. 
+	private int readerTargetOffset; 			// the offset used to calculate the lower capacity of edges. 
 	
 	protected Vertex source;					// the source vertex reference
 	protected Vertex sink;						// the sink vertex reference
@@ -34,7 +41,7 @@ public class Network {
 		addVertex(source);
 		addVertex(sink);
 		
-		this.lowerCapacityOffset = 0;
+		this.readerTargetOffset = 0;
 	}
 	
 	
@@ -50,21 +57,21 @@ public class Network {
 		}
 	}
 	
-	public int getLowerCapacityOffset(){
-		return this.lowerCapacityOffset;
+	public int getReaderTargetOffset(){
+		return this.readerTargetOffset;
 	}
 	
-	public void increaseCapacityOffset(){
-		if (this.lowerCapacityOffset < 0){
-			this.lowerCapacityOffset++;
+	public void increaseReaderTargetOffset(){
+		if (this.readerTargetOffset < 0){
+			this.readerTargetOffset++;
 		}
 		for (Edge e : this.source.getOutEdges()){
 			e.increaseCapacity();
 		}
 	}
 	
-	public void decreaseCapacityOffset(){
-		this.lowerCapacityOffset--;
+	public void decreaseReaderTargetOffset(){
+		this.readerTargetOffset--;
 		for (Edge e : this.source.getOutEdges()){
 			e.decreaseCapacity();
 		}
@@ -240,26 +247,26 @@ public class Network {
             addEdge(projectSinkEdge);
 	}
         
-        /**
-         * adds a reader to the graph. adds its vertex and creates
-         * source -> reader and reader -> preference edges..
-         * @param reader 
-         */
-        public void addReader(Reader reader) {
-             addVertex(reader.getVertex());
-            
-            // if reader has any capacity, create an edge from source to the reader with the capacity
-            if (reader.getReaderTarget() > 0) {
-                createSourceReaderEdge(reader);
-            }
-
-            int preference = 1; // the initial preference weight
-            for (Project project : reader.getPreferences()) {
-                
-                createReaderProjectEdge(reader, project, preference);
-                preference++;
-            } 
+    /**
+     * adds a reader to the graph. adds its vertex and creates
+     * source -> reader and reader -> preference edges..
+     * @param reader 
+     */
+    public void addReader(Reader reader) {
+         addVertex(reader.getVertex());
+        
+        // if reader has any capacity, create an edge from source to the reader with the capacity
+        if (reader.getReaderTarget() > 0) {
+            createSourceReaderEdge(reader);
         }
+
+        int preference = 1; // the initial preference weight
+        for (Project project : reader.getPreferences()) {
+            
+            createReaderProjectEdge(reader, project, preference);
+            preference++;
+        } 
+    }
 	
 	
 	/**

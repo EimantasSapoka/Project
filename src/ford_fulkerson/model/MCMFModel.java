@@ -143,7 +143,7 @@ public class MCMFModel {
         	}
         	
         	// reader target gap is his target - number assigned projects and takes into account the reader target offset.
-        	int readerTargetGap = reader.getReaderTarget() + network.getLowerCapacityOffset() - reader.getAssigned().size();
+        	int readerTargetGap = reader.getReaderTarget() + network.getReaderTargetOffset() - reader.getAssigned().size();
         	
         	// if lower than zero, just consider it to be zero
         	readerTargetGap = readerTargetGap < 0? 0:readerTargetGap;
@@ -153,7 +153,7 @@ public class MCMFModel {
             	if (otherReader.getReaderTarget() == 0){
             		continue; // same here, ignore readers with target of zero
             	}
-            	int otherReaderTargetGap = otherReader.getReaderTarget() + network.getLowerCapacityOffset() - otherReader.getAssigned().size();
+            	int otherReaderTargetGap = otherReader.getReaderTarget() + network.getReaderTargetOffset() - otherReader.getAssigned().size();
             	otherReaderTargetGap = otherReaderTargetGap < 0? 0:otherReaderTargetGap;
             	
             	/*

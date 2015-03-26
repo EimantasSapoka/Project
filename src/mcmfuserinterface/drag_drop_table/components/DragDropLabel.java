@@ -69,6 +69,7 @@ public class DragDropLabel extends DragLabel {
                 DialogUtils.createErrorDialog(projectToAdd, errorMsg);
             } 
             
+        	controller.refreshSideProjectList();
             event.consume();
         });
     }

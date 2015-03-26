@@ -319,6 +319,7 @@ public abstract class TableViewController implements Initializable, TableControl
     		}
     	}
     }
+    
 
     @FXML
     protected void anchorPaneDragDone(DragEvent event) {

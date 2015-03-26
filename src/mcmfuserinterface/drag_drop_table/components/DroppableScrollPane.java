@@ -93,6 +93,7 @@ public class DroppableScrollPane extends ScrollPane {
                 DialogUtils.createErrorDialog(errorMsg);
             }
             
+        	controller.refreshSideProjectList();
             event.setDropCompleted(true);
             event.consume();
         });
