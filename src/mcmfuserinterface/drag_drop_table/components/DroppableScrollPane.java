@@ -5,14 +5,14 @@
  */
 package mcmfuserinterface.drag_drop_table.components;
 
-import ford_fulkerson.model.Project;
-import ford_fulkerson.model.Reader;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import mcmfuserinterface.DialogUtils;
 import mcmfuserinterface.controllers.TableControllerInterface;
+import ford_fulkerson.model.Project;
+import ford_fulkerson.model.Reader;
 
 /**
  *

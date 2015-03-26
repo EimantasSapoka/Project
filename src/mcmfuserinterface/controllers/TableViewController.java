@@ -44,7 +44,7 @@ import ford_fulkerson.model.Reader;
  *
  * @author Eimantas
  */
-public abstract class ViewController implements Initializable, TableControllerInterface {
+public abstract class TableViewController implements Initializable, TableControllerInterface {
 	
 	public static String DESKTOP_DIRECTORY;
 
@@ -265,7 +265,7 @@ public abstract class ViewController implements Initializable, TableControllerIn
     	 */
 		private void addNonZeroCapacityReaders(ObservableList<Reader> items) {
 			for (Reader r : model.getReaders()){
-			    if (!(r.getMarkingTarget() == 0)){
+			    if (!(r.getReaderTarget() == 0)){
 			        items.add(r);
 			    }
 			}

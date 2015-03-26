@@ -20,12 +20,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
-import javafx.scene.control.MenuBar;
 import javafx.scene.control.TextField;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.KeyEvent;
@@ -53,17 +51,21 @@ import ford_fulkerson.model.Project;
 import ford_fulkerson.model.Reader;
 
 /**
- *
+ * A class which builds on top of the TableViewController class
+ * and extends it with main view specific functionality and components.
  * @author Eimantas
  */
-public class MainViewController extends ViewController {
+public class MainViewController extends TableViewController {
 	
+	// the results view controller
 	private ResultsViewController resultsController;
-    private Stage resultsStage; 
+	
+	// results stage
+    private Stage resultsStage;
+    
+    // project which is highlighted in the table
     private Project highlightedProject;
     
-    @FXML    private MenuBar menuBar;
-    @FXML    private Button runAlgorithmButton;
     @FXML    private CheckBox loadBalancedCheckbox;
     @FXML    private TextField projectLowSelectionLimitBox;
     @FXML    private Label trashBin;
@@ -76,24 +78,20 @@ public class MainViewController extends ViewController {
     * shows a new window with the resulting assignments.
     */
     private void showResultsView() {
-        if (!resultsStage.isShowing()){
-            Parent myPane = null;
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/mcmfuserinterface/fxml/FXMLResultsView.fxml"));
-                myPane = (Parent) loader.load();
-                resultsController = (ResultsViewController) loader.getController();
-                resultsController.setModel(model);
-                Scene scene = new Scene(myPane);
-                String css = UserInterface.class.getResource("css/stylesheet.css").toExternalForm();
-                scene.getStylesheets().add(css);
-                resultsStage.setScene(scene);
-                
-                resultsStage.show();
-            } catch (Exception ex) {
-            	DialogUtils.createExceptionDialog(ex);
-            }
-        } else {
-            resultsController.refresh();
+        Parent myPane = null;
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/mcmfuserinterface/fxml/FXMLResultsView.fxml"));
+            myPane = (Parent) loader.load();
+            resultsController = (ResultsViewController) loader.getController();
+            resultsController.setModel(model);
+            Scene scene = new Scene(myPane);
+            String css = UserInterface.class.getResource("css/stylesheet.css").toExternalForm();
+            scene.getStylesheets().add(css);
+            resultsStage.setScene(scene);
+            
+            resultsStage.show();
+        } catch (Exception ex) {
+        	DialogUtils.createExceptionDialog(ex);
         }
     }    
  
@@ -125,6 +123,12 @@ public class MainViewController extends ViewController {
     
     /******************* FXML METHODS *******************/
     
+    /**
+     * extends the anchor pane drag over with displaying the 
+     * trash bin icon if the project is being moved (that is 
+     * not from the side list)
+     * @param dragEvent
+     */
     @FXML
     @Override
     protected void anchorPaneDragOver(DragEvent dragEvent) {
@@ -134,6 +138,11 @@ public class MainViewController extends ViewController {
         }
     }
 
+    /**
+     * extends the anchor pane drag done event with
+     * hiding of the trash bin
+     * @param event
+     */
     @FXML
     @Override
     protected void anchorPaneDragDone(DragEvent event) {
@@ -151,6 +160,10 @@ public class MainViewController extends ViewController {
             openFileButtonAction();
             return;
         } 
+        
+        if (resultsStage != null && resultsStage.isShowing()){
+        	resultsStage.close();
+        }
         
         boolean runAlgorithm = true;
         
@@ -181,9 +194,7 @@ public class MainViewController extends ViewController {
     private void createRandomInstance(){
         UserInterfaceModel randomModel = DialogUtils.createRandomInstanceCreatorDialog();
         if (randomModel != null){
-        	model = randomModel;
-        	createTableFromModel();
-        	createSideList();
+        	loadModel(randomModel);
         }
     }
     
@@ -207,12 +218,10 @@ public class MainViewController extends ViewController {
     @FXML
     private void openFileButtonAction() {
         fileChooser.setTitle("Open Input File");
-        File file = fileChooser.showOpenDialog(menuBar.getScene().getWindow());
+        File file = fileChooser.showOpenDialog(anchorPane.getScene().getWindow());
         if (file != null) {
             try {
-                model = new UserInterfaceModel(file);
-                createTableFromModel();
-                createSideList();
+            	loadModel(new UserInterfaceModel(file));
             } catch (Exception ex){
                 DialogUtils.createExceptionDialog(ex);
             }
@@ -220,7 +229,17 @@ public class MainViewController extends ViewController {
     }
 
 
-    /**
+    private void loadModel(UserInterfaceModel userInterfaceModel) {
+    	 model = userInterfaceModel;
+		 createTableFromModel();
+         createSideList();
+         if (resultsStage != null && resultsStage.isShowing()){
+         	resultsStage.close();
+         }
+	}
+
+
+	/**
      * extends the preference lists of readers
      */
     @FXML
@@ -378,7 +397,7 @@ public class MainViewController extends ViewController {
             label.getStyleClass().remove("highlighted");
         }
         
-        if (reader.getPreferences().indexOf(project)< reader.getMarkingTarget()){
+        if (reader.getPreferences().indexOf(project)< reader.getReaderTarget()){
         	label.getStyleClass().add("topChoice");
         } else {
         	label.getStyleClass().remove("topChoice");
@@ -403,7 +422,7 @@ public class MainViewController extends ViewController {
 
 	@Override
 	protected boolean isReaderListComplete(Reader reader) {
-		return reader.getPreferences().size() >= reader.getMarkingTarget()*2;
+		return reader.getPreferences().size() >= reader.getReaderTarget()*2;
 	}
 	
 	  /**
@@ -420,7 +439,7 @@ public class MainViewController extends ViewController {
     		output += p.getID() + ", " + p.getName() + ", " + p.getSupervisorID()+"\n";
     	}
     	for (Reader r: model.getReaders()){
-    		output += r.getID() + ", " + r.getName() +", " + r.getMarkingTarget() + ", ";
+    		output += r.getID() + ", " + r.getName() +", " + r.getReaderTarget() + ", ";
     		for (Project p: r.getPreferences()){
     			output += p.getID() +" ";
     		}

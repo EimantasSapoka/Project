@@ -1,5 +1,10 @@
 package ford_fulkerson.network;
 
+/**
+ * Edge class representing an edge in the network
+ * @author Eimantas
+ *
+ */
 public class Edge{
 	
 	protected int capacity;			// edge capacity
@@ -8,17 +13,31 @@ public class Edge{
 	protected Vertex source;		// where the edge is coming from, origin
 	protected Vertex destination;	// where the edge is going to, destination
 	
-	
+	/**
+	 * constructor which sets edge weight to zero
+	 */
 	public Edge (Vertex parent, Vertex destination, int capacity){
 		this(parent, destination, capacity, 0);
 	}
 	
+	/**
+	 * constructor which sets all of the values. Best to use this.
+	 * @param parent
+	 * @param destination
+	 * @param capacity
+	 * @param weight
+	 */
 	public Edge (Vertex parent, Vertex destination, int capacity, int weight){
 		this(parent, destination);
 		this.capacity = capacity;
 		this.weight = weight;
 	}
 	
+	/**
+	 * constructor which defaults weight and capacity to zero
+	 * @param parent
+	 * @param destination
+	 */
 	public Edge (Vertex parent, Vertex destination){
 		this.weight = 0;
 		this.capacity = 0;
@@ -68,6 +87,12 @@ public class Edge{
 		this.weight = weight;
 	}
 	
+	/**
+	 * compares the edge with another object.
+	 * If the object is also an edge, compares 
+	 * the edges with respect to source, destination
+	 * vertices and capacities.
+	 */
 	@Override
 	public boolean equals(Object o){
 		if (!(o instanceof Edge)){

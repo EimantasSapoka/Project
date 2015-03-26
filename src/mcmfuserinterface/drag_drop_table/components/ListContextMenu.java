@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import ford_fulkerson.model.Project;
-import ford_fulkerson.model.Reader;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceDialog;
@@ -18,6 +16,8 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.HBox;
 import mcmfuserinterface.controllers.TableControllerInterface;
+import ford_fulkerson.model.Project;
+import ford_fulkerson.model.Reader;
 
 /**
  *
@@ -79,7 +79,7 @@ public class ListContextMenu extends ContextMenu {
         MenuItem add = new MenuItem("Add..");
         add.setOnAction(e -> {
 
-            if (reader.getMarkingTarget() == 0) {
+            if (reader.getReaderTarget() == 0) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setHeaderText("Cannot add preference!");
                 alert.setContentText("Reader has capacity of zero!");

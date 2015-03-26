@@ -5,14 +5,14 @@
  */
 package mcmfuserinterface.drag_drop_table.components;
 
-import ford_fulkerson.model.Project;
-import ford_fulkerson.model.Reader;
 import javafx.scene.Node;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import mcmfuserinterface.DialogUtils;
 import mcmfuserinterface.controllers.MainViewController;
+import ford_fulkerson.model.Project;
+import ford_fulkerson.model.Reader;
 
 /**
  *
@@ -41,7 +41,7 @@ public class DragDropLabel extends DragLabel {
         });
 
         this.setOnDragExited(event -> {
-            setText(getText().trim());
+            setText(getText().replaceAll("\t", ""));
         });
 
         this.setOnDragDropped(event -> {

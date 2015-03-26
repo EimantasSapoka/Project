@@ -57,7 +57,7 @@ public class Constraints_Test {
 		
 		for (Reader r: model.getReaders()){
 			assigned = 0;
-			capacity = r.getMarkingTarget();
+			capacity = r.getReaderTarget();
 			for (Edge e : r.getVertex().getOutEdges()){
 				if (e.getFlow() > 0){
 					assigned ++;

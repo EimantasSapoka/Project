@@ -16,7 +16,6 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.chart.BarChart;
-import javafx.scene.control.Button;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -39,12 +38,9 @@ import ford_fulkerson.model.Reader;
  *
  * @author Eimantas
  */
-public class ResultsViewController extends ViewController{
-    
-    @FXML    Button infoButton;
-    @FXML    Button cancelButton;
-    @FXML    CheckMenuItem preferencesCheckBox;
-    
+public class ResultsViewController extends TableViewController{
+	
+    @FXML    CheckMenuItem preferencesCheckBox; 
     private  BarChart<String,Number> barChart;
     
     
@@ -140,7 +136,7 @@ public class ResultsViewController extends ViewController{
 	                resultString.append(reader.getName() +", ");
 	            }
 	            if(parameters.contains("cap")){
-	                resultString.append(reader.getAssigned().size()+"/"+reader.getMarkingTarget()+", ");
+	                resultString.append(reader.getAssigned().size()+"/"+reader.getReaderTarget()+", ");
 	            }
 	            if (parameters.contains("supervised")){
 	                for (Project project: reader.getSupervisorProjects()){
@@ -256,7 +252,7 @@ public class ResultsViewController extends ViewController{
         int indexOfPreference = reader.getPreferences().indexOf(project);
 		if (indexOfPreference == -1){
 			label.getStyleClass().remove("topChoice");
-        } else if (indexOfPreference  < reader.getMarkingTarget()) {
+        } else if (indexOfPreference  < reader.getReaderTarget()) {
         	label.getStyleClass().add("topChoice");
         } else {
 			label.getStyleClass().remove("topChoice");
@@ -282,7 +278,7 @@ public class ResultsViewController extends ViewController{
 
 	@Override
 	protected boolean isReaderListComplete(Reader reader) {
-		return reader.getAssigned().size() == reader.getMarkingTarget();
+		return reader.getAssigned().size() == reader.getReaderTarget();
 	}
 	
 	@Override

@@ -6,6 +6,7 @@
 package ford_fulkerson.model;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 import javafx.collections.FXCollections;
 import ford_fulkerson.ReaderShortlistException;
 import ford_fulkerson.network.Network;
+import ford_fulkerson.utils.InvalidInputException;
 import ford_fulkerson.utils.TextScanner;
 
 /**
@@ -22,22 +24,41 @@ import ford_fulkerson.utils.TextScanner;
  */
 public class MCMFModel {
 	
-	protected List<Reader> readers;		// readers list
+	protected List<Reader> readers;			// readers list
     protected List<Project> projects;		// projects list
-    protected Network network;					// the network
+    protected Network network;				// the network
 
-    public MCMFModel(File file) throws Exception {
+    /**
+     * constructor which parses a file and creates the 
+     * reader allocation instance. Throws exceptions if 
+     * it cannot open the file or parse the file
+     * @param file
+     * @throws IOException if the file cannot be opened
+     * @throws InvalidInputException if the file cannot be parsed
+     */
+    public MCMFModel(File file) throws InvalidInputException, IOException  {
        this();
        loadNetworkFromFile(file);
     }
     
+    /**
+     * default constructor which creates an empty instance
+     * with zero readers and zero projects.
+     */
     public MCMFModel(){
         this.readers = FXCollections.observableArrayList();
         this.projects = FXCollections.observableArrayList();
     }
 
 
-	public void loadNetworkFromFile(File file) throws Exception {
+    /**
+     * loads the network from file and populates the model with
+     * readers and projects
+     * @param file to parse
+     * @throws InvalidInputException if file is incorrectly formatted
+     * @throws IOException if file cannot be opened
+     */
+	public void loadNetworkFromFile(File file) throws InvalidInputException, IOException {
         TextScanner.parseCommaSeparatedInput(file, this);
     }
     
@@ -48,8 +69,8 @@ public class MCMFModel {
 
     /**
      * method to check if the model contains the reader
-     *
-     * @param id
+     * with the id
+     * @param id of the reader
      * @return
      */
     public boolean hasReader(int id) {
@@ -63,9 +84,8 @@ public class MCMFModel {
 
     /**
      * method to check if a model contains the project
-     *
      * @param project
-     * @return
+     * @return weather the model contains the project
      */
     public boolean hasProject(Project project) {
         for (Project p : projects) {
@@ -78,9 +98,8 @@ public class MCMFModel {
 
     /**
      * returns a project with the id
-     *
      * @param id
-     * @return
+     * @return project with the id or null if not found
      */
     public Project getProject(int id) {
         for (Project p : projects) {
@@ -91,64 +110,57 @@ public class MCMFModel {
         return null;
     }
     
-    public Project getProject(Project project){
-        if (project == null){
-            return null;
-        }
-         for (Project p : projects) {
-            if (p.equals(project)) {
-                return p;
-            }
-        }
-        return null;
-    }
 
     /**
      * returns projects list
-     *
      * @return
      */
     public List<Project> getProjects() {
         return this.projects;
     }
 
+    /**
+     * returns the readers list
+     * @return
+     */
     public List<Reader> getReaders() {
         return this.readers;
     }
 
-    public Reader getReader(Reader r){
-        for (Reader reader : this.getReaders()){
-            if (reader.equals(r)){
-                return r;
-            }
-        }
-        return null;
-    }
+
     /**
-     * returns if the graph is load balanced. That is weather all the reader's
-     * in the graph have no more than one less project assigned with respect to
-     * their capacities than any other reader. Example: if a reader has capacity
-     * 7 and flow 4, load balanced graph would mean that no other reader has
-     * flow higher than their capacity - 3 or lower than their capacity - 4.
-     *
+     * returns if the graph is load balanced. This is calculated by
+     * comparing each reader to all other readers and if their marking gap
+     * absolute difference is more than one, the graph is not load balanced.
+     * A reader's marking gap is the difference between its reader target and
+     * the number of projects assigned.
      * @return
      */
     public boolean isLoadBalanced() {
         for (Reader reader : this.readers) {
-        	if (reader.getMarkingTarget() == 0){
-        		continue;
+        	if (reader.getReaderTarget() == 0){
+        		continue; // if the reader has target of zero, ignore him
         	}
-        	int readerCapacityGap = reader.getMarkingTarget() + network.getLowerCapacityOffset() - reader.getAssigned().size();
-        	readerCapacityGap = readerCapacityGap < 0? 0:readerCapacityGap;
         	
+        	// reader target gap is his target - number assigned projects. 
+        	int readerTargetGap = reader.getReaderTarget() - reader.getAssigned().size();
+        	
+        	// if lower than zero, just consider it to be zero
+        	readerTargetGap = readerTargetGap < 0? 0:readerTargetGap;
+        	
+        	// loop through all readers and compare reader target gaps
             for (Reader otherReader : readers){
-            	if (otherReader.getMarkingTarget() == 0){
-            		continue;
+            	if (otherReader.getReaderTarget() == 0){
+            		continue; // same here, ignore readers with target of zero
             	}
-            	int otherReaderCapacityGap = otherReader.getMarkingTarget() + network.getLowerCapacityOffset() - otherReader.getAssigned().size();
-            	otherReaderCapacityGap = otherReaderCapacityGap < 0? 0:otherReaderCapacityGap;
+            	int otherReaderTargetGap = otherReader.getReaderTarget() - otherReader.getAssigned().size();
+            	otherReaderTargetGap = otherReaderTargetGap < 0? 0:otherReaderTargetGap;
             	
-            	if (Math.abs( otherReaderCapacityGap - readerCapacityGap) > 1){
+            	/*
+            	 *  if the absolute difference between reader target gaps is more than one, network is 
+            	 *  not load balanced
+            	 */
+            	if (Math.abs( otherReaderTargetGap - readerTargetGap) > 1){
             		return false; 
             	}
             }
@@ -182,8 +194,10 @@ public class MCMFModel {
     }
 
     /**
-     * creates the vertices and edges between them according to the reader and
-     * preference information.
+     * Resets the previous network, if present. 
+     * Creates a new network and sets the vertices and edges between them 
+     * according to the reader and preference information. 
+     * @throws ReaderShortlistException if any readers have shortlists
      */
     public void createNetwork() throws ReaderShortlistException {
         StringBuilder warnings = new StringBuilder();
@@ -192,11 +206,13 @@ public class MCMFModel {
         
         for (Project project : this.projects){
             
-           project.resetVertex();
+           project.resetVertex(); 
            network.addProject(project);
            
+           // if project not selected, add error message
            if (project.getSelectedCount() == 0){
-               errors.append(String.format(">PROJECT %s (ID: %d) HAS NOT BEEN SELECTED BY ANYONE\n", project.getName(),project.getID()));
+               errors.append(String.format(">PROJECT %s (ID: %d) HAS NOT BEEN SELECTED BY ANYONE\n", 
+            		   						project.getName(),project.getID()));
            } 
         }
 
@@ -207,7 +223,7 @@ public class MCMFModel {
             network.addReader(reader);
             
             int preferenceCount = reader.getPreferences().size();
-			int markingTarget = reader.getMarkingTarget();
+			int markingTarget = reader.getReaderTarget();
 			int id = reader.getID();
 			String name = reader.getName();
 			
@@ -218,8 +234,8 @@ public class MCMFModel {
                 
             } else if (preferenceCount < markingTarget * 2) {
             	
-                warnings.append(String.format(">reader %s (ID: %d) has capacity of %d and preference list size %d. "
-                		+ "Ideally, %d preferneces are needed\n", name, id, markingTarget, preferenceCount, markingTarget * 2));
+                warnings.append(String.format(">reader %s (ID: %d) has capacity of %d and %d preferences. "
+                		+ "Ideally, %d preferences are needed\n", name, id, markingTarget, preferenceCount, markingTarget * 2));
                 
             }
         }
@@ -236,7 +252,8 @@ public class MCMFModel {
     }
 
     /**
-     * method which extends readers preference lists to 2x their capacities
+     * method which extends readers preference lists to 2x their capacities.
+     * Does so by assigning the least selected projects first
      */
     public void extendPreferenceLists() {
         for (Reader r : this.readers) {
@@ -245,7 +262,7 @@ public class MCMFModel {
            List<Project> projectList = new ArrayList<Project>();
            projectList.addAll(projects);
 
-            while (preferences.size() < 2 * r.getMarkingTarget() && !projectList.isEmpty()) {
+            while (preferences.size() < 2 * r.getReaderTarget() && !projectList.isEmpty()) {
 
                 Collections.sort(projectList);
                 Project proj = projectList.remove(0);
@@ -288,9 +305,30 @@ public class MCMFModel {
     }
 
 
-	public void reset() {
+    /**
+     * clears the assigned projects list of each reader.
+     */
+	public void clearReaderAssignedProjectLists() {
 		for (Reader r: readers){
 			r.clearAssignedProjects();
+		}
+	}
+
+	/**
+	 * decreases each reader's reader target by 1
+	 */
+	public void decreaseReaderTargets() {
+		for (Reader r: readers){
+			r.decreaseReaderTarget();
+		}
+	}
+
+	/**
+	 * increases each reader's reader target by 1
+	 */
+	public void increaseReaderTargets() {
+		for (Reader r: readers){
+			r.increaseReaderTarget();
 		}
 	}
 

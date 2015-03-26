@@ -3,6 +3,7 @@ package ford_fulkerson.utils;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,9 +24,10 @@ public class TextScanner {
      * parses comma separated text file
      * @param textFile
      * @param model
+     * @throws IOException 
      * @throws Exception 
      */
-    public static void parseCommaSeparatedInput(File textFile, MCMFModel model) throws Exception {
+    public static void parseCommaSeparatedInput(File textFile, MCMFModel model) throws InvalidInputException, IOException {
         
         BufferedReader textReader = new BufferedReader(new FileReader(textFile));
         String line = "";

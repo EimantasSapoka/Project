@@ -8,8 +8,8 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.util.Callback;
-import mcmfuserinterface.controllers.TableControllerInterface;
 import mcmfuserinterface.controllers.MainViewController;
+import mcmfuserinterface.controllers.TableControllerInterface;
 import mcmfuserinterface.drag_drop_table.components.PopLabel;
 import ford_fulkerson.model.Project;
 

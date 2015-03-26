@@ -27,7 +27,7 @@ public class CapacityColumn extends TableColumn<Reader, String>{
         setCellValueFactory(features -> {
         	  setEditable(true);
               Reader reader = (Reader) features.getValue();
-              return new ReadOnlyObjectWrapper(reader.getMarkingTarget()+"");
+              return new ReadOnlyObjectWrapper(reader.getReaderTarget()+"");
         });
         
         setCellFactory(TextFieldTableCell.forTableColumn());
@@ -39,13 +39,13 @@ public class CapacityColumn extends TableColumn<Reader, String>{
                 	
 					if (newValue.matches("\\d{1,2}")){
                 		int newMarkingTarget = Integer.parseInt(newValue);
-                		t.getRowValue().setMarkingTarget(newMarkingTarget);
+                		t.getRowValue().setReaderTarget(newMarkingTarget);
                 	}
 					
 					setCellValueFactory(features -> {
 			        	  setEditable(true);
 			              Reader reader = (Reader) features.getValue();
-			              return new ReadOnlyObjectWrapper(reader.getMarkingTarget()+"");
+			              return new ReadOnlyObjectWrapper(reader.getReaderTarget()+"");
 			        });
                 }
             }

@@ -173,7 +173,7 @@ public class UserInterfaceModel extends MCMFModel {
     		return PROJECT_ALREADY_PREFERENCE_ERROR_MSG;
     	}
 		
-		if (readerToAdd.getMarkingTarget() == 0){
+		if (readerToAdd.getReaderTarget() == 0){
 			return READER_CAPACITY_ZERO_ERR_MSG;
 		}
     	
@@ -195,14 +195,14 @@ public class UserInterfaceModel extends MCMFModel {
 			return null;
 		}
 		
-		if (readerToAdd.getMarkingTarget() == 0){
+		if (readerToAdd.getReaderTarget() == 0){
 			return READER_CAPACITY_ZERO_ERR_MSG;
 		}
 		
 		if (readerToAdd.getAssigned().contains(projectToAdd)) {
     		return READER_ALREADY_ASSIGNED_PROJECT_ERR_MSG;
     	}
-		if (readerToAdd.getMarkingTarget() <= readerToAdd.getAssigned().size()){
+		if (readerToAdd.getReaderTarget() <= readerToAdd.getAssigned().size()){
 			return READER_AT_MARKING_TARGET_ERR_MSG;
 		}
 		
@@ -255,8 +255,8 @@ public class UserInterfaceModel extends MCMFModel {
 	public Double getAverageReaderCapacity() {
         int totalCap = 0;
         for (Reader r : readers){
-            if (r.getMarkingTarget() != 0){
-                totalCap += r.getMarkingTarget();
+            if (r.getReaderTarget() != 0){
+                totalCap += r.getReaderTarget();
             }
         }
         Double avg = new Double(totalCap);
