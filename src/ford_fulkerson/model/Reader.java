@@ -53,7 +53,18 @@ public class Reader  implements NetworkObjectInterface{
 		this.readerAssignedShortlistStyleProperty = new SimpleStringProperty("");
 		instanciateUIElementListeners();
 		
+		// init reader assigned rows to be orange if reader has target of one
+		// and to be red if reader has target more than one.
+		if (readerTarget == 1){
+			readerAssignedShortlistStyleProperty.set("-fx-background-color: orange;");
+		} else if (readerTarget > 1){
+			 readerAssignedShortlistStyleProperty.set("-fx-background-color: red;");
+		}
 		
+		// init reader preference rows to be red if he has at least one preference.
+		if (readerTarget > 0){
+			readerPreferenceShortlistStyleProperty.set("-fx-background-color: red;");
+        }
 	}
 
 	/**
