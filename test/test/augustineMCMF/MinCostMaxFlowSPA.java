@@ -357,7 +357,7 @@ public class MinCostMaxFlowSPA
 		
 		for (Reader reader: model.getReaders()){
 			Vertex v = reader.getVertex();
-			node = new Node(v.getVertexID(), (v.getVertexID())+"", NodeType.LECTURER, reader.getMarkingTarget());
+			node = new Node(v.getVertexID(), (v.getVertexID())+"", NodeType.LECTURER, reader.getReaderTarget());
 			augustine_Network.addNode(node);
 			
 		}

@@ -12,7 +12,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import ford_fulkerson.model.Reader;
 
 /**
- *
+ * editable reader name column
  * @author Eimantas
  * @param <Reader>
  */

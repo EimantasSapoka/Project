@@ -11,26 +11,36 @@ import ford_fulkerson.network.Edge;
 import ford_fulkerson.network.NetworkObjectInterface;
 import ford_fulkerson.network.Vertex;
 
+/**
+ * class which holds all reader information
+ * @author Eimantas
+ *
+ */
 public class Reader  implements NetworkObjectInterface{
 	
 	private final int id;								// reader id
 	private final Vertex vertex;						// it's vertex
-	private int markingTarget;							// it's project preference capacity
-	private final ArrayList<Project> supervisorProjects;		// list of already assigned projects
-	private List<Project> preferences;				// list of project preferences
-    private List<Project> assigned;                // list of assigned projects
+	private int readerTarget;							// it's project preference capacity
+	private final ArrayList<Project> supervisorProjects;	// list of already assigned projects.
+	private List<Project> preferences;					// list of project preferences
+    private List<Project> assigned;                		// list of assigned projects
 	private String name;								// reader name
 	
-	private final IntegerProperty preferenceCountProperty;
-    private final IntegerProperty assignedCountProperty;
-    private final SimpleStringProperty readerPreferenceShortlistStyleProperty;
-    private final SimpleStringProperty readerAssignedShortlistStyleProperty;
+	/*
+	 * UI Specific variables. These are used, because they relate to the 
+	 * javaFX framework and have listeners associated to them so if they 
+	 * change, the view is updated. 
+	 */
+	private final IntegerProperty preferenceCountProperty;		// The number of preferences read has
+    private final IntegerProperty assignedCountProperty;		// The number of project reader is assigned
+    private final SimpleStringProperty readerPreferenceShortlistStyleProperty; // The style this reader's preferences row should have
+    private final SimpleStringProperty readerAssignedShortlistStyleProperty; // The style this reader's assigned row should have
 
 	
-	public Reader(int id, int capacity){
+	public Reader(int id, int target){
 		this.id = id;
-		this.vertex = new Vertex(id, this);
-		this.markingTarget = capacity < 0? 0:capacity;
+		this.vertex = new Vertex(this);
+		this.readerTarget = target < 0? 0:target;
 		this.supervisorProjects = new ArrayList<Project>();
 		this.preferences = FXCollections.observableArrayList();
 		this.name = String.valueOf(id);
@@ -41,12 +51,24 @@ public class Reader  implements NetworkObjectInterface{
 		this.assignedCountProperty = new SimpleIntegerProperty(0);
 		this.readerPreferenceShortlistStyleProperty = new SimpleStringProperty("");
 		this.readerAssignedShortlistStyleProperty = new SimpleStringProperty("");
+		instanciateUIElementListeners();
 		
+		
+	}
+
+	/**
+	 * Adds listeners to preference count and assigned project count
+	 * properties so when these change, they also change the values 
+	 * of their respective row styles. For example, if the reader 
+	 * has a project added to his preferences or assigned projects list,
+	 * those lists styles would react and change appropriately. 
+	 */
+	private void instanciateUIElementListeners() {
 		preferenceCountProperty.addListener((observable, oldValue, newValue) ->{
 			int num = (int) newValue;
-			if (num < markingTarget){
+			if (num < readerTarget){
 				readerPreferenceShortlistStyleProperty.set("-fx-background-color: red;");
-            } else if (num < markingTarget*2){
+            } else if (num < readerTarget*2){
             	readerPreferenceShortlistStyleProperty.set("-fx-background-color: orange;");
             } else {
             	readerPreferenceShortlistStyleProperty.set("");
@@ -55,16 +77,14 @@ public class Reader  implements NetworkObjectInterface{
 		
 		assignedCountProperty.addListener((observable, oldValue, newValue) ->{
 			int num = (int) newValue;
-			 if (markingTarget - 1 > num){
+			 if (readerTarget - 1 > num){
 				 readerAssignedShortlistStyleProperty.set("-fx-background-color: red;");
-             } else if (markingTarget > num){
+             } else if (readerTarget > num){
             	 readerAssignedShortlistStyleProperty.set("-fx-background-color: orange;");
              } else {
             	 readerAssignedShortlistStyleProperty.set("");
              }
 		});
-		
-		
 	}
     
     public Reader(String readerName, int id, int capacity){
@@ -96,7 +116,7 @@ public class Reader  implements NetworkObjectInterface{
 	 * @return
 	 */
     public boolean addPreference(int indexToPlace, Project project) {
-	    if (	markingTarget == 0 || 
+	    if (	readerTarget == 0 || 
 	    		preferences.contains(project) ||
 	    		supervisorProjects.contains(project.getID()) ){
 
@@ -113,8 +133,8 @@ public class Reader  implements NetworkObjectInterface{
 		return this.vertex;
 	}
 
-	public int getMarkingTarget() {
-		return markingTarget;
+	public int getReaderTarget() {
+		return readerTarget;
 	}
 
 	public List<Project> getSupervisorProjects() {
@@ -136,7 +156,8 @@ public class Reader  implements NetworkObjectInterface{
     /**
     * returns all assigned projects from the graph data. WARNING!!
     * HAS A SIDE EFFECT OF OVERWRITING ASSIGNMENT DATA WITH 
-    * WHAT IS IN THE GRAPH.
+    * WHAT IS IN THE GRAPH. IF CHANGING IMPLEMENTATION, TREAD CAREFULLY.
+    * you have been warned. 
     *
     * @return
     */
@@ -152,7 +173,20 @@ public class Reader  implements NetworkObjectInterface{
        return temp;
    }
    
+   /**
+    * returns the projects which are assigned to this reader. 
+    * always returns a list. Never null. 
+    * @return
+    */
    public List<Project> getAssigned(){
+	   /*
+	    *  if the assigned list had not been initialized yet, 
+	    *  initialize it with assigned projects from the network.
+	    *  Do not do this if the list has already been initialized,
+	    *  as all user manual modifications will be overwritten with 
+	    *  assigned projects from network. 
+	    */
+	   
        if (assigned == null){
            assigned = getAssignedProjectsFromGraph();
        }
@@ -160,6 +194,11 @@ public class Reader  implements NetworkObjectInterface{
        return assigned;
    }
 	
+   /**
+    * compares the readers with respect to their IDs and vertices.
+    * @param r
+    * @return
+    */
 	public boolean equals(Reader r){
 		if (r == null){
 			return false;
@@ -168,15 +207,16 @@ public class Reader  implements NetworkObjectInterface{
 	}
 	
 	public String toString(){
-		return name + "; capacity: " + this.getMarkingTarget() + ", preferences: " + this.getPreferences().size();
+		return name + "; capacity: " + this.getReaderTarget() + ", preferences: " + this.getPreferences().size();
 	}
 
 	/**
 	 * returns how many projects can the reader still take.
+	 * reader target - assigned projects.
 	 * @return
 	 */
 	public int getResidualCapacity() {
-		return this.getMarkingTarget() - this.getAssignedProjectsFromGraph().size();
+		return this.getReaderTarget() - this.getAssignedProjectsFromGraph().size();
 	}
 
     public void removePreference(Project project) {
@@ -201,10 +241,10 @@ public class Reader  implements NetworkObjectInterface{
      * assigns a project to this reader. 
      * @param indexToPlace
      * @param projectToMove
-     * @return
+     * @return weather it had been assigned
      */
     public boolean assignProject(int indexToPlace, Project projectToMove) {
-        if (	this.markingTarget == assigned.size() || 
+        if (	this.readerTarget == assigned.size() || 
         		assigned.contains(projectToMove) || 
         		supervisorProjects.contains(projectToMove) ){
             return false;
@@ -252,15 +292,22 @@ public class Reader  implements NetworkObjectInterface{
 		return readerAssignedShortlistStyleProperty;
 	}
 
-	public void setMarkingTarget(Integer newValue) {
-		this.markingTarget = newValue;
+	public void setReaderTarget(Integer newValue) {
+		this.readerTarget = newValue;
 		
 		// to repaint the rows invoke their listeners by changing value
 		this.preferenceCountProperty.set(preferenceCountProperty.get()+1);
 		this.assignedCountProperty.set(assignedCountProperty.get()+1);
 		this.preferenceCountProperty.set(preferenceCountProperty.get()-1);
 		this.assignedCountProperty.set(assignedCountProperty.get()-1);
+	}
+
+	public void decreaseReaderTarget() {
+		setReaderTarget(readerTarget - 1);
 	}    
     
+	public void increaseReaderTarget(){
+		setReaderTarget(readerTarget + 1);
+	}
     
 }

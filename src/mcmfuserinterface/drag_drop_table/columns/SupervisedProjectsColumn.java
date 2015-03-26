@@ -11,6 +11,11 @@ import mcmfuserinterface.drag_drop_table.components.PopLabel;
 import ford_fulkerson.model.Project;
 import ford_fulkerson.model.Reader;
 
+/**
+ * column which shows the supervised projects list. 
+ * @author Eimantas
+ *
+ */
 public class SupervisedProjectsColumn extends TableColumn<Reader, List<Project>>{
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -26,8 +31,6 @@ public class SupervisedProjectsColumn extends TableColumn<Reader, List<Project>>
         
         setCellFactory(features ->{
         	return new TableCell<Reader, List<Project>>() {
-        		
-        		
         		
                 @Override
                 public void updateItem(final List<Project> list, boolean empty) {

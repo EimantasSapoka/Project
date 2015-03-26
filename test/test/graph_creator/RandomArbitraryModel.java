@@ -1,6 +1,6 @@
 package test.graph_creator;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import ford_fulkerson.ReaderShortlistException;
@@ -10,7 +10,9 @@ import ford_fulkerson.network.Network;
 import ford_fulkerson.network.Vertex;
 
 /**
- * class which creates a random arbitrary graph
+ * class which creates a random arbitrary graph.
+ * Creates a network with random number of vertices 
+ * and randomly assigns edges between them. 
  * @author Eimantas
  *
  */
@@ -40,7 +42,7 @@ public class RandomArbitraryModel extends MCMFModel {
 		this.numVertices = rand.nextInt(8) + 25; 
 		this.pEdge = rand.nextInt(20)+1; // 1 <= n < 21
 		for (int i = 2; i < numVertices+2; i++){
-			network.addVertex(new Vertex(i,new MockNetworkObject(i)));
+			network.addVertex(new Vertex(new MockNetworkObject(i)));
 		}
 		
 		add_source_sink_edges();
@@ -114,10 +116,9 @@ public class RandomArbitraryModel extends MCMFModel {
 	 * or the vertex and the source
 	 * @param v
 	 */
-	@SuppressWarnings("unchecked")
 	private void add_source_sink_edges() {
 		
-		ArrayList<Vertex> vertices = (ArrayList<Vertex>) network.getVertices().clone();
+		List<Vertex> vertices = network.getVertices();
 		vertices.remove(network.source());
 		vertices.remove(network.sink());
 		int randomInt; 

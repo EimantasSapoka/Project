@@ -41,17 +41,21 @@ import ford_fulkerson.model.Project;
 import ford_fulkerson.model.Reader;
 
 /**
- *
+ * The Godfather class in the user interface. 
+ * It is an abstract class which implements methods which 
+ * are general for a controller with a table. A class extending
+ * this one is already prepared to have a drag drop table in it and 
+ * side list. 
  * @author Eimantas
  */
-public abstract class ViewController implements Initializable, TableControllerInterface {
+public abstract class TableViewController implements Initializable, TableControllerInterface {
 	
 	public static String DESKTOP_DIRECTORY;
 
-    protected UserInterfaceModel model;
-    protected Label dragLabel;
-    protected PopOver errorPopOver;
-    protected int scroll = 10;
+    protected UserInterfaceModel model;	// the model to use
+    protected Label dragLabel;			// a label which follows the mouse as the user drags a project
+    protected PopOver errorPopOver;		// error pop over
+    protected int scroll = 10;			// the scroll counter. This is not perfect, but hey, better than nothing. 
     
     protected FileChooser fileChooser;
     
@@ -265,7 +269,7 @@ public abstract class ViewController implements Initializable, TableControllerIn
     	 */
 		private void addNonZeroCapacityReaders(ObservableList<Reader> items) {
 			for (Reader r : model.getReaders()){
-			    if (!(r.getMarkingTarget() == 0)){
+			    if (!(r.getReaderTarget() == 0)){
 			        items.add(r);
 			    }
 			}
@@ -315,6 +319,7 @@ public abstract class ViewController implements Initializable, TableControllerIn
     		}
     	}
     }
+    
 
     @FXML
     protected void anchorPaneDragDone(DragEvent event) {

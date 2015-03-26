@@ -4,6 +4,12 @@ import ford_fulkerson.network.Edge;
 import ford_fulkerson.network.Network;
 import ford_fulkerson.network.Vertex;
 
+/**
+ * an extension class of the network. 
+ * Represents a residual network .
+ * @author Eimantas
+ *
+ */
 public class ResidualNetwork extends ford_fulkerson.network.Network {
 
 	/**

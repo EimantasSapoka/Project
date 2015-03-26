@@ -14,13 +14,14 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 /**
- *
+ * The main application class. runs the main window.
  * @author Eimantas
  */
 public class UserInterface extends Application {
     
     @Override
     public void start(Stage stage) throws Exception {
+    	// checks if JRE is supported
     	if (UserInterface.isJavaVersionCorrect()){
 	        Parent root = FXMLLoader.load(getClass().getResource("fxml/FXMLMainView.fxml"));
 	        Scene scene = new Scene(root);
@@ -28,7 +29,7 @@ public class UserInterface extends Application {
 	        scene.getStylesheets().add(css);
 	        stage.setScene(scene);
 	        stage.setTitle("Reader Allocator 1.0");
-    	} else {
+    	} else { // if not, show a simple window with a message 
     		StackPane root = new StackPane();
     		root.getChildren().add(new Label("Usupported java version! Java 1.8.0_20 required, older versions are unsupported. "
     				+ "Your java version: " + System.getProperty("java.version")));
@@ -44,6 +45,10 @@ public class UserInterface extends Application {
         launch(args);
     }
     
+    /**
+     * parse java version and return if it is supported.
+     * @return
+     */
     private static boolean isJavaVersionCorrect(){
     	try {
     		String version = System.getProperty("java.version");

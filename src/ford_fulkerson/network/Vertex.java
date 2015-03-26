@@ -16,10 +16,11 @@ public class Vertex implements Comparable<Vertex>{
 	
 	private ResidualEdge path;						// an edge taken to come to this vertex
 	
-	private Vertex(NetworkObjectInterface objectReference){
+	public Vertex(NetworkObjectInterface objectReference){
 		this.object = objectReference;
 		this.outEdges = new ArrayList<Edge>();
 		this.distanceFromSource = 0;
+		this.vertexID = vertexIdCounter++;
 	}
 
 	public Vertex(Vertex v){
@@ -27,13 +28,7 @@ public class Vertex implements Comparable<Vertex>{
 		this.vertexID = v.getVertexID();
 	}
 
-	
-	public Vertex(int id, NetworkObjectInterface obj){
-		this(obj);
-		this.vertexID = vertexIdCounter++;
-	}
-	
-	public Vertex(int parentID, int vertexID, NetworkObjectInterface obj){
+	public Vertex(int vertexID, NetworkObjectInterface obj){
 		this(obj);
 		this.vertexID = vertexID;
 	}
@@ -116,10 +111,10 @@ public class Vertex implements Comparable<Vertex>{
 		}
 	}
         
-        public void resetVertex(){
-            this.distanceFromSource=0;
-            this.outEdges.clear();
-            this.reachable = false;
-        }
+    public void resetVertex(){
+        this.distanceFromSource=0;
+        this.outEdges.clear();
+        this.reachable = false;
+    }
 
 }

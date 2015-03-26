@@ -5,22 +5,22 @@
  */
 package mcmfuserinterface.drag_drop_table.components;
 
-import ford_fulkerson.model.Project;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import mcmfuserinterface.controllers.TableControllerInterface;
+import ford_fulkerson.model.Project;
 
 /**
- *
+ * a label which can be dragged, but cannot be dropped before.
  * @author Eimantas
  */
 public class DragLabel extends PopLabel {
 
     public DragLabel(final Project project, final TableControllerInterface controller) {
-        super(project.getID() + "");
+        super(String.format("%-3d", project.getID()));
 
         this.setUserData(project);
         this.setTooltip(new Tooltip(project.getName()));

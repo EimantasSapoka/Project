@@ -9,7 +9,7 @@ import javafx.scene.control.TableColumn;
 import ford_fulkerson.model.Reader;
 
 /**
- *
+ * 
  * @author Eimantas
  */
 public class AssignedProjectsCountColumn extends TableColumn<Reader, Integer> {

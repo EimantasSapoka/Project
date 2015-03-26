@@ -38,6 +38,17 @@ import ford_fulkerson.model.MCMFModel;
 import ford_fulkerson.model.Project;
 import ford_fulkerson.model.Reader;
 
+/**
+ * utility class to create dialogs. 
+ * Because dialog creation involves a lot of repetetive 
+ * tasks which are difficult to abstract - would require methods
+ * with veeeery long signatures - these methods are all very similar 
+ * and specific to cause. 
+ * 
+ * The code is ugly and there's little that can be done about it. Deal with it. 
+ * @author Eimantas
+ *
+ */
 public class DialogUtils {
     private static final String READER_PREFERENCES_MAX = "readerPreferencesMax";
 	private static final String READER_PREFERENCES_MIN = "readerPreferencesMin";

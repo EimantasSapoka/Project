@@ -14,14 +14,15 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.layout.HBox;
-import mcmfuserinterface.controllers.TableControllerInterface;
 import mcmfuserinterface.controllers.ResultsViewController;
+import mcmfuserinterface.controllers.TableControllerInterface;
 import mcmfuserinterface.drag_drop_table.components.DroppableScrollPane;
 import ford_fulkerson.model.Project;
 import ford_fulkerson.model.Reader;
 
 /**
- *
+ * a column which has a preferences or assigned projects list. 
+ * Depends on the controller which is passed to the constructor. 
  * @author Eimantas
  */
 public class ListColumn  extends TableColumn<Reader, ObservableList<Project>>{
@@ -70,6 +71,7 @@ public class ListColumn  extends TableColumn<Reader, ObservableList<Project>>{
         				listToDisplay = ((ResultsViewController) controller).getDisplayList(reader);
         			}
         			
+        			// for each item in the list, call the controller to create a label for it. 
 					for (Project project : listToDisplay) {
                         Label label = controller.createLabel(reader, project);
                         hbox.getChildren().add(label);

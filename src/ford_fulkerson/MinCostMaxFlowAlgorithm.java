@@ -54,12 +54,12 @@ public class MinCostMaxFlowAlgorithm {
 		while( !model.isLoadBalanced()){
 			network.reset();
 			model.reset();
-			network.decreaseCapacityOffset();
+			network.decreaseReaderTargetOffset();
 			solveNetwork(network);
 		}
 
-		while (network.getLowerCapacityOffset() != 0){
-			network.increaseCapacityOffset();
+		while (network.getReaderTargetOffset() != 0){
+			network.increaseReaderTargetOffset();
 			model.reset();
 			solveNetwork(network);
 		}

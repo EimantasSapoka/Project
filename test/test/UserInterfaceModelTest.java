@@ -10,6 +10,12 @@ import ford_fulkerson.model.MCMFModel;
 import ford_fulkerson.model.Project;
 import ford_fulkerson.model.Reader;
 
+/**
+ * a suite of tests which check that the user interface model 
+ * methods perform as they're expected to. 
+ * @author Eimantas
+ *
+ */
 public class UserInterfaceModelTest {
 	
 	UserInterfaceModel model;
