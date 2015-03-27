@@ -1,10 +1,11 @@
 package ford_fulkerson.network;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import test.graph_creator.MockNetworkObject;
 import ford_fulkerson.model.Project;
 import ford_fulkerson.model.Reader;
-import test.graph_creator.MockNetworkObject;
 
 /**
  * class which represents a network.
@@ -83,9 +84,17 @@ public class Network {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	public ArrayList<Vertex> getVertices() {
-		return (ArrayList<Vertex>) vertices.clone();
+	/**
+	 * returns a new list with all vertices from the graph. 
+	 * It is not a deep copy, modifying the vertices will modify
+	 * the graph ones, but removing or adding items to the returned
+	 * list will not add them to the network.
+	 * @return
+	 */
+	public List<Vertex> getVertices() {
+		List<Vertex> newList = new ArrayList<Vertex>();
+		newList.addAll(vertices);
+		return newList;
 	}
 
 	public ArrayList<Edge> getEdges() {

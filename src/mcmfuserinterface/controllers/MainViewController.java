@@ -254,6 +254,7 @@ public class MainViewController extends TableViewController {
             Optional<ButtonType> result = confirmation.showAndWait();
             if (result.get() == ButtonType.OK){
                 model.extendPreferenceLists();
+                refreshSideProjectList();
             }
         }
     }

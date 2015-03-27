@@ -90,6 +90,7 @@ public class Constraints_Test {
 	@Test
 	public void testArbitraryGraph() throws ReaderShortlistException{
 		for (int i = 0; i< TEST_COUNT ; i++){
+			System.out.println(i);
 			arbitraryGraph = new RandomArbitraryModel(i%50+1, i%400+1);
 			MinCostMaxFlowAlgorithm.runLoadBalancedAlgorithm(arbitraryGraph);
 			networkConstraintsTests(arbitraryGraph.getNetwork());

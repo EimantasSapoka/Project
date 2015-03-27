@@ -3,7 +3,7 @@
 }
 .myLabel{
     -fx-font-size: 15px;
-    -fx-label-padding: 3 0 0 0;
+    -fx-label-padding: 3 0 0 3;
     -fx-font-weight: bold;
     -fx-cursor: hand;
 }

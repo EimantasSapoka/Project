@@ -17,7 +17,7 @@ import ford_fulkerson.model.Reader;
 
 public class CorrectnessTest {
 
-	private static final int TEST_COUNT = 5000;
+	private static final int TEST_COUNT = 100;
 	MinCostMaxFlowSPA alg;
 	
 	@Before 
@@ -97,6 +97,7 @@ public class CorrectnessTest {
 	@Test
 	public void readerAllocationGraphTest() throws Exception{
 		for (int i=0; i<TEST_COUNT; i++){
+			System.out.println(i);
 			// create a new random reader graph
 			MCMFModel testGraph = new RandomReaderAllocationModel(i%50+1, i%400+1);
 			try {
@@ -122,12 +123,9 @@ public class CorrectnessTest {
 	@Test
 	public void arbitraryGraphTest() throws Exception{
 		for (int i = 0; i<TEST_COUNT; i++){
+			System.out.println(i);
 			MCMFModel testGraph = new RandomArbitraryModel(i%50+1,i%400+1);
-            try {
-                testGraph.createNetwork();
-            } catch(ReaderShortlistException ex){
-                // nobody cares about shortlists in testing.
-            }
+            
 			Augustine_Network augustine_Network = alg.createAugustine_NetworkFromGraph(testGraph.getNetwork());
 			runTests(testGraph, augustine_Network);
 			

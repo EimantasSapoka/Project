@@ -25,57 +25,28 @@ public class RandomArbitraryModel extends MCMFModel {
     private Network network;
 	
 	private int pEdge;
-	private int numVertices;
 	
 	/**
 	 * creates a random arbitrary graph with the default 
 	 * probability values
 	 * @throws ReaderShortlistException 
 	 */
-	public RandomArbitraryModel() throws ReaderShortlistException{
+	public RandomArbitraryModel(int probEdge, int numVertices) throws ReaderShortlistException{
 		super();
 		rand = new Random();
 		createNetwork();
 		network = this.getNetwork();
 		
+		this.pEdge = probEdge;
 		
-		this.numVertices = rand.nextInt(8) + 25; 
-		this.pEdge = rand.nextInt(20)+1; // 1 <= n < 21
-		for (int i = 2; i < numVertices+2; i++){
+		for (int i = 0; i < numVertices; i++){
 			network.addVertex(new Vertex(new MockNetworkObject(i)));
 		}
 		
 		add_source_sink_edges();
 		generate_random_edges();
 	}
-	
-	/**
-	 * creates a random graph with the probability of the edge between any two 
-	 * vertices being probEdge 
-	 * @param probEdge (0<=pEdge<=100)
-	 * @throws ReaderShortlistException 
-	 */
-	public RandomArbitraryModel(int probEdge) throws ReaderShortlistException{
-		this();
 
-		if (probEdge > 0 && probEdge < 100){
-			this.pEdge = probEdge;
-		} 
-	}
-	
-	/**
-	 * creates a random graph with the number of vertices 
-	 * and the edge pobability between them provided
-	 * @param probEdge
-	 * @param numVertices
-	 * @throws ReaderShortlistException 
-	 */
-	public RandomArbitraryModel(int probEdge, int numVertices) throws ReaderShortlistException{
-		this(probEdge);
-		this.numVertices = numVertices;
-	}
-	
-	
 	/**
 	 * method which creates random edges between all the vertices
 	 */

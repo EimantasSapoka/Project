@@ -94,7 +94,7 @@ public class Vertex implements Comparable<Vertex>{
 
 
 	public String toString(){
-		return ""+this.getDistanceFromSource();
+		return String.format("Vertex: %d, outEdges:%d", vertexID, outEdges.size());
 	}
 
 
